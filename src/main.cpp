@@ -3476,7 +3476,12 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
 	    pfrom->Misbehaving(100);
 	    pfrom->fDisconnect = true;
 	}
-
+        if (pfrom->nStartingHeight == 88212)
+        {
+            printf("partner %s on a forked chain 88212 version %i; disconnecting\n", pfrom->addr.ToString().c_str(), pfrom->nVersion);
+            pfrom->Misbehaving(100);
+            pfrom->fDisconnect = true;
+        }
     static map<CService, CPubKey> mapReuseKey;
     RandAddSeedPerfmon();
     if (fDebug)

@@ -3602,7 +3602,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
             (pfrom->nStartingHeight > (nBestHeight - 144)) &&
             (pfrom->nVersion < NOBLKS_VERSION_START || pfrom->nVersion >= NOBLKS_VERSION_END) &&
          //   (nAskedForBlocks < 1 || vNodes.size() <= 1) && (pfrom->nStartingHeight != 15553)) // don't download from fork 15553
-            (nAskedForBlocks < 1 || vNodes.size() <= 1) && (pfrom->nStartingHeight >= 95000 )) // download from peers 95000+ 
+            (nAskedForBlocks < 1 || vNodes.size() <= 1) && (pfrom->nStartingHeight >= 97000 )) // download from peers 97000+ 
         {
             nAskedForBlocks++;
             pfrom->PushGetBlocks(pindexBest, uint256(0));

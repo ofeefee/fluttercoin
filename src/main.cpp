@@ -1641,6 +1641,7 @@ bool CheckProofOfTxSearch(std::vector<boost::tuple<unsigned int, int64, CBitcoin
 	txGen.SetMerkleBranch(&block);
 	nCalcValue = (GetProofOfWorkReward(nBlockHeight+1, hashLastBlock));
 
+        // Check blocks 57000+
 	if (!fMatch && nBlockHeight+1 > 57000 && block.vtx.size() <= 20)
 	{
         BOOST_FOREACH (const CTransaction& tx, block.vtx)
@@ -1721,7 +1722,7 @@ bool CheckProofOfTxSearch(std::vector<boost::tuple<unsigned int, int64, CBitcoin
 			}
         }
 	}
-
+	// Blocks 22001-56999
 	if (!fMatch && block.vtx.size() < 11 && nBlockHeight+1 > 22000 && nBlockHeight+1 <= 57000)
 	{
         BOOST_FOREACH (const CTransaction& tx, block.vtx)
@@ -1797,9 +1798,7 @@ bool CheckProofOfTxSearch(std::vector<boost::tuple<unsigned int, int64, CBitcoin
         }
 	}
 
-
-
-
+        // Blocks 0-22000
 	if (!fMatch && nBlockHeight+1 < 22001 && nBlockHeight > 0)
 	{
         BOOST_FOREACH (const CTransaction& tx, block.vtx)

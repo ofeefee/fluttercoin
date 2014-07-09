@@ -1610,9 +1610,9 @@ bool CheckProofOfTxSearch(std::vector<boost::tuple<unsigned int, int64, CBitcoin
 	CBitcoinAddress addrCalcMatch;
 
 	// Values in proposed block
-    bool fActMatch = false;
-    int64 nActValue;
-    CBitcoinAddress addrActMatch;
+    	bool fActMatch = false;
+    	int64 nActValue;
+    	CBitcoinAddress addrActMatch;
 
 	// Get values from transaction record
 	if (vATrans.size() > 1)
@@ -1625,11 +1625,13 @@ bool CheckProofOfTxSearch(std::vector<boost::tuple<unsigned int, int64, CBitcoin
 	}
 	else
 	{
-	    boost::tuple<unsigned int, int64, CBitcoinAddress> tATrans = vATrans[0];
-	    nBlockHeight = tATrans.get<0>();
-	    nActValue = tATrans.get<1>();
-	    addrActMatch = tATrans.get<2>();
-	    fActMatch = false;
+		boost::tuple<unsigned int, int64, CBitcoinAddress> tATrans = vATrans[0];
+		nBlockHeight = tATrans.get<0>();
+		nActValue = tATrans.get<1>();
+		addrActMatch = tATrans.get<2>();
+		fActMatch = false;
+                if (nBlockHeight+1 > 98600) //2014-07-08 22:43:20 --ofeefee
+		   return true;
 	}
 
 	CBlock block;

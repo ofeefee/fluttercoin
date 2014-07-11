@@ -1587,7 +1587,7 @@ string SearchTerm(const char *chAddress)
 
 bool fAddrMiner (const char *chHash, const char *chTerm)
 {
-  for (int i = 0; i < strlen(chHash); ++i)
+  for (int i = 0; i < ((int)strlen(chHash)); ++i)
   {
     if (strncmp (&chHash[i], chTerm, strlen(chTerm)) == 0)
       return true;
@@ -3472,18 +3472,12 @@ unsigned char pchMessageStart[4] = { 0xcf, 0xd1, 0xe8, 0xea };
 
 bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
 {
-	if (pfrom->nStartingHeight == 15553)
-	{
-	    printf("partner %s on a forked chain 15553 version %i; disconnecting\n", pfrom->addr.ToString().c_str(), pfrom->nVersion);
-	    pfrom->Misbehaving(100);
-	    pfrom->fDisconnect = true;
-	}
-        if (pfrom->nStartingHeight == 88212)
-        {
-            printf("partner %s on a forked chain 88212 version %i; disconnecting\n", pfrom->addr.ToString().c_str(), pfrom->nVersion);
-            pfrom->Misbehaving(100);
-            pfrom->fDisconnect = true;
-        }
+    if (pfrom->nStartingHeight == 15553)
+    {
+	printf("partner %s on a forked chain 15553 version %i; disconnecting\n", pfrom->addr.ToString().c_str(), pfrom->nVersion);
+	pfrom->Misbehaving(100);
+	pfrom->fDisconnect = true;
+    }
     static map<CService, CPubKey> mapReuseKey;
     RandAddSeedPerfmon();
     if (fDebug)

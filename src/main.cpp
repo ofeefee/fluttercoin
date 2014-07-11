@@ -1587,7 +1587,7 @@ string SearchTerm(const char *chAddress)
 
 bool fAddrMiner (const char *chHash, const char *chTerm)
 {
-  for (int i = 0; i < strlen(chHash); ++i)
+  for (int i = 0; i < ((int)strlen(chHash)); ++i)
   {
     if (strncmp (&chHash[i], chTerm, strlen(chTerm)) == 0)
       return true;

@@ -22,9 +22,9 @@ CCriticalSection cs_mapAlerts;
 // static const char* pszTestKey = "044d5253cb7c6fcb7b790365ac5aeeef359fc52de23f1ce9bffc092c16dd0372444b75ba328ddf4ebb73257e7c882c9bf81d86d1938ad36ac280214ba72aa9aca6";
 
 // new alert keys ofeefee 2014-07-10 05:59:14
-   static const char* pszMainKey = "0404043f174b220c2109da3babc7f0dcf582dd8f77b4041abb6a815baab6f30b6b5babd4dffd65f5a7058a6b3accf743e87643fce3c5b13aaded21815459c1f30d";
+   static const char* pszMainKey = "04f750b25eabbba1ac3c251475c6a6a435d36ef484b0ed3a1bbc4d03d66990c3574a4c763f0ff7a47ef7c07e2a09daaa457bd6224b427639beb7cc368631ca305d";
 // TestNet
-   static const char* pszTestKey = "04ce4131eaaec4f00927609034dc86ce9b712784444294fcaf5c098bed4802ff4533845f8ebc8408291dfedd463f2c5878af73eb652101d5b5877ca826c940a06a";
+   static const char* pszTestKey = "0462fdfd3715415b538267a16620a9406f849b2de355ed8d0d856e962d1d5862d0b5416f9354966381ab80e6f918def726ab7f84fac9daad9b5952993b236f295f";
 
 void CUnsignedAlert::SetNull()
 {

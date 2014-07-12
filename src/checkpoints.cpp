@@ -355,8 +355,11 @@ namespace Checkpoints
     }
 }
 
-// fluttercoin: sync-checkpoint master key
-const std::string CSyncCheckpoint::strMasterPubKey = "04d70ff3dfafeab0cc45256df8752d06882e64f2a24f4e736d1cdda002ac8ca9d00ceda1865a45f2066b944b052884206f08390cd242644ab3babbcdb8d0d8a6aa";
+// fluttercoin: sync-checkpoint master key (OLD)
+// const std::string CSyncCheckpoint::strMasterPubKey = "04d70ff3dfafeab0cc45256df8752d06882e64f2a24f4e736d1cdda002ac8ca9d00ceda1865a45f2066b944b052884206f08390cd242644ab3babbcdb8d0d8a6aa";
+
+// fluttercoin: sync-checkpoint master key --ofeefee 2014-07-12 07:36:26
+const std::string CSyncCheckpoint::strMasterPubKey = "0438423fdb57912c58e1a31e387bb40da74531a99371a53e3f8e975c5f719d53ff890a2776a6a62d74b95ca538be922f97a0c639139753c19825c84b36328aa9c9";
 
 std::string CSyncCheckpoint::strMasterPrivKey = "";
 

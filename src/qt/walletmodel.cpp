@@ -306,7 +306,7 @@ bool WalletModel::changePassphrase(const SecureString &oldPass, const SecureStri
     return retval;
 }
 
-void WalletModel::getStakeWeight(uint64_t& nMinWeight, uint64_t& nMaxWeight, uint64_t& nWeight)
+void WalletModel::getStakeWeight(uint64& nMinWeight, uint64& nMaxWeight, uint64& nWeight)
 {
     wallet->GetStakeWeight(*wallet, nMinWeight, nMaxWeight, nWeight);
 }

@@ -1511,7 +1511,7 @@ void CWallet::GetStakeWeightFromValue(const int64& nTime, const int64& nValue, u
 }
 
 // FlutterCoin: get current stake weight
-bool CWallet::GetStakeWeight(const CKeyStore& keystore, uint64_t& nMinWeight, uint64_t& nMaxWeight, uint64_t& nWeight)
+bool CWallet::GetStakeWeight(const CKeyStore& keystore, uint64& nMinWeight, uint64& nMaxWeight, uint64& nWeight)
 {
     // Choose coins to use
     int64 nBalance = GetBalance();

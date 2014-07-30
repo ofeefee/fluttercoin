@@ -16,6 +16,21 @@ CONFIG += thread
 #    BOOST_INCLUDE_PATH, BOOST_LIB_PATH, BDB_INCLUDE_PATH,
 #    BDB_LIB_PATH, OPENSSL_INCLUDE_PATH and OPENSSL_LIB_PATH respectively
 
+# Slax0r - Added for Max OS X Mavericks/Homebrew build
+macx: {
+BDB_LIB_SUFFIX = -5.3
+BOOST_INCLUDE_PATH=/usr/local/include
+BOOST_LIB_PATH=/usr/local/lib
+BDB_INCLUDE_PATH=/usr/local/include
+BDB_LIB_PATH=/usr/local/lib
+OPENSSL_INCLUDE_PATH=/usr/local/include
+OPENSSL_LIB_PATH=/usr/local/lib
+MINIUPNPC_INCLUDE_PATH=/usr/local/include
+MINIUPNPC_LIB_PATH=/usr/local/lib
+QRENCODE_INCLUDE_PATH=/usr/local/include
+QRENCODE_LIB_PATH=/usr/local/lib
+}
+
 OBJECTS_DIR = build
 MOC_DIR = build
 UI_DIR = build
@@ -23,7 +38,11 @@ UI_DIR = build
 # use: qmake "RELEASE=1"
 contains(RELEASE, 1) {
     # Mac: compile for maximum compatibility (10.5, 32-bit)
-    macx:QMAKE_CXXFLAGS += -mmacosx-version-min=10.5 -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk
+    #macx:QMAKE_CXXFLAGS += -mmacosx-version-min=10.5 -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk
+
+# Slaxor - Replaced the line above because version-min is 10.7 as this version of the SDK isnt even available anymore
+# and the removed arguments arent needed in modern build environments (ie the last 3 years)
+    macx:QMAKE_CXXFLAGS += -arch x86_64
 
     !windows:!macx {
         # Linux: static link
@@ -369,6 +388,7 @@ isEmpty(BOOST_THREAD_LIB_SUFFIX) {
 
 isEmpty(BDB_LIB_PATH) {
     macx:BDB_LIB_PATH = /opt/local/lib/db48
+    macx:BDB_LIB_PATH = /opt/local/lib/db48
 }
 
 isEmpty(BDB_LIB_SUFFIX) {
@@ -410,11 +430,14 @@ macx:HEADERS += src/qt/macdockiconhandler.h
 macx:OBJECTIVE_SOURCES += src/qt/macdockiconhandler.mm
 macx:LIBS += -framework Foundation -framework ApplicationServices -framework AppKit
 macx:DEFINES += MAC_OSX MSG_NOSIGNAL=0
-macx:ICON = src/qt/res/icons/bitcoin.icns
+# Slax0r  - changed from "bitcoin" to "fluttercoin" to pick up the correct icon
+macx:ICON = src/qt/res/icons/fluttercoin.icns
 macx:TARGET = "FlutterCoin-Qt"
-macx:QMAKE_CFLAGS_THREAD += -pthread
-macx:QMAKE_LFLAGS_THREAD += -pthread
-macx:QMAKE_CXXFLAGS_THREAD += -pthread
+
+# Slax0r -- no longer necessary on Mavericks
+#macx:QMAKE_CFLAGS_THREAD += -pthread
+#macx:QMAKE_LFLAGS_THREAD += -pthread
+#macx:QMAKE_CXXFLAGS_THREAD += -pthread
 
 # Set libraries and includes at end, to use platform-defined defaults if not overridden
 INCLUDEPATH += $$BOOST_INCLUDE_PATH $$BDB_INCLUDE_PATH $$OPENSSL_INCLUDE_PATH $$QRENCODE_INCLUDE_PATH

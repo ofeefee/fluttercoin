@@ -73,6 +73,12 @@ void TransactionFilterProxy::setLimit(int limit)
     this->limitRows = limit;
 }
 
+void TransactionFilterProxy::setShowInactive(bool showInactive)
+{
+    this->showInactive = showInactive;
+    invalidateFilter();
+}
+
 int TransactionFilterProxy::rowCount(const QModelIndex &parent) const
 {
     if(limitRows != -1)

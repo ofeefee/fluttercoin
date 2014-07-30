@@ -162,9 +162,8 @@ void OverviewPage::setModel(WalletModel *model)
         filter->setSourceModel(model->getTransactionTableModel());
         filter->setLimit(NUM_ITEMS);
         filter->setDynamicSortFilter(true);
-        // filter->setSortRole(Qt::EditRole);
-        filter->setSortRole(TransactionTableModel::DateRole);
-        filter->sort(TransactionTableModel::Status, Qt::DescendingOrder);
+        filter->setSortRole(Qt::EditRole);
+        filter->sort(TransactionTableModel::Date, Qt::DescendingOrder);
 
         ui->listTransactions->setModel(filter);
         ui->listTransactions->setModelColumn(TransactionTableModel::ToAddress);

@@ -3,8 +3,8 @@ name: "fluttercoin"
 suites:
 - "precise"
 architectures:
-- "i386"
 - "amd64"
+- "i386"
 packages: 
 - "g++"
 - "libqt4-dev"
@@ -16,15 +16,15 @@ packages:
 - "automake"
 - "faketime"
 - "bsdmainutils"
+- "zlib1g-dev"
 reference_datetime: "2013-06-01 00:00:00"
-remotes:
-- "url": "https://github.com/thekidcoin/fluttercoin.git"
-  "dir": "fluttercoin"
+remotes: []
 files:
 - "fluttercoin-deps-linux32-gitian-r3.zip"
 - "fluttercoin-deps-linux64-gitian-r3.zip"
 - "boost-linux32-1.55.0-gitian-r1.zip"
 - "boost-linux64-1.55.0-gitian-r1.zip"
+- "fluttercoin-src.zip"
 script: |
   STAGING="$HOME/install"
   OPTFLAGS='-O2'
@@ -36,9 +36,11 @@ script: |
   cd $STAGING
   unzip ../build/fluttercoin-deps-linux${GBUILD_BITS}-gitian-r3.zip
   unzip ../build/boost-linux${GBUILD_BITS}-1.55.0-gitian-r1.zip
-  cd ../build
+  unzip ../build/fluttercoin-src.zip
   #
-  cd fluttercoin
+  cp -Rf $STAGING/fluttercoin $HOME/build/fluttercoin${GBUILD_BITS}
+  cd ../build
+  cd fluttercoin${GBUILD_BITS}
   mkdir -p $OUTDIR/src
   git archive HEAD | tar -x -C ${OUTDIR}/src
   cp ${OUTDIR}/src/doc/README.md ${OUTDIR}

@@ -25,7 +25,7 @@ LIBS= -dead_strip
 ifdef STATIC
 # Build STATIC if you are redistributing the bitcoind binary
 LIBS += \
- $(DEPSDIR)/lib/db48/libdb_cxx-5.3.a \
+ $(DEPSDIR)/lib/libdb_cxx-5.3.a \
  $(DEPSDIR)/lib/libboost_system-mt.a \
  $(DEPSDIR)/lib/libboost_filesystem-mt.a \
  $(DEPSDIR)/lib/libboost_program_options-mt.a \

@@ -9,6 +9,7 @@
 #include "txdb.h"
 #include "net.h"
 #include "init.h"
+#include "util.h"
 #include "ui_interface.h"
 #include "kernel.h"
 #include "zerocoin/Zerocoin.h"
@@ -102,7 +103,7 @@ void UnregisterWallet(CWallet* pwalletIn)
 bool static IsFromMe(CTransaction& tx)
 {
     BOOST_FOREACH(CWallet* pwallet, setpwalletRegistered)
-        if (pwallet->IsFromMe(tx))
+            if (pwallet->IsFromMe(tx))
             return true;
     return false;
 }
@@ -111,7 +112,7 @@ bool static IsFromMe(CTransaction& tx)
 bool static GetTransaction(const uint256& hashTx, CWalletTx& wtx)
 {
     BOOST_FOREACH(CWallet* pwallet, setpwalletRegistered)
-        if (pwallet->GetTransaction(hashTx,wtx))
+            if (pwallet->GetTransaction(hashTx,wtx))
             return true;
     return false;
 }
@@ -120,7 +121,7 @@ bool static GetTransaction(const uint256& hashTx, CWalletTx& wtx)
 void static EraseFromWallets(uint256 hash)
 {
     BOOST_FOREACH(CWallet* pwallet, setpwalletRegistered)
-        pwallet->EraseFromWallet(hash);
+            pwallet->EraseFromWallet(hash);
 }
 
 // make sure all wallets know about the given transaction, in the given block
@@ -132,49 +133,49 @@ void SyncWithWallets(const CTransaction& tx, const CBlock* pblock, bool fUpdate,
         if (tx.IsCoinStake())
         {
             BOOST_FOREACH(CWallet* pwallet, setpwalletRegistered)
-                if (pwallet->IsFromMe(tx))
+                    if (pwallet->IsFromMe(tx))
                     pwallet->DisableTransaction(tx);
         }
         return;
     }
 
     BOOST_FOREACH(CWallet* pwallet, setpwalletRegistered)
-        pwallet->AddToWalletIfInvolvingMe(tx, pblock, fUpdate);
+            pwallet->AddToWalletIfInvolvingMe(tx, pblock, fUpdate);
 }
 
 // notify wallets about a new best chain
 void static SetBestChain(const CBlockLocator& loc)
 {
     BOOST_FOREACH(CWallet* pwallet, setpwalletRegistered)
-        pwallet->SetBestChain(loc);
+            pwallet->SetBestChain(loc);
 }
 
 // notify wallets about an updated transaction
 void static UpdatedTransaction(const uint256& hashTx)
 {
     BOOST_FOREACH(CWallet* pwallet, setpwalletRegistered)
-        pwallet->UpdatedTransaction(hashTx);
+            pwallet->UpdatedTransaction(hashTx);
 }
 
 // dump all wallets
 void static PrintWallets(const CBlock& block)
 {
     BOOST_FOREACH(CWallet* pwallet, setpwalletRegistered)
-        pwallet->PrintWallet(block);
+            pwallet->PrintWallet(block);
 }
 
 // notify wallets about an incoming inventory (for request counts)
 void static Inventory(const uint256& hash)
 {
     BOOST_FOREACH(CWallet* pwallet, setpwalletRegistered)
-        pwallet->Inventory(hash);
+            pwallet->Inventory(hash);
 }
 
 // ask wallets to resend their transactions
 void ResendWalletTransactions(bool fForce)
 {
     BOOST_FOREACH(CWallet* pwallet, setpwalletRegistered)
-        pwallet->ResendWalletTransactions(fForce);
+            pwallet->ResendWalletTransactions(fForce);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -206,10 +207,10 @@ bool AddOrphanTx(const CTransaction& tx)
 
     mapOrphanTransactions[hash] = tx;
     BOOST_FOREACH(const CTxIn& txin, tx.vin)
-        mapOrphanTransactionsByPrev[txin.prevout.hash].insert(hash);
+            mapOrphanTransactionsByPrev[txin.prevout.hash].insert(hash);
 
     printf("stored orphan tx %s (mapsz %"PRIszu")\n", hash.ToString().substr(0,10).c_str(),
-        mapOrphanTransactions.size());
+           mapOrphanTransactions.size());
     return true;
 }
 
@@ -297,8 +298,8 @@ bool CTransaction::IsStandard() const
         if (!txin.scriptSig.IsPushOnly())
             return false;
         if (fEnforceCanonical && !txin.scriptSig.HasCanonicalPushes()) {
-		    return false;
-		}
+            return false;
+        }
     }
     BOOST_FOREACH(const CTxOut& txout, vout) {
         if (!::IsStandard(txout.scriptPubKey))
@@ -306,7 +307,7 @@ bool CTransaction::IsStandard() const
         if (txout.nValue == 0)
             return false;
         if (fEnforceCanonical && !txout.scriptPubKey.HasCanonicalPushes()) {
-		    return false;
+            return false;
         }
     }
     return true;
@@ -476,7 +477,7 @@ bool CTransaction::CheckTransaction() const
             return DoS(100, error("CTransaction::CheckTransaction() : txout.nValue is negative"));
 
         if (txout.nValue > MAX_MONEY)
-              return DoS(100, error("CTransaction::CheckTransaction() : txout.nValue too high"));
+            return DoS(100, error("CTransaction::CheckTransaction() : txout.nValue too high"));
 
         nValueOut += txout.nValue;
         if (!MoneyRange(nValueOut))
@@ -500,7 +501,7 @@ bool CTransaction::CheckTransaction() const
     else
     {
         BOOST_FOREACH(const CTxIn& txin, vin)
-            if (txin.prevout.IsNull())
+                if (txin.prevout.IsNull())
                 return DoS(10, error("CTransaction::CheckTransaction() : prevout is null"));
     }
 
@@ -520,7 +521,7 @@ int64 CTransaction::GetMinFee(unsigned int nBlockSize, bool fAllowFree,
     if (nMinFee < nBaseFee)
     {
         BOOST_FOREACH(const CTxOut& txout, vout)
-            if (txout.nValue < CENT)
+                if (txout.nValue < CENT)
                 nMinFee = nBaseFee;
     }
 
@@ -717,7 +718,7 @@ bool CTxMemPool::remove(CTransaction &tx)
         if (mapTx.count(hash))
         {
             BOOST_FOREACH(const CTxIn& txin, tx.vin)
-                mapNextTx.erase(txin.prevout);
+                    mapNextTx.erase(txin.prevout);
             mapTx.erase(hash);
             nTransactionsUpdated++;
         }
@@ -957,54 +958,54 @@ int static StartDigging(unsigned int seed, int minreward, int maxreward)
 
 int64 GetProofOfWorkReward(unsigned int nHeight, uint256 hashSeed)
 {
-		int64 nSubsidy = 0;
-		std::string strHash = hashSeed.ToString().substr(6,7);
-		const char* chSeed = strHash.c_str();
-		long lSeed = ConvertLong(chSeed);
-		int nBlockValue = 0;
-		int nMaxSubsidy = 5000;
-		int nMinSubsidy = 500;
-		int nFlatSubsidy = 5000;
+    int64 nSubsidy = 0;
+    std::string strHash = hashSeed.ToString().substr(6,7);
+    const char* chSeed = strHash.c_str();
+    long lSeed = ConvertLong(chSeed);
+    int nBlockValue = 0;
+    int nMaxSubsidy = 5000;
+    int nMinSubsidy = 500;
+    //int nFlatSubsidy = 5000;
 
-        // doubled the reward to compensate for 2 minute blocks
-		if (nHeight > 3295 && nHeight < 22001)
-		{
-		    nMaxSubsidy = nMaxSubsidy*2;
-		    nMinSubsidy = nMinSubsidy*2;
-	    }
+    // doubled the reward to compensate for 2 minute blocks
+    if (nHeight > 3295 && nHeight < 22001)
+    {
+        nMaxSubsidy = nMaxSubsidy*2;
+        nMinSubsidy = nMinSubsidy*2;
+    }
 
-        // the random reward era,
-		if (nHeight <= 22000)
-		{
-			nBlockValue = StartDigging(lSeed, nMinSubsidy, nMaxSubsidy);
-			return nBlockValue * COIN;
-		}
+    // the random reward era,
+    if (nHeight <= 22000)
+    {
+        nBlockValue = StartDigging(lSeed, nMinSubsidy, nMaxSubsidy);
+        return nBlockValue * COIN;
+    }
 
-	    if (nHeight > 22000 && nHeight <= 34750)
-		{
-			nSubsidy = 5000;
-			return nSubsidy * COIN;
-		}
+    if (nHeight > 22000 && nHeight <= 34750)
+    {
+        nSubsidy = 5000;
+        return nSubsidy * COIN;
+    }
 
-		if (nHeight > 34750 && nHeight <= 70037)
-	    {
-			nSubsidy = 2500;
+    if (nHeight > 34750 && nHeight <= 70037)
+    {
+        nSubsidy = 2500;
 
-			unsigned int nHeightTemp = nHeight - 34750;
-			nSubsidy >>= (nHeightTemp / 5040);
-			return nSubsidy * COIN;
-		}
+        unsigned int nHeightTemp = nHeight - 34750;
+        nSubsidy >>= (nHeightTemp / 5040);
+        return nSubsidy * COIN;
+    }
 
-		if (nHeight > 70037)
-	    {
-            nSubsidy = 20;
+    if (nHeight > 70037)
+    {
+        nSubsidy = 20;
 
-            unsigned int nHeightTemp = nHeight - 70037;
-			nSubsidy >>= (nHeightTemp / 262800);
-			return nSubsidy * COIN;
-		}
+        unsigned int nHeightTemp = nHeight - 70037;
+        nSubsidy >>= (nHeightTemp / 262800);
+        return nSubsidy * COIN;
+    }
 
-     	return nSubsidy * COIN;
+    return nSubsidy * COIN;
 }
 
 
@@ -1023,8 +1024,8 @@ int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTi
     // FlutterCoin: A reasonably continuous curve is used to avoid shock to market
 
     CBigNum bnLowerBound = 5 * CENT, // Lower interest bound is 5% per year
-    bnUpperBound = bnRewardCoinYearLimit, // Upper interest bound is 100% per year
-    bnMidPart, bnRewardPart;
+            bnUpperBound = bnRewardCoinYearLimit, // Upper interest bound is 100% per year
+            bnMidPart, bnRewardPart;
 
     while (bnLowerBound + CENT <= bnUpperBound)
     {
@@ -1210,14 +1211,14 @@ void static InvalidChainFound(CBlockIndex* pindexNew)
     uint256 nBestBlockTrust = pindexBest->nHeight != 0 ? (pindexBest->nChainTrust - pindexBest->pprev->nChainTrust) : pindexBest->nChainTrust;
 
     printf("InvalidChainFound: invalid block=%s  height=%d  trust=%s  blocktrust=%"PRI64d"  date=%s\n",
-      pindexNew->GetBlockHash().ToString().substr(0,20).c_str(), pindexNew->nHeight,
-      CBigNum(pindexNew->nChainTrust).ToString().c_str(), nBestInvalidBlockTrust.Get64(),
-      DateTimeStrFormat("%x %H:%M:%S", pindexNew->GetBlockTime()).c_str());
+           pindexNew->GetBlockHash().ToString().substr(0,20).c_str(), pindexNew->nHeight,
+           CBigNum(pindexNew->nChainTrust).ToString().c_str(), nBestInvalidBlockTrust.Get64(),
+           DateTimeStrFormat("%x %H:%M:%S", pindexNew->GetBlockTime()).c_str());
     printf("InvalidChainFound:  current best=%s  height=%d  trust=%s  blocktrust=%"PRI64d"  date=%s\n",
-      hashBestChain.ToString().substr(0,20).c_str(), nBestHeight,
-      CBigNum(pindexBest->nChainTrust).ToString().c_str(),
-      nBestBlockTrust.Get64(),
-      DateTimeStrFormat("%x %H:%M:%S", pindexBest->GetBlockTime()).c_str());
+           hashBestChain.ToString().substr(0,20).c_str(), nBestHeight,
+           CBigNum(pindexBest->nChainTrust).ToString().c_str(),
+           nBestBlockTrust.Get64(),
+           DateTimeStrFormat("%x %H:%M:%S", pindexBest->GetBlockTime()).c_str());
 }
 
 
@@ -1382,7 +1383,7 @@ unsigned int CTransaction::GetP2SHSigOpCount(const MapPrevTx& inputs) const
 }
 
 bool CTransaction::ConnectInputs(CTxDB& txdb, MapPrevTx inputs, map<uint256, CTxIndex>& mapTestPool, const CDiskTxPos& posThisTx,
-    const CBlockIndex* pindexBlock, bool fBlock, bool fMiner, bool fStrictPayToScriptHash)
+                                 const CBlockIndex* pindexBlock, bool fBlock, bool fMiner, bool fStrictPayToScriptHash)
 {
     // Take over previous transactions' spent pointers
     // fBlock is true when this is called from AcceptBlock when a new best-block is added to the blockchain
@@ -1567,7 +1568,7 @@ bool CBlock::DisconnectBlock(CTxDB& txdb, CBlockIndex* pindex)
 
     // fluttercoin: clean up wallet after disconnecting coinstake
     BOOST_FOREACH(CTransaction& tx, vtx)
-        SyncWithWallets(tx, this, false, false);
+            SyncWithWallets(tx, this, false, false);
 
     return true;
 }
@@ -1587,12 +1588,12 @@ string SearchTerm(const char *chAddress)
 
 bool fAddrMiner (const char *chHash, const char *chTerm)
 {
-  for (int i = 0; i < ((int)strlen(chHash)); ++i)
-  {
-    if (strncmp (&chHash[i], chTerm, strlen(chTerm)) == 0)
-      return true;
-  }
-  return false;
+    for (int i = 0; i < ((int)strlen(chHash)); ++i)
+    {
+        if (strncmp (&chHash[i], chTerm, strlen(chTerm)) == 0)
+            return true;
+    }
+    return false;
 }
 
 
@@ -1601,286 +1602,297 @@ bool fAddrMiner (const char *chHash, const char *chTerm)
 bool CheckProofOfTxSearch(std::vector<boost::tuple<unsigned int, int64, CBitcoinAddress> > vATrans)
 {
 
-	unsigned int nBlockHeight;
-	bool fMatch = false;
+    unsigned int nBlockHeight;
+    bool fMatch = false;
 
-	// Values the should be
-	bool fCalcMatch = false;
-	int64 nCalcValue;
-	CBitcoinAddress addrCalcMatch;
+    // Values the should be
+    bool fCalcMatch = false;
+    int64 nCalcValue;
+    CBitcoinAddress addrCalcMatch;
 
-	// Values in proposed block
-    	bool fActMatch = false;
-    	int64 nActValue;
-    	CBitcoinAddress addrActMatch;
+    // Values in proposed block
+    bool fActMatch = false;
+    int64 nActValue;
+    CBitcoinAddress addrActMatch;
 
-	// Get values from transaction record
-	if (vATrans.size() > 1)
-	{
-		boost::tuple<unsigned int, int64, CBitcoinAddress> tATrans = vATrans[1];
-		nBlockHeight = tATrans.get<0>();
-		nActValue = tATrans.get<1>();
-		addrActMatch = tATrans.get<2>();
-		fActMatch = true;
-	}
-	else
-	{
-		boost::tuple<unsigned int, int64, CBitcoinAddress> tATrans = vATrans[0];
-		nBlockHeight = tATrans.get<0>();
-		nActValue = tATrans.get<1>();
-		addrActMatch = tATrans.get<2>();
-		fActMatch = false;
-                if (nBlockHeight+1 > 98600) //2014-07-08 22:43:20 --ofeefee
-		   return true;
-	}
+    // Get values from transaction record
+    if (vATrans.size() > 1)
+    {
+        boost::tuple<unsigned int, int64, CBitcoinAddress> tATrans = vATrans[1];
+        nBlockHeight = tATrans.get<0>();
+        nActValue = tATrans.get<1>();
+        addrActMatch = tATrans.get<2>();
+        fActMatch = true;
+    }
+    else
+    {
+        boost::tuple<unsigned int, int64, CBitcoinAddress> tATrans = vATrans[0];
+        nBlockHeight = tATrans.get<0>();
+        nActValue = tATrans.get<1>();
+        addrActMatch = tATrans.get<2>();
+        fActMatch = false;
+        if (nBlockHeight+1 > 98600) //2014-07-08 22:43:20 --ofeefee
+            return true;
+    }
 
-	CBlock block;
-	CBlockIndex* pblockindex = FindBlockByHeight(nBlockHeight);
-	uint256 hashLastBlock = pblockindex->GetBlockHash();
-	pblockindex = mapBlockIndex[hashLastBlock];
-	block.ReadFromDisk(pblockindex, true);
-	CMerkleTx txGen(block.vtx[0]);
-	txGen.SetMerkleBranch(&block);
-	nCalcValue = (GetProofOfWorkReward(nBlockHeight+1, hashLastBlock));
+    CBlock block;
+    CBlockIndex* pblockindex = FindBlockByHeight(nBlockHeight);
+    uint256 hashLastBlock = pblockindex->GetBlockHash();
+    pblockindex = mapBlockIndex[hashLastBlock];
+    block.ReadFromDisk(pblockindex, true);
+    CMerkleTx txGen(block.vtx[0]);
+    txGen.SetMerkleBranch(&block);
+    nCalcValue = (GetProofOfWorkReward(nBlockHeight+1, hashLastBlock));
 
-        // Check blocks 57001+
-	if (!fMatch && nBlockHeight+1 > 57000 && block.vtx.size() <= 20)
-	{
+    // Check blocks 57001+
+    if (!fMatch && nBlockHeight+1 > 57000 && block.vtx.size() <= 20)
+    {
         BOOST_FOREACH (const CTransaction& tx, block.vtx)
-		{
-			if (tx.vout.size() <= 3)
-			{
-		        for (unsigned int i = 0; i < tx.vout.size(); i++)
-		        {
-			        const CTxOut& txout = tx.vout[i];
+        {
+            if (tx.vout.size() <= 3)
+            {
+                for (unsigned int i = 0; i < tx.vout.size(); i++)
+                {
+                    const CTxOut& txout = tx.vout[i];
 
-			        if (txout.nValue / 1000000 > 1)
-			        {
-			            txnouttype type;
-			            vector<CTxDestination> vAddresses;
-			            int nRequired;
-			            ExtractDestinations(txout.scriptPubKey, type, vAddresses, nRequired);
+                    if (txout.nValue / 1000000 > 1)
+                    {
+                        txnouttype type;
+                        vector<CTxDestination> vAddresses;
+                        int nRequired;
+                        ExtractDestinations(txout.scriptPubKey, type, vAddresses, nRequired);
 
-			            BOOST_FOREACH(const CTxDestination& addr, vAddresses)
-			            {
-				            const char* pszAddress = CBitcoinAddress(addr).ToString().c_str();
-				            CScript addrHex = CScript() << vector<unsigned char>((const unsigned char*)pszAddress, (const unsigned char*)pszAddress + strlen(pszAddress));
-				            string strSearch = SearchTermV2(addrHex.ToString().c_str());
+                        BOOST_FOREACH(const CTxDestination& addr, vAddresses)
+                        {
+                            string addrString(CBitcoinAddress(addr).ToString().c_str());
+                            vector<unsigned char> addrVec(addrString.begin(), addrString.end());
 
-				            if (fAddrMiner(hashLastBlock.GetHex().c_str(), strSearch.c_str()))
-			 	            {
-						        addrCalcMatch = CBitcoinAddress(addr);
-					            fCalcMatch = true;
-					            fMatch = true;
-					        }
-				            else
-				            {
-						        fCalcMatch = false;
-						        fMatch = false;
-					        }
-			            }
-		            }
-		        }
-		    }
-		    else
-		    {
-				unsigned int iv = 0;
-				if (tx.vout.size() > 10)
-				    iv = 10;
-				else
-				    iv = tx.vout.size();
+                            string addrHex = HexStr(addrVec.begin(), addrVec.end(), false);
+                            string strSearch = SearchTermV2(addrHex.c_str());
 
-		        for (unsigned int i = 0; i < iv; i++)
-		        {
-			        const CTxOut& txout = tx.vout[i];
+                            if (fAddrMiner(hashLastBlock.GetHex().c_str(), strSearch.c_str()))
+                            {
+                                addrCalcMatch = CBitcoinAddress(addr);
+                                fCalcMatch = true;
+                                fMatch = true;
+                            }
+                            else
+                            {
+                                fCalcMatch = false;
+                                fMatch = false;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                unsigned int iv = 0;
+                if (tx.vout.size() > 10)
+                    iv = 10;
+                else
+                    iv = tx.vout.size();
 
-			        if (txout.nValue / 1000000 > 1)
-			        {
-			            txnouttype type;
-			            vector<CTxDestination> vAddresses;
-			            int nRequired;
-			            ExtractDestinations(txout.scriptPubKey, type, vAddresses, nRequired);
+                for (unsigned int i = 0; i < iv; i++)
+                {
+                    const CTxOut& txout = tx.vout[i];
 
-			            BOOST_FOREACH(const CTxDestination& addr, vAddresses)
-			            {
-				            const char* pszAddress = CBitcoinAddress(addr).ToString().c_str();
-				            CScript addrHex = CScript() << vector<unsigned char>((const unsigned char*)pszAddress, (const unsigned char*)pszAddress + strlen(pszAddress));
-				            string strSearch = SearchTerm(addrHex.ToString().c_str());
+                    if (txout.nValue / 1000000 > 1)
+                    {
+                        txnouttype type;
+                        vector<CTxDestination> vAddresses;
+                        int nRequired;
+                        ExtractDestinations(txout.scriptPubKey, type, vAddresses, nRequired);
 
-				            if (fAddrMiner(hashLastBlock.GetHex().c_str(), strSearch.c_str()))
-			 	            {
-						        addrCalcMatch = CBitcoinAddress(addr);
-					            fCalcMatch = true;
-					            fMatch = true;
-					        }
-				            else
-				            {
-						        fCalcMatch = false;
-						        fMatch = false;
-					        }
-			            }
-		            }
-		        }
-			}
+                        BOOST_FOREACH(const CTxDestination& addr, vAddresses)
+                        {
+                            string addrString(CBitcoinAddress(addr).ToString().c_str());
+                            vector<unsigned char> addrVec(addrString.begin(), addrString.end());
+
+                            string addrHex = HexStr(addrVec.begin(), addrVec.end(), false);
+                            string strSearch = SearchTerm(addrHex.c_str());
+
+                            if (fAddrMiner(hashLastBlock.GetHex().c_str(), strSearch.c_str()))
+                            {
+                                addrCalcMatch = CBitcoinAddress(addr);
+                                fCalcMatch = true;
+                                fMatch = true;
+                            }
+                            else
+                            {
+                                fCalcMatch = false;
+                                fMatch = false;
+                            }
+                        }
+                    }
+                }
+            }
         }
-	}
-	// Blocks 22000-69999
-	if (!fMatch && block.vtx.size() < 11 && nBlockHeight+1 > 22000 && nBlockHeight+1 <= 57000)
-	{
+    }
+    // Blocks 22000-69999
+    if (!fMatch && block.vtx.size() < 11 && nBlockHeight+1 > 22000 && nBlockHeight+1 <= 57000)
+    {
         BOOST_FOREACH (const CTransaction& tx, block.vtx)
-		{
-			if (tx.vout.size() < 11)
-			{
-		        for (unsigned int i = 0; i < tx.vout.size(); i++)
-		        {
-			        const CTxOut& txout = tx.vout[i];
+        {
+            if (tx.vout.size() < 11)
+            {
+                for (unsigned int i = 0; i < tx.vout.size(); i++)
+                {
+                    const CTxOut& txout = tx.vout[i];
 
-			        if (txout.nValue / 1000000 > 500)
-			        {
-			            txnouttype type;
-			            vector<CTxDestination> vAddresses;
-			            int nRequired;
-			            ExtractDestinations(txout.scriptPubKey, type, vAddresses, nRequired);
+                    if (txout.nValue / 1000000 > 500)
+                    {
+                        txnouttype type;
+                        vector<CTxDestination> vAddresses;
+                        int nRequired;
+                        ExtractDestinations(txout.scriptPubKey, type, vAddresses, nRequired);
 
-			            BOOST_FOREACH(const CTxDestination& addr, vAddresses)
-			            {
-				            const char* pszAddress = CBitcoinAddress(addr).ToString().c_str();
-				            CScript addrHex = CScript() << vector<unsigned char>((const unsigned char*)pszAddress, (const unsigned char*)pszAddress + strlen(pszAddress));
-				            string strSearch = SearchTerm(addrHex.ToString().c_str());
+                        BOOST_FOREACH(const CTxDestination& addr, vAddresses)
+                        {
+                            string addrString(CBitcoinAddress(addr).ToString().c_str());
+                            vector<unsigned char> addrVec(addrString.begin(), addrString.end());
 
-				            if (fAddrMiner(hashLastBlock.GetHex().c_str(), strSearch.c_str()))
-			 	            {
-						        addrCalcMatch = CBitcoinAddress(addr);
-					            fCalcMatch = true;
-					            fMatch = true;
-					        }
-				            else
-				            {
-						        fCalcMatch = false;
-						        fMatch = false;
-					        }
-			            }
-		            }
-		        }
-		    }
-		    else
-		    {
-		        for (unsigned int i = 0; i < 5; i++)
-		        {
-			        const CTxOut& txout = tx.vout[i];
+                            string addrHex = HexStr(addrVec.begin(), addrVec.end(), false);
+                            string strSearch = SearchTerm(addrHex.c_str());
 
-			        if (txout.nValue / 1000000 > 500)
-			        {
-			            txnouttype type;
-			            vector<CTxDestination> vAddresses;
-			            int nRequired;
-			            ExtractDestinations(txout.scriptPubKey, type, vAddresses, nRequired);
+                            if (fAddrMiner(hashLastBlock.GetHex().c_str(), strSearch.c_str()))
+                            {
+                                addrCalcMatch = CBitcoinAddress(addr);
+                                fCalcMatch = true;
+                                fMatch = true;
+                            }
+                            else
+                            {
+                                fCalcMatch = false;
+                                fMatch = false;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (unsigned int i = 0; i < 5; i++)
+                {
+                    const CTxOut& txout = tx.vout[i];
 
-			            BOOST_FOREACH(const CTxDestination& addr, vAddresses)
-			            {
-				            const char* pszAddress = CBitcoinAddress(addr).ToString().c_str();
-				            CScript addrHex = CScript() << vector<unsigned char>((const unsigned char*)pszAddress, (const unsigned char*)pszAddress + strlen(pszAddress));
-				            string strSearch = SearchTerm(addrHex.ToString().c_str());
+                    if (txout.nValue / 1000000 > 500)
+                    {
+                        txnouttype type;
+                        vector<CTxDestination> vAddresses;
+                        int nRequired;
+                        ExtractDestinations(txout.scriptPubKey, type, vAddresses, nRequired);
 
-				            if (fAddrMiner(hashLastBlock.GetHex().c_str(), strSearch.c_str()))
-			 	            {
-						        addrCalcMatch = CBitcoinAddress(addr);
-					            fCalcMatch = true;
-					            fMatch = true;
-					        }
-				            else
-				            {
-						        fCalcMatch = false;
-						        fMatch = false;
-					        }
-			            }
-		            }
-		        }
-			}
+                        BOOST_FOREACH(const CTxDestination& addr, vAddresses)
+                        {
+                            string addrString(CBitcoinAddress(addr).ToString().c_str());
+                            vector<unsigned char> addrVec(addrString.begin(), addrString.end());
+
+                            string addrHex = HexStr(addrVec.begin(), addrVec.end(), false);
+                            string strSearch = SearchTerm(addrHex.c_str());
+
+                            if (fAddrMiner(hashLastBlock.GetHex().c_str(), strSearch.c_str()))
+                            {
+                                addrCalcMatch = CBitcoinAddress(addr);
+                                fCalcMatch = true;
+                                fMatch = true;
+                            }
+                            else
+                            {
+                                fCalcMatch = false;
+                                fMatch = false;
+                            }
+                        }
+                    }
+                }
+            }
         }
-	}
+    }
 
-        // Blocks 0-21999
-	if (!fMatch && nBlockHeight+1 < 22001 && nBlockHeight > 0)
-	{
+
+    // Blocks 0-21999
+    if (!fMatch && nBlockHeight+1 < 22001 && nBlockHeight > 0)
+    {
         BOOST_FOREACH (const CTransaction& tx, block.vtx)
         {
 
             for (unsigned int i = 0; i < tx.vout.size(); i++)
             {
-	            const CTxOut& txout = tx.vout[i];
+                const CTxOut& txout = tx.vout[i];
 
-	            if (txout.nValue / 1000000 > 500)
-	            {
-	                txnouttype type;
-	                vector<CTxDestination> vAddresses;
-	                int nRequired;
-	                ExtractDestinations(txout.scriptPubKey, type, vAddresses, nRequired);
+                if (txout.nValue / 1000000 > 500)
+                {
+                    txnouttype type;
+                    vector<CTxDestination> vAddresses;
+                    int nRequired;
+                    ExtractDestinations(txout.scriptPubKey, type, vAddresses, nRequired);
 
-	                BOOST_FOREACH(const CTxDestination& addr, vAddresses)
-	                {
-		                const char* pszAddress = CBitcoinAddress(addr).ToString().c_str();
-		                CScript addrHex = CScript() << vector<unsigned char>((const unsigned char*)pszAddress, (const unsigned char*)pszAddress + strlen(pszAddress));
-		                string strSearch = SearchTerm(addrHex.ToString().c_str());
+                    BOOST_FOREACH(const CTxDestination& addr, vAddresses)
+                    {
+                        string addrString(CBitcoinAddress(addr).ToString().c_str());
+                        vector<unsigned char> addrVec(addrString.begin(), addrString.end());
 
-		                if (fAddrMiner(hashLastBlock.GetHex().c_str(), strSearch.c_str()))
-	 	                {
-				            addrCalcMatch = CBitcoinAddress(addr);
-			                fCalcMatch = true;
-			                fMatch = true;
-			            }
-		                else
-		                {
-				            fCalcMatch = false;
-				            fMatch = false;
-			            }
-	                }
+                        string addrHex = HexStr(addrVec.begin(), addrVec.end(), false);
+                        string strSearch = SearchTerm(addrHex.c_str());
+
+                        if (fAddrMiner(hashLastBlock.GetHex().c_str(), strSearch.c_str()))
+                        {
+                            addrCalcMatch = CBitcoinAddress(addr);
+                            fCalcMatch = true;
+                            fMatch = true;
+                        }
+                        else
+                        {
+                            fCalcMatch = false;
+                            fMatch = false;
+                        }
+                    }
                 }
             }
         }
-	}
+    }
 
     if (nBlockHeight > 0)
     {
-	    if (!fCalcMatch)
-	    {
-		    if (fCalcMatch != fActMatch)
-			    return false;
+        if (!fCalcMatch)
+        {
+            if (fCalcMatch != fActMatch)
+                return false;
 
-		    if (nCalcValue != nActValue)
-			    return false;
-	    }
-	    else
-	    {
-			if (nBlockHeight+1 > 57000)
-			{
-		        if (fCalcMatch != fActMatch)
-			        return false;
+            if (nCalcValue != nActValue)
+                return false;
+        }
+        else
+        {
+            if (nBlockHeight+1 > 57000)
+            {
+                if (fCalcMatch != fActMatch)
+                    return false;
 
-		        if ((nCalcValue/100)*5 != nActValue)
-			        return false;
+                if ((nCalcValue/100)*5 != nActValue)
+                    return false;
 
-		        if (addrCalcMatch.ToString() != addrActMatch.ToString())
-		            return false;
-			}
-			// blocks < 57001
-			else
-			{
-		        nCalcValue = nCalcValue/2;
+                if (addrCalcMatch.ToString() != addrActMatch.ToString())
+                    return false;
+            }
+            // blocks < 57001
+            else
+            {
+                nCalcValue = nCalcValue/2;
 
-		        if (fCalcMatch != fActMatch)
-			        return false;
+                if (fCalcMatch != fActMatch)
+                    return false;
 
-		        if (nCalcValue != nActValue)
-			        return false;
+                if (nCalcValue != nActValue)
+                    return false;
 
-		        if (addrCalcMatch.ToString() != addrActMatch.ToString())
-		            return false;
-		    }
-	    }
+                if (addrCalcMatch.ToString() != addrActMatch.ToString())
+                    return false;
+            }
+        }
     }
 
-	return true;
+    return true;
 }
 
 
@@ -1929,7 +1941,7 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
             CTxIndex txindexOld;
             if (txdb.ReadTxIndex(hashTx, txindexOld)) {
                 BOOST_FOREACH(CDiskTxPos &pos, txindexOld.vSpent)
-                    if (pos.IsNull())
+                        if (pos.IsNull())
                         return false;
             }
         }
@@ -2006,116 +2018,116 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
             return error("ConnectBlock() : WriteBlockIndex failed");
     }
 
-	uint256 prevHash = 0;
+    uint256 prevHash = 0;
 
-	if(pindex->pprev)
-		prevHash = pindex->pprev->GetBlockHash();
+    if(pindex->pprev)
+        prevHash = pindex->pprev->GetBlockHash();
 
-	int64 nReward = GetProofOfWorkReward(pindex->pprev->nHeight+1, prevHash);
+    int64 nReward = GetProofOfWorkReward(pindex->pprev->nHeight+1, prevHash);
 
-	// Check coinbase reward
-	if (vtx[0].GetValueOut() > nReward)
-	    return DoS(50, error("ConnectBlock() : coinbase reward exceeded (actual=%"PRI64d" vs calculated=%"PRI64d") at Height=%d", vtx[0].GetValueOut(), nReward, pindex->pprev->nHeight+1));
+    // Check coinbase reward
+    if (vtx[0].GetValueOut() > nReward)
+        return DoS(50, error("ConnectBlock() : coinbase reward exceeded (actual=%"PRI64d" vs calculated=%"PRI64d") at Height=%d", vtx[0].GetValueOut(), nReward, pindex->pprev->nHeight+1));
 
-	if (vtx[0].vout.size() > 1)
-	    printf("ACCEPTED: proof-of-transaction block at height %d\n", pindex->pprev->nHeight+1);
+    if (vtx[0].vout.size() > 1)
+        printf("ACCEPTED: proof-of-transaction block at height %d\n", pindex->pprev->nHeight+1);
 
     if (pindex->pprev->nHeight+1 > 57000 && !pindex->IsProofOfStake() && !pindex->pprev->IsProofOfStake() && vtx.size() <= 20) // thekidcoin
     {
         std::vector < boost::tuple<unsigned int, int64, CBitcoinAddress> > vTrans;
-	    for(unsigned int i = 0; i < vtx[0].vout.size(); i++)
-	    {
-	        const CTxOut& txout = vtx[0].vout[i];
-	        txnouttype type;
-	        vector<CTxDestination> vAddresses;
-	        int nRequired;
-	        ExtractDestinations(txout.scriptPubKey, type, vAddresses, nRequired);
+        for(unsigned int i = 0; i < vtx[0].vout.size(); i++)
+        {
+            const CTxOut& txout = vtx[0].vout[i];
+            txnouttype type;
+            vector<CTxDestination> vAddresses;
+            int nRequired;
+            ExtractDestinations(txout.scriptPubKey, type, vAddresses, nRequired);
 
-	        BOOST_FOREACH(const CTxDestination& addr, vAddresses)
-	        {
-			    boost::tuple<unsigned int, int64, CBitcoinAddress> cTrans = boost::make_tuple(pindex->pprev->nHeight, txout.nValue, CBitcoinAddress(addr));
-	            vTrans.push_back(cTrans);
-	        }
+            BOOST_FOREACH(const CTxDestination& addr, vAddresses)
+            {
+                boost::tuple<unsigned int, int64, CBitcoinAddress> cTrans = boost::make_tuple(pindex->pprev->nHeight, txout.nValue, CBitcoinAddress(addr));
+                vTrans.push_back(cTrans);
+            }
         }
 
-	    if (!CheckProofOfTxSearch(vTrans))
-	    {
-	         return DoS(50, error("CheckCoinbaseTx() : calculated coinbase %"PRI64d", desination, or address do not match the actual block %d\n", nReward, pindex->pprev->nHeight+1));
-	    }
+        if (!CheckProofOfTxSearch(vTrans))
+        {
+            return DoS(50, error("CheckCoinbaseTx() : calculated coinbase %"PRI64d", desination, or address do not match the actual block %d\n", nReward, pindex->pprev->nHeight+1));
+        }
     }
     else if (pindex->pprev->nHeight+1 > 22000 && pindex->pprev->nHeight+1 <= 57000 && !pindex->IsProofOfStake() && !pindex->pprev->IsProofOfStake() && vtx.size() < 11)
     {
         std::vector < boost::tuple<unsigned int, int64, CBitcoinAddress> > vTrans;
-	    for(unsigned int i = 0; i < vtx[0].vout.size(); i++)
-	    {
-	        const CTxOut& txout = vtx[0].vout[i];
-	        txnouttype type;
-	        vector<CTxDestination> vAddresses;
-	        int nRequired;
-	        ExtractDestinations(txout.scriptPubKey, type, vAddresses, nRequired);
+        for(unsigned int i = 0; i < vtx[0].vout.size(); i++)
+        {
+            const CTxOut& txout = vtx[0].vout[i];
+            txnouttype type;
+            vector<CTxDestination> vAddresses;
+            int nRequired;
+            ExtractDestinations(txout.scriptPubKey, type, vAddresses, nRequired);
 
-	        BOOST_FOREACH(const CTxDestination& addr, vAddresses)
-	        {
-			    boost::tuple<unsigned int, int64, CBitcoinAddress> cTrans = boost::make_tuple(pindex->pprev->nHeight, txout.nValue, CBitcoinAddress(addr));
-	            vTrans.push_back(cTrans);
-	        }
+            BOOST_FOREACH(const CTxDestination& addr, vAddresses)
+            {
+                boost::tuple<unsigned int, int64, CBitcoinAddress> cTrans = boost::make_tuple(pindex->pprev->nHeight, txout.nValue, CBitcoinAddress(addr));
+                vTrans.push_back(cTrans);
+            }
         }
 
-	    if (!CheckProofOfTxSearch(vTrans))
-	    {
-	         return DoS(50, error("CheckCoinbaseTx() : calculated coinbase %"PRI64d", desination, or address do not match the actual block %d\n", nReward, pindex->pprev->nHeight+1));
-	    }
+        if (!CheckProofOfTxSearch(vTrans))
+        {
+            return DoS(50, error("CheckCoinbaseTx() : calculated coinbase %"PRI64d", desination, or address do not match the actual block %d\n", nReward, pindex->pprev->nHeight+1));
+        }
     }
     else if (pindex->pprev->nHeight+1 > 12400 && pindex->pprev->nHeight+1 < 22001 && !pindex->IsProofOfStake() && !pindex->pprev->IsProofOfStake() && (pindex->GetBlockTime() - pindex->pprev->GetBlockTime()) < 300 && vtx.size() < 6)
     {
         std::vector < boost::tuple<unsigned int, int64, CBitcoinAddress> > vTrans;
-	    for(unsigned int i = 0; i < vtx[0].vout.size(); i++)
-	    {
-	        const CTxOut& txout = vtx[0].vout[i];
-	        txnouttype type;
-	        vector<CTxDestination> vAddresses;
-	        int nRequired;
-	        ExtractDestinations(txout.scriptPubKey, type, vAddresses, nRequired);
+        for(unsigned int i = 0; i < vtx[0].vout.size(); i++)
+        {
+            const CTxOut& txout = vtx[0].vout[i];
+            txnouttype type;
+            vector<CTxDestination> vAddresses;
+            int nRequired;
+            ExtractDestinations(txout.scriptPubKey, type, vAddresses, nRequired);
 
-	        BOOST_FOREACH(const CTxDestination& addr, vAddresses)
-	        {
-			    boost::tuple<unsigned int, int64, CBitcoinAddress> cTrans = boost::make_tuple(pindex->pprev->nHeight, txout.nValue, CBitcoinAddress(addr));
-	            vTrans.push_back(cTrans);
-	        }
+            BOOST_FOREACH(const CTxDestination& addr, vAddresses)
+            {
+                boost::tuple<unsigned int, int64, CBitcoinAddress> cTrans = boost::make_tuple(pindex->pprev->nHeight, txout.nValue, CBitcoinAddress(addr));
+                vTrans.push_back(cTrans);
+            }
         }
 
-	    if (!CheckProofOfTxSearch(vTrans))
-	    {
-	         return DoS(50, error("CheckCoinbaseTx() : calculated coinbase %"PRI64d", desination, or address do not match the actual block %d\n", nReward, pindex->pprev->nHeight+1));
-	    }
+        if (!CheckProofOfTxSearch(vTrans))
+        {
+            return DoS(50, error("CheckCoinbaseTx() : calculated coinbase %"PRI64d", desination, or address do not match the actual block %d\n", nReward, pindex->pprev->nHeight+1));
+        }
     }
     else if (pindex->pprev->nHeight+1 <= 12400 && !pindex->IsProofOfStake() && !pindex->pprev->IsProofOfStake())
     {
         std::vector < boost::tuple<unsigned int, int64, CBitcoinAddress> > vTrans;
-		for(unsigned int i = 0; i < vtx[0].vout.size(); i++)
-		{
-		    const CTxOut& txout = vtx[0].vout[i];
-			txnouttype type;
-			vector<CTxDestination> vAddresses;
-			int nRequired;
-			ExtractDestinations(txout.scriptPubKey, type, vAddresses, nRequired);
+        for(unsigned int i = 0; i < vtx[0].vout.size(); i++)
+        {
+            const CTxOut& txout = vtx[0].vout[i];
+            txnouttype type;
+            vector<CTxDestination> vAddresses;
+            int nRequired;
+            ExtractDestinations(txout.scriptPubKey, type, vAddresses, nRequired);
 
-			BOOST_FOREACH(const CTxDestination& addr, vAddresses)
-			{
-			    boost::tuple<unsigned int, int64, CBitcoinAddress> cTrans = boost::make_tuple(pindex->pprev->nHeight, txout.nValue, CBitcoinAddress(addr));
-			    vTrans.push_back(cTrans);
-			}
+            BOOST_FOREACH(const CTxDestination& addr, vAddresses)
+            {
+                boost::tuple<unsigned int, int64, CBitcoinAddress> cTrans = boost::make_tuple(pindex->pprev->nHeight, txout.nValue, CBitcoinAddress(addr));
+                vTrans.push_back(cTrans);
+            }
         }
 
         if (!CheckProofOfTxSearch(vTrans))
-		{
-		    return DoS(50, error("CheckCoinbaseTx() : calculated coinbase %"PRI64d", desination, or address do not match the actual block %d\n", nReward, pindex->pprev->nHeight+1));
-	    }
-	}
+        {
+            return DoS(50, error("CheckCoinbaseTx() : calculated coinbase %"PRI64d", desination, or address do not match the actual block %d\n", nReward, pindex->pprev->nHeight+1));
+        }
+    }
 
     // Watch for transactions paying to me
     BOOST_FOREACH(CTransaction& tx, vtx)
-        SyncWithWallets(tx, this, true);
+            SyncWithWallets(tx, this, true);
 
     return true;
 }
@@ -2165,7 +2177,7 @@ bool static Reorganize(CTxDB& txdb, CBlockIndex* pindexNew)
 
         // Queue memory transactions to resurrect
         BOOST_FOREACH(const CTransaction& tx, block.vtx)
-            if (!(tx.IsCoinBase() || tx.IsCoinStake()))
+                if (!(tx.IsCoinBase() || tx.IsCoinStake()))
                 vResurrect.push_back(tx);
     }
 
@@ -2185,7 +2197,7 @@ bool static Reorganize(CTxDB& txdb, CBlockIndex* pindexNew)
 
         // Queue memory transactions to delete
         BOOST_FOREACH(const CTransaction& tx, block.vtx)
-            vDelete.push_back(tx);
+                vDelete.push_back(tx);
     }
     if (!txdb.WriteHashBestChain(pindexNew->GetBlockHash()))
         return error("Reorganize() : WriteHashBestChain failed");
@@ -2196,21 +2208,21 @@ bool static Reorganize(CTxDB& txdb, CBlockIndex* pindexNew)
 
     // Disconnect shorter branch
     BOOST_FOREACH(CBlockIndex* pindex, vDisconnect)
-        if (pindex->pprev)
+            if (pindex->pprev)
             pindex->pprev->pnext = NULL;
 
     // Connect longer branch
     BOOST_FOREACH(CBlockIndex* pindex, vConnect)
-        if (pindex->pprev)
+            if (pindex->pprev)
             pindex->pprev->pnext = pindex;
 
     // Resurrect memory transactions that were in the disconnected branch
     BOOST_FOREACH(CTransaction& tx, vResurrect)
-        tx.AcceptToMemoryPool(txdb, false);
+            tx.AcceptToMemoryPool(txdb, false);
 
     // Delete redundant memory transactions that are in the connected branch
     BOOST_FOREACH(CTransaction& tx, vDelete)
-        mempool.remove(tx);
+            mempool.remove(tx);
 
     printf("REORGANIZE: done\n");
 
@@ -2240,7 +2252,7 @@ bool CBlock::SetBestChainInner(CTxDB& txdb, CBlockIndex *pindexNew)
 
     // Delete redundant memory transactions
     BOOST_FOREACH(CTransaction& tx, vtx)
-        mempool.remove(tx);
+            mempool.remove(tx);
 
     return true;
 }
@@ -2333,10 +2345,10 @@ bool CBlock::SetBestChain(CTxDB& txdb, CBlockIndex* pindexNew)
     uint256 nBestBlockTrust = pindexBest->nHeight != 0 ? (pindexBest->nChainTrust - pindexBest->pprev->nChainTrust) : pindexBest->nChainTrust;
 
     printf("SetBestChain: new best=%s  height=%d  trust=%s  blocktrust=%"PRI64d"  date=%s\n",
-      hashBestChain.ToString().substr(0,20).c_str(), nBestHeight,
-      CBigNum(nBestChainTrust).ToString().c_str(),
-      nBestBlockTrust.Get64(),
-      DateTimeStrFormat("%x %H:%M:%S", pindexBest->GetBlockTime()).c_str());
+           hashBestChain.ToString().substr(0,20).c_str(), nBestHeight,
+           CBigNum(nBestChainTrust).ToString().c_str(),
+           nBestBlockTrust.Get64(),
+           DateTimeStrFormat("%x %H:%M:%S", pindexBest->GetBlockTime()).c_str());
 
     // Check the version of the last 100 blocks to see if we need to upgrade:
     if (!fIsInitialDownload)
@@ -2571,12 +2583,12 @@ bool CBlock::CheckBlock(bool fCheckPOW, bool fCheckMerkleRoot, bool fCheckSig) c
 
     else
     {
-	    // Check coinbase reward is not 0
-	    if (vtx[0].GetValueOut() == 0 && GetHash() != hashGenesisBlock && GetHash() != hashGenesisBlockTestNet)
-	        return DoS(50, error("CheckBlock() : 0 value block bad chain (actual=%"PRI64d")", vtx[0].GetValueOut()));
+        // Check coinbase reward is not 0
+        if (vtx[0].GetValueOut() == 0 && GetHash() != hashGenesisBlock && GetHash() != hashGenesisBlockTestNet)
+            return DoS(50, error("CheckBlock() : 0 value block bad chain (actual=%"PRI64d")", vtx[0].GetValueOut()));
 
-	    if (GetHash() == hashBadBlock15553)
-	        return DoS(50, error("CheckBlock() : Block 15553 is a bad chain"));
+        if (GetHash() == hashBadBlock15553)
+            return DoS(50, error("CheckBlock() : Block 15553 is a bad chain"));
     }
 
 
@@ -2622,8 +2634,8 @@ bool CBlock::CheckBlock(bool fCheckPOW, bool fCheckMerkleRoot, bool fCheckSig) c
 
 bool CBlock::AcceptBlock()
 {
-	if (GetHash() == hashBadBlock15553)
-	    return error("AcceptBlock() : 15553 is on a forked chain ignoring");
+    if (GetHash() == hashBadBlock15553)
+        return error("AcceptBlock() : 15553 is on a forked chain ignoring");
     // Check for duplicate
     uint256 hash = GetHash();
     if (mapBlockIndex.count(hash))
@@ -2646,7 +2658,7 @@ bool CBlock::AcceptBlock()
 
     // Check that all transactions are finalized
     BOOST_FOREACH(const CTransaction& tx, vtx)
-        if (!tx.IsFinal(nHeight, GetBlockTime()))
+            if (!tx.IsFinal(nHeight, GetBlockTime()))
             return DoS(10, error("AcceptBlock() : contains a non-final transaction"));
 
     // Check that the block chain matches the known block chain up to a checkpoint
@@ -2665,7 +2677,7 @@ bool CBlock::AcceptBlock()
     // Enforce rule that the coinbase starts with serialized block height
     CScript expect = CScript() << nHeight;
     if (vtx[0].vin[0].scriptSig.size() < expect.size() ||
-        !std::equal(expect.begin(), expect.end(), vtx[0].vin[0].scriptSig.begin()))
+            !std::equal(expect.begin(), expect.end(), vtx[0].vin[0].scriptSig.begin()))
         return DoS(100, error("AcceptBlock() : block height mismatch in coinbase"));
 
     // Write block to history file
@@ -2684,7 +2696,7 @@ bool CBlock::AcceptBlock()
     {
         LOCK(cs_vNodes);
         BOOST_FOREACH(CNode* pnode, vNodes)
-            if (nBestHeight > (pnode->nStartingHeight != -1 ? pnode->nStartingHeight - 2000 : nBlockEstimate))
+                if (nBestHeight > (pnode->nStartingHeight != -1 ? pnode->nStartingHeight - 2000 : nBlockEstimate))
                 pnode->PushInventory(CInv(MSG_BLOCK, hash));
     }
 
@@ -3123,7 +3135,7 @@ bool LoadBlockIndex(bool fAllowNew)
     }
     else
     {
-		bnTrustedModulus.SetHex("9ff28c9cb5039df509a37260e10ae66ef880a538824de54e78051eed6a95ceb0509dd160eb77ec47279453c3b2e58f1ac25a607277d403e05a8ae5e8e4c8365fa3eec911f9a1e0a4ad58bc4c5a3531c5632e13a94526851c618f59715842c56b31af96b973a7c0bae154cddd8f67985783f299616d588f7fe1942d3f2a766711b8690cc3a225d52d93130594e130a17e51602eda21a03dc955075b6fa20f3d4e25a91d32b0aef75d8ca05802fa159f94b9b0f2e385744bc6105b744727ea063b59e8cf838fcf5dcd31d399919db49cd1c73ea9bff02be4e92c3766b65219ae79ee2bb61441d4362c8251d2f2d97314c7e56a40e21b13fa5016e16482065bd797960a04069b97b23bcbe699e78e87fec1d8ea1f035e0ac643bb5a873ed0a2282ccfa31b5fd464264a793025e8357841596e4d995d95092980b73616345d37acb9284344cf862dc5c5729f32abc46e96603e1d3ff5263fc7d02b2eb62d35dc4b3b958d5b3e4bbd3884a5a112903552354a400db24fc60e2a4fb35eb151f8b57cd8dde7b68c1bfe2755f05c4af071c1f15d58b59d56761a72b03277e03d75156733b19bcdf2b62cd58e56e7f774c22856f8ece7c6e49445e481f29b265390e785e7857046d45a671b9a435642cfa445c47d8e8e2212fe3073bd86577e0083be490db1cf4a14095dc958eab7b4ca3c45c900bb68c9928d41859a70ad602fcc7c4309");
+        bnTrustedModulus.SetHex("9ff28c9cb5039df509a37260e10ae66ef880a538824de54e78051eed6a95ceb0509dd160eb77ec47279453c3b2e58f1ac25a607277d403e05a8ae5e8e4c8365fa3eec911f9a1e0a4ad58bc4c5a3531c5632e13a94526851c618f59715842c56b31af96b973a7c0bae154cddd8f67985783f299616d588f7fe1942d3f2a766711b8690cc3a225d52d93130594e130a17e51602eda21a03dc955075b6fa20f3d4e25a91d32b0aef75d8ca05802fa159f94b9b0f2e385744bc6105b744727ea063b59e8cf838fcf5dcd31d399919db49cd1c73ea9bff02be4e92c3766b65219ae79ee2bb61441d4362c8251d2f2d97314c7e56a40e21b13fa5016e16482065bd797960a04069b97b23bcbe699e78e87fec1d8ea1f035e0ac643bb5a873ed0a2282ccfa31b5fd464264a793025e8357841596e4d995d95092980b73616345d37acb9284344cf862dc5c5729f32abc46e96603e1d3ff5263fc7d02b2eb62d35dc4b3b958d5b3e4bbd3884a5a112903552354a400db24fc60e2a4fb35eb151f8b57cd8dde7b68c1bfe2755f05c4af071c1f15d58b59d56761a72b03277e03d75156733b19bcdf2b62cd58e56e7f774c22856f8ece7c6e49445e481f29b265390e785e7857046d45a671b9a435642cfa445c47d8e8e2212fe3073bd86577e0083be490db1cf4a14095dc958eab7b4ca3c45c900bb68c9928d41859a70ad602fcc7c4309");
     }
 
     // Set up the Zerocoin Params object
@@ -3145,7 +3157,7 @@ bool LoadBlockIndex(bool fAllowNew)
             return false;
 
         // Genesis block
-/*
+        /*
         // MainNet
         CBlock(hash=00000e95eda26ced69bcda5d4794e153c54b2a7edb7752439a7c5d376238c7e0, ver=1, hashPrevBlock=0000000000000000000000000000000000000000000000000000000000000000, hashMerkleRoot=13ac7b8ed4b6d3450aba496e7c146c1c0e50b38850777bc4d76d80c3ad8b76dc, nTime=1393864140, nBits=1e0fffff, nNonce=3241266, vtx=1, vchBlockSig=)
         Coinbase(hash=13ac7b8ed4, nTime=1393864140, ver=1, vin.size=1, vout.size=1, nLockTime=0)
@@ -3261,7 +3273,7 @@ void PrintBlockTree()
             for (int i = 0; i < nCol; i++)
                 printf("| ");
             printf("|\n");
-       }
+        }
         nPrevCol = nCol;
 
         // print columns
@@ -3272,14 +3284,14 @@ void PrintBlockTree()
         CBlock block;
         block.ReadFromDisk(pindex);
         printf("%d (%u,%u) %s  %08x  %s  mint %7s  tx %"PRIszu"",
-            pindex->nHeight,
-            pindex->nFile,
-            pindex->nBlockPos,
-            block.GetHash().ToString().c_str(),
-            block.nBits,
-            DateTimeStrFormat("%x %H:%M:%S", block.GetBlockTime()).c_str(),
-            FormatMoney(pindex->nMint).c_str(),
-            block.vtx.size());
+               pindex->nHeight,
+               pindex->nFile,
+               pindex->nBlockPos,
+               block.GetHash().ToString().c_str(),
+               block.nBits,
+               DateTimeStrFormat("%x %H:%M:%S", block.GetBlockTime()).c_str(),
+               FormatMoney(pindex->nMint).c_str(),
+               block.vtx.size());
 
         PrintWallets(block);
 
@@ -3443,20 +3455,20 @@ bool static AlreadyHave(CTxDB& txdb, const CInv& inv)
     switch (inv.type)
     {
     case MSG_TX:
-        {
+    {
         bool txInMap = false;
-            {
+        {
             LOCK(mempool.cs);
             txInMap = (mempool.exists(inv.hash));
-            }
-        return txInMap ||
-               mapOrphanTransactions.count(inv.hash) ||
-               txdb.ContainsTx(inv.hash);
         }
+        return txInMap ||
+                mapOrphanTransactions.count(inv.hash) ||
+                txdb.ContainsTx(inv.hash);
+    }
 
     case MSG_BLOCK:
         return mapBlockIndex.count(inv.hash) ||
-               mapOrphanBlocks.count(inv.hash);
+                mapOrphanBlocks.count(inv.hash);
     }
     // Don't know what it is, just say we already got one
     return true;
@@ -3474,9 +3486,9 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
 {
     if (pfrom->nStartingHeight == 15553)
     {
-	printf("partner %s on a forked chain 15553 version %i; disconnecting\n", pfrom->addr.ToString().c_str(), pfrom->nVersion);
-	pfrom->Misbehaving(100);
-	pfrom->fDisconnect = true;
+        printf("partner %s on a forked chain 15553 version %i; disconnecting\n", pfrom->addr.ToString().c_str(), pfrom->nVersion);
+        pfrom->Misbehaving(100);
+        pfrom->fDisconnect = true;
     }
     static map<CService, CPubKey> mapReuseKey;
     RandAddSeedPerfmon();
@@ -3513,9 +3525,9 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         }
 
         if(nTime > 1400198400) // Fri, 16 May 2014 00:00:00 GMT
-		{
-		    if(pfrom->nVersion < 70009)
-		        badVersion = true;
+        {
+            if(pfrom->nVersion < 70009)
+                badVersion = true;
         }
         else
         {
@@ -3595,9 +3607,9 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         // Ask the first connected node for block updates
         static int nAskedForBlocks = 0;
         if (!pfrom->fClient && !pfrom->fOneShot &&
-            (pfrom->nStartingHeight > (nBestHeight - 144)) &&
-            (pfrom->nVersion < NOBLKS_VERSION_START || pfrom->nVersion >= NOBLKS_VERSION_END) &&
-            (nAskedForBlocks < 1 || vNodes.size() <= 1) && (pfrom->nStartingHeight != 15553)) // don't download from fork 15553
+                (pfrom->nStartingHeight > (nBestHeight - 144)) &&
+                (pfrom->nVersion < NOBLKS_VERSION_START || pfrom->nVersion >= NOBLKS_VERSION_END) &&
+                (nAskedForBlocks < 1 || vNodes.size() <= 1) && (pfrom->nStartingHeight != 15553)) // don't download from fork 15553
         {
             nAskedForBlocks++;
             pfrom->PushGetBlocks(pindexBest, uint256(0));
@@ -3607,7 +3619,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         {
             LOCK(cs_mapAlerts);
             BOOST_FOREACH(PAIRTYPE(const uint256, CAlert)& item, mapAlerts)
-                item.second.RelayTo(pfrom);
+                    item.second.RelayTo(pfrom);
         }
 
         // Relay sync-checkpoint
@@ -3879,7 +3891,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
             pfrom->hashCheckpointKnown = checkpoint.hashCheckpoint;
             LOCK(cs_vNodes);
             BOOST_FOREACH(CNode* pnode, vNodes)
-                checkpoint.RelayTo(pnode);
+                    checkpoint.RelayTo(pnode);
         }
     }
 
@@ -3971,7 +3983,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
             }
 
             BOOST_FOREACH(uint256 hash, vEraseQueue)
-                EraseOrphanTx(hash);
+                    EraseOrphanTx(hash);
         }
         else if (fMissingInputs)
         {
@@ -4011,7 +4023,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         pfrom->vAddrToSend.clear();
         vector<CAddress> vAddr = addrman.GetAddr();
         BOOST_FOREACH(const CAddress &addr, vAddr)
-            if(addr.nTime > nCutOff)
+                if(addr.nTime > nCutOff)
                 pfrom->PushAddress(addr);
     }
 
@@ -4025,7 +4037,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
             CInv inv(MSG_TX, vtxid[i]);
             vInv.push_back(inv);
             if (i == (MAX_INV_SZ - 1))
-                    break;
+                break;
         }
         if (vInv.size() > 0)
             pfrom->PushMessage("inv", vInv);
@@ -4116,7 +4128,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
                 {
                     LOCK(cs_vNodes);
                     BOOST_FOREACH(CNode* pnode, vNodes)
-                        alert.RelayTo(pnode);
+                            alert.RelayTo(pnode);
                 }
             }
             else {
@@ -4218,7 +4230,7 @@ bool ProcessMessages(CNode* pfrom)
         if (nChecksum != hdr.nChecksum)
         {
             printf("ProcessMessages(%s, %u bytes) : CHECKSUM ERROR nChecksum=%08x hdr.nChecksum=%08x\n",
-               strCommand.c_str(), nMessageSize, nChecksum, hdr.nChecksum);
+                   strCommand.c_str(), nMessageSize, nChecksum, hdr.nChecksum);
             continue;
         }
 

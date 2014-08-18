@@ -866,6 +866,7 @@ void BitcoinGUI::unlockWallet()
 {
     if(!walletModel)
         return;
+        
     // Unlock wallet when requested by wallet model
     if(walletModel->getEncryptionStatus() == WalletModel::Locked || fWalletUnlockStakingOnly)
     {
@@ -875,7 +876,6 @@ void BitcoinGUI::unlockWallet()
         dlg.exec();
     }
 }
-
 
 void BitcoinGUI::unlockWalletStaking()
 {

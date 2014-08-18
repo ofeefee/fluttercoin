@@ -61,6 +61,7 @@
 extern CWallet* pwalletMain;
 extern int64 nLastCoinStakeSearchInterval;
 extern unsigned int nStakeTargetSpacing;
+extern bool fWalletUnlockStakingOnly;
 double GetPoSKernelPS();
 
 BitcoinGUI::BitcoinGUI(QWidget *parent):
@@ -291,7 +292,7 @@ void BitcoinGUI::createActions()
     connect(encryptWalletAction, SIGNAL(triggered(bool)), this, SLOT(encryptWallet(bool)));
     connect(backupWalletAction, SIGNAL(triggered()), this, SLOT(backupWallet()));
     connect(changePassphraseAction, SIGNAL(triggered()), this, SLOT(changePassphrase()));
-    connect(unlockWalletAction, SIGNAL(triggered()), this, SLOT(unlockWallet()));
+    connect(unlockWalletAction, SIGNAL(triggered()), this, SLOT(unlockWalletStaking()));
     connect(signMessageAction, SIGNAL(triggered()), this, SLOT(gotoSignMessageTab()));
     connect(verifyMessageAction, SIGNAL(triggered()), this, SLOT(gotoVerifyMessageTab()));
 }
@@ -866,11 +867,26 @@ void BitcoinGUI::unlockWallet()
     if(!walletModel)
         return;
     // Unlock wallet when requested by wallet model
+    if(walletModel->getEncryptionStatus() == WalletModel::Locked || fWalletUnlockStakingOnly)
+    {
+        AskPassphraseDialog::Mode mode = AskPassphraseDialog::Unlock;
+        AskPassphraseDialog dlg(mode, this);
+        dlg.setModel(walletModel);
+        dlg.exec();
+    }
+}
+
+
+void BitcoinGUI::unlockWalletStaking()
+{
+    if(!walletModel)
+        return;
+
+    // Unlock wallet when requested by wallet model
     if(walletModel->getEncryptionStatus() == WalletModel::Locked)
     {
-		AskPassphraseDialog::Mode mode = sender() == unlockWalletAction ?
-            AskPassphraseDialog::UnlockStaking : AskPassphraseDialog::Unlock;
-        AskPassphraseDialog dlg(AskPassphraseDialog::Unlock, this);
+        AskPassphraseDialog::Mode mode = AskPassphraseDialog::UnlockStaking;
+        AskPassphraseDialog dlg(mode, this);
         dlg.setModel(walletModel);
         dlg.exec();
     }

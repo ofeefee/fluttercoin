@@ -870,7 +870,7 @@ void BitcoinGUI::changePassphrase()
     dlg.exec();
 }
 
-void BitcoinGUI::lockwallet()
+void BitcoinGUI::lockWallet()
 {
     if(!walletModel)
         return;    

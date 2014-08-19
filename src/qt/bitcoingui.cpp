@@ -877,7 +877,7 @@ void BitcoinGUI::lockWallet()
     
     {
         walletModel->setWalletLocked(true);
-        fWalletUnlockMintOnly = false;
+        fWalletUnlockStakingOnly = false;
     }
 }
 

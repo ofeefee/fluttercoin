@@ -27,6 +27,8 @@ AskPassphraseDialog::AskPassphraseDialog(Mode mode, QWidget *parent) :
     ui->passEdit2->installEventFilter(this);
     ui->passEdit3->installEventFilter(this);
 
+    ui->stakingCheckBox->setChecked(fWalletUnlockStakingOnly);
+
     switch(mode)
     {
         case Encrypt: // Ask passphrase x2
@@ -36,7 +38,7 @@ AskPassphraseDialog::AskPassphraseDialog(Mode mode, QWidget *parent) :
             setWindowTitle(tr("Encrypt wallet"));
             break;
         case UnlockStaking:
-		    ui->stakingCheckBox->setChecked(true);
+            ui->stakingCheckBox->setChecked(true);
             ui->stakingCheckBox->show();
             // fallthru
         case Unlock: // Ask passphrase
@@ -153,7 +155,7 @@ void AskPassphraseDialog::accept()
         }
         else
         {
-			fWalletUnlockStakingOnly = ui->stakingCheckBox->isChecked();
+            fWalletUnlockStakingOnly = ui->stakingCheckBox->isChecked();
             QDialog::accept(); // Success
         }
         break;

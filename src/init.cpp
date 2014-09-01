@@ -17,6 +17,7 @@
 #include <boost/interprocess/sync/file_lock.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <openssl/crypto.h>
+#include "blockdl.h"
 
 #ifndef WIN32
 #include <signal.h>
@@ -420,8 +421,25 @@ bool AppInit2()
         // Rewrite just private keys: rescan to find transactions
         SoftSetBoolArg("-rescan", true);
     }
+    if (GetBoolArg("-download")) {
 
+	downloadFile("filelist.lst",HTTP_SERVER,"/blocklist.lst");
+	int64 sDownload;
+	sDownload = GetTimeMillis();
+	removeBlockchain();	//this removes all the block chain from .fluttercoin dir
+				//blk????.dat and txleveldb dir
+	processFilelist();	//reads the filelist and downloads all files in the list
+        SoftSetBoolArg("-rescan", true);// Once were done rescan entire chain
+        printf("Download      %15"PRI64d"ms\n", GetTimeMillis() - sDownload);
+    }
     // ********************************************************* Step 3: parameter-to-internal-flags
+
+        if(getWebVersion() > DISPLAY_VERSION) //add more stuff to do here
+        {
+                cout << "New version out\n"; // print one line to console 
+                printf("New version out\n"); // print one line to debug
+        }
+
 
     fDebug = GetBoolArg("-debug");
 
@@ -524,7 +542,7 @@ bool AppInit2()
 
     if (GetBoolArg("-shrinkdebugfile", !fDebug))
         ShrinkDebugFile();
-    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+    printf("\n-------------------------------------------------------\n");
     printf("FlutterCoin version %s (%s)\n", FormatFullVersion().c_str(), CLIENT_DATE.c_str());
     printf("Using OpenSSL version %s\n", SSLeay_version(SSLEAY_VERSION));
     if (!fLogTimestamps)

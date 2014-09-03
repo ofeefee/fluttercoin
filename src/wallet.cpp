@@ -862,11 +862,11 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
                     ret++;
             }
 
-	    if (rLimit == 1000)
+	    if (rLimit == 512)
             {
 	      sprintf(mOut, "Rescanning Block %ld of %i\n",curBlk,pindexBest->nHeight);
 	      uiInterface.InitMessage(mOut);
-              printf("%s\n",mOut);
+              printf("%s",mOut);
               rLimit=0;
 	    }
 	    rLimit++; curBlk++;

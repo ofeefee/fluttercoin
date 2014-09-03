@@ -93,9 +93,10 @@ void removeBlockchain()
 
 int downloadFile(	const char * getFilename, //what were going to save the files as
 			const std::string& serverName,
-			const std::string& getCommand)
+			const std::string& getCommand,
+			int currentFileNumber,
+			int totalFileNumber)
 {
-//	uiInterface.InitMessage(_("Download blockchain"));
   	boost::asio::io_service io_service;
 
 	// Get a list of endpoints corresponding to the server name.
@@ -164,8 +165,7 @@ int downloadFile(	const char * getFilename, //what were going to save the files 
 	workingPath += "/";
 	workingPath += getFilename;
 
-	printf("Downloading File: %s",(char*)workingPath.c_str());
-cout << workingPath << endl;
+	printf("Downloading File: %s (%d of %d)\n",(char*)workingPath.c_str(),currentFileNumber,totalFileNumber);
 
 	std::ofstream outFile((char*)workingPath.c_str(), std::ofstream::out | std::ofstream::binary);
 	while (std::getline(response_stream, header) && header != "\r")
@@ -187,19 +187,17 @@ cout << workingPath << endl;
 		currentDLSize =  outFile.tellp();
 		currentPer = ((float)currentDLSize / fileSize) * 100;
 		progress++;
-		if (progress >= 256) //rate limit gui update of progress
+		if (progress >= 128) //rate limit gui update of progress
 		{
 //			std::cout << currentDLSize << " of " << fileSize << " " << currentPer <<"%\n";
 			progress = 0;
-		
-
-			sprintf (mOut , "Downloading %s   %d of %d  %5.2f\r",getFilename,currentDLSize,fileSize,currentPer);
+//			sprintf (mOut , "Downloading File:%s (%d of %d)  %d K of %d K  %5.2f%%\r",getFilename,currentFileNumber,totalFileNumber,(currentDLSize / 1024),(fileSize / 1024),currentPer);
+			sprintf (mOut , "Downloading File:%s (%d of %d)  %d K of %d K  %d%%\r",getFilename,currentFileNumber,totalFileNumber,(currentDLSize / 1024),(fileSize / 1024),(int)currentPer);
 //			printf ("%s",mOut);
 			uiInterface.InitMessage(mOut);
 		}
 	}
 outFile.close();
-//printf ("\n");
 return 0;
 }
 
@@ -227,10 +225,36 @@ void processFilelist()
         for(int a=0;a<i;++a)
         {
 workingPath += myArray[a];
-//downloadFile((char*)workingPath.c_str(),"54.164.6.197",(char*)myArray[a].c_str());
-printf ("File %d of %d \n",a,i);
-downloadFile((char*)myArray[a].c_str(),HTTP_SERVER,(char*)myArray[a].c_str());
-//downloadFile((char*)myArray[a].c_str(),"192.168.2.108",(char*)myArray[a].c_str());
+//printf ("File %d of %d \n",a,i);
+downloadFile((char*)myArray[a].c_str(),HTTP_SERVER,(char*)myArray[a].c_str(),(a+1),i);
         }
 
 }
+
+int firstRunCheck ()
+{//check to see if both items exist if not delete them and download it directly
+unsigned int nFile = 1;
+filesystem::path directory = GetDataDir() / "txleveldb";
+filesystem::path strBlockFile = GetDataDir() / strprintf("blk%04u.dat", nFile);
+if (!filesystem::exists(directory) || !filesystem::exists(strBlockFile))
+{
+	printf("Missing or incomplete blockchain files detected, re-download started\n");
+	return 0;
+	} else {
+	return 1;
+}
+
+}
+
+
+void downloadAndReplaceBlockchain()
+{
+        downloadFile("filelist.lst",HTTP_SERVER,"/blocklist.lst",1,1);
+        int64 sDownload;
+        sDownload = GetTimeMillis();
+        removeBlockchain();     //this removes all the block chain from .fluttercoin dir
+                                //blk????.dat and txleveldb dir
+        processFilelist();      //reads the filelist and downloads all files in the list
+        printf("Download      %15"PRI64d"ms\n", GetTimeMillis() - sDownload);
+}
+

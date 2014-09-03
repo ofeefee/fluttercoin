@@ -261,6 +261,7 @@ std::string HelpMessage()
         "  -bantime=<n>           " + _("Number of seconds to keep misbehaving peers from reconnecting (default: 86400)") + "\n" +
         "  -maxreceivebuffer=<n>  " + _("Maximum per-connection receive buffer, <n>*1000 bytes (default: 5000)") + "\n" +
         "  -maxsendbuffer=<n>     " + _("Maximum per-connection send buffer, <n>*1000 bytes (default: 1000)") + "\n" +
+        "  -download		  " + _("Download blockchain files from HTTP server (removes current files)") + "\n" +
 #ifdef USE_UPNP
 #if USE_UPNP
         "  -upnp                  " + _("Use UPnP to map the listening port (default: 1 when listening)") + "\n" +
@@ -365,6 +366,11 @@ bool AppInit2()
 #endif
 
     // ********************************************************* Step 2: parameter interactions
+if (firstRunCheck() == 0)
+	{// check to see if any of the chain files exist if not redownload them
+	downloadAndReplaceBlockchain();
+        SoftSetBoolArg("-rescan", true);// Once were done rescan entire chain for tx
+	}
 
     nNodeLifespan = GetArg("-addrlifespan", 7);
     fUseFastIndex = GetBoolArg("-fastindex", true);
@@ -421,15 +427,17 @@ bool AppInit2()
         // Rewrite just private keys: rescan to find transactions
         SoftSetBoolArg("-rescan", true);
     }
+
     if (GetBoolArg("-download")) {
 
-	downloadFile("filelist.lst",HTTP_SERVER,"/blocklist.lst");
+	downloadFile("filelist.lst",HTTP_SERVER,"/blocklist.lst",1,1);
 	int64 sDownload;
 	sDownload = GetTimeMillis();
 	removeBlockchain();	//this removes all the block chain from .fluttercoin dir
 				//blk????.dat and txleveldb dir
 	processFilelist();	//reads the filelist and downloads all files in the list
-        SoftSetBoolArg("-rescan", true);// Once were done rescan entire chain
+//        SoftSetBoolArg("-checkblocks", 0);// Once were done check entire chain
+        SoftSetBoolArg("-rescan", true);// Once were done rescan entire chain for tx
         printf("Download      %15"PRI64d"ms\n", GetTimeMillis() - sDownload);
     }
     // ********************************************************* Step 3: parameter-to-internal-flags

@@ -226,7 +226,7 @@ void processFilelist()
         {
 workingPath += myArray[a];
 //printf ("File %d of %d \n",a,i);
-downloadFile((char*)myArray[a].c_str(),HTTP_SERVER,(char*)myArray[a].c_str(),(a+1),i);
+downloadFile((char*)myArray[a].c_str(),HTTP_SERVER,(char*)myArray[a].c_str(),(a+1),(i+1));
         }
 
 }

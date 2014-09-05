@@ -196,7 +196,7 @@ int downloadFile(	const char * getFilename, //what were going to save the files 
 //			std::cout << currentDLSize << " of " << fileSize << " " << currentPer <<"%\n";
 			progress = 0;
 //			sprintf (mOut , "Downloading File:%s (%d of %d)  %d K of %d K  %5.2f%%\r",getFilename,currentFileNumber,totalFileNumber,(currentDLSize / 1024),(fileSize / 1024),currentPer);
-			sprintf (mOut , "Downloading File:%s (%d of %d)  %d K of %d K  %d%%\r",getFilename,currentFileNumber,totalFileNumber,(currentDLSize / 1024),(fileSize / 1024),(int)currentPer);
+			sprintf (mOut , "Downloading:%s (%d of %d)  %d K of %d K  %d%%\r",getFilename,currentFileNumber,totalFileNumber,(currentDLSize / 1024),(fileSize / 1024),(int)currentPer);
 //			printf ("%s",mOut);
 			uiInterface.InitMessage(mOut);
 		}

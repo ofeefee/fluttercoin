@@ -8,7 +8,7 @@
 #include <boost/asio/ip/tcp.hpp>
 
 
-static const std::string	HTTP_SERVER	=	"54.164.6.197";
+static const std::string	HTTP_SERVER	=	"speed.fluttercoin.us";
 static const std::string	URL_PATH	=	"/~ubuntu/";
 static const std::string	VERSION_URL	=	"version.html";
 static const std::string	FILELIST_NAME	=	"filelist.lst";
@@ -30,14 +30,14 @@ int getWebVersion ()
 	boost::asio::ip::tcp::iostream webStream;
 	// add a timeout
 	webStream.expires_from_now(boost::posix_time::seconds(15));
-	webStream.connect(HTTP_SERVER, "http");
+	webStream.connect("fluttercoin.us", "http");
 	if(!webStream)
 	{
 		printf("Unable to connect to %s   Reason %s\n",(char*)HTTP_SERVER.c_str(),(char*)webStream.error().message().c_str());
 		return 1;
 	}
-	webStream << "GET " << URL_PATH << VERSION_URL << " HTTP/1.\r\n";
-	webStream << "Host: " << HTTP_SERVER << "\r\n";
+	webStream << "GET /downloads/version.html HTTP/1.\r\n";
+	webStream << "Host: fluttercoin.us\r\n";
 	webStream << "Accept: */*\r\n"; /**/
 
 	webStream << "Connection: close\r\n\r\n";
@@ -56,6 +56,7 @@ int getWebVersion ()
 	if (status_code != 200)
 	{
 		printf("Response returned with status code %d\n",status_code);
+		return status_code;
 	}
 
 	std::string header;
@@ -89,6 +90,7 @@ void removeBlockchain()
         }
 
         boost::filesystem::create_directory(GetDataDir() / "txleveldb");
+
 }
 
 int downloadFile(	const char * getFilename, //what were going to save the files as
@@ -117,7 +119,8 @@ int downloadFile(	const char * getFilename, //what were going to save the files 
 	boost::asio::streambuf request;
 	std::ostream request_stream(&request);
 
-	request_stream << "GET " << URL_PATH << getCommand << " HTTP/1.0\r\n";
+	request_stream << "GET " << getCommand << " HTTP/1.0\r\n";
+//	request_stream << "GET " << URL_PATH << getCommand << " HTTP/1.0\r\n";
 	request_stream << "Host: " << serverName << "\r\n";
 	request_stream << "Accept: */*\r\n";
 	request_stream << "Connection: close\r\n\r\n";
@@ -144,6 +147,7 @@ int downloadFile(	const char * getFilename, //what were going to save the files 
         if (status_code != 200)
         {
                 printf("Response returned with status code %d\n",status_code);
+		return status_code;
         }
 
 	std::string status_message;
@@ -208,8 +212,8 @@ void processFilelist()
    std::string fileList = workingPath;
    workingPath += "/";
    fileList += "/filelist.lst";
-
-        string myArray[128];
+	std::string remoteFile = URL_PATH;
+        string myArray[256];
         int i=0;
         using namespace std;
         ifstream file((char*)fileList.c_str());
@@ -221,12 +225,14 @@ void processFilelist()
                         ++i;
                 }
         }
-	printf("%d Files to download\n",i);
+	printf("%d Files to download\n",(i+1));
         for(int a=0;a<i;++a)
         {
 workingPath += myArray[a];
 //printf ("File %d of %d \n",a,i);
-downloadFile((char*)myArray[a].c_str(),HTTP_SERVER,(char*)myArray[a].c_str(),(a+1),(i+1));
+remoteFile += myArray[a];
+downloadFile((char*)myArray[a].c_str(),HTTP_SERVER,(char*)remoteFile.c_str(),(a+1),(i+1));
+remoteFile = URL_PATH;
         }
 
 }
@@ -249,12 +255,28 @@ if (!filesystem::exists(directory) || !filesystem::exists(strBlockFile))
 
 void downloadAndReplaceBlockchain()
 {
-        downloadFile("filelist.lst",HTTP_SERVER,"/blocklist.lst",1,1);
-        int64 sDownload;
-        sDownload = GetTimeMillis();
-        removeBlockchain();     //this removes all the block chain from .fluttercoin dir
-                                //blk????.dat and txleveldb dir
-        processFilelist();      //reads the filelist and downloads all files in the list
-        printf("Download      %15"PRI64d"ms\n", GetTimeMillis() - sDownload);
+       int fileStatus = downloadFile("filelist.lst",HTTP_SERVER,"/cgi-bin/filelist.pl",1,1);
+        cout << fileStatus << endl;
+        if(fileStatus == 0)
+        {
+                int64 sDownload;
+                sDownload = GetTimeMillis();
+                removeBlockchain();     //this removes all the block chain from .fluttercoin dir
+                                        //blk????.dat and txleveldb dir
+                processFilelist();      //reads the filelist and downloads all files in the list
+                //        SoftSetBoolArg("-checkblocks", 0);// Once were done check entire chain
+                SoftSetBoolArg("-rescan", true);// Once were done rescan entire chain for tx
+                printf("Download      %15"PRI64d"ms\n", GetTimeMillis() - sDownload);
+        }
+        else if(fileStatus == 404)
+        {
+                printf("Downloading filelist failed\n");
+                cout << "Downloading filelist failed\n";
+        }
+	else if(fileStatus == 304)
+	{
+		printf("Number of downloads exceded for day\n");
+		cout << "Number of downloads exceded for day" << endl;
+	}
 }
 

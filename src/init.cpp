@@ -368,8 +368,10 @@ bool AppInit2()
     // ********************************************************* Step 2: parameter interactions
 if (firstRunCheck() == 0)
 	{// check to see if any of the chain files exist if not redownload them
+        boost::filesystem::path fileList = GetDataDir() / "filelist.lst";
+        boost::filesystem::remove(fileList);
+
 	downloadAndReplaceBlockchain();
-        SoftSetBoolArg("-rescan", true);// Once were done rescan entire chain for tx
 	}
 
     nNodeLifespan = GetArg("-addrlifespan", 7);
@@ -428,23 +430,17 @@ if (firstRunCheck() == 0)
         SoftSetBoolArg("-rescan", true);
     }
 
-    if (GetBoolArg("-download")) {
-
-	downloadFile("filelist.lst",HTTP_SERVER,"/blocklist.lst",1,1);
-	int64 sDownload;
-	sDownload = GetTimeMillis();
-	removeBlockchain();	//this removes all the block chain from .fluttercoin dir
-				//blk????.dat and txleveldb dir
-	processFilelist();	//reads the filelist and downloads all files in the list
-//        SoftSetBoolArg("-checkblocks", 0);// Once were done check entire chain
-        SoftSetBoolArg("-rescan", true);// Once were done rescan entire chain for tx
-        printf("Download      %15"PRI64d"ms\n", GetTimeMillis() - sDownload);
+    if (GetBoolArg("-download")) 
+    {
+        boost::filesystem::path fileList = GetDataDir() / "filelist.lst";
+        boost::filesystem::remove(fileList); 
+	downloadAndReplaceBlockchain();
     }
     // ********************************************************* Step 3: parameter-to-internal-flags
 
         if(getWebVersion() > DISPLAY_VERSION) //add more stuff to do here
         {
-                cout << "New version out\n"; // print one line to console 
+                cout << "New version out " << getWebVersion() << "\n"; // print one line to console 
                 printf("New version out\n"); // print one line to debug
         }
 

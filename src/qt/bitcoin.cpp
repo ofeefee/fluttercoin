@@ -11,6 +11,7 @@
 #include "init.h"
 #include "ui_interface.h"
 #include "qtipcserver.h"
+#include "newversion.h"
 
 #include <QApplication>
 #include <QMessageBox>
@@ -110,6 +111,12 @@ static void handleRunawayException(std::exception *e)
     exit(1);
 }
 
+static void newVersion()
+{
+	NewVersion newVersionDLG;
+	newVersionDLG.exec();
+}
+
 #ifndef BITCOIN_QT_TEST
 int main(int argc, char *argv[])
 {
@@ -188,6 +195,7 @@ int main(int argc, char *argv[])
     uiInterface.InitMessage.connect(InitMessage);
     uiInterface.QueueShutdown.connect(QueueShutdown);
     uiInterface.Translate.connect(Translate);
+    uiInterface.newVersion.connect(newVersion);
 
     // Show help message immediately after parsing command-line options (for "-lang") and setting locale,
     // but before showing splash screen.
@@ -267,4 +275,6 @@ int main(int argc, char *argv[])
     }
     return 0;
 }
+
+
 #endif // BITCOIN_QT_TEST

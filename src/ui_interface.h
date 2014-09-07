@@ -88,6 +88,10 @@ public:
      * @note called with lock cs_mapAlerts held.
      */
     boost::signals2::signal<void (const uint256 &hash, ChangeType status)> NotifyAlertChanged;
+
+    // Updated client dialog box
+    boost::signals2::signal<void ()> newVersion;
+
 };
 
 extern CClientUIInterface uiInterface;

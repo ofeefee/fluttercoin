@@ -440,8 +440,9 @@ if (firstRunCheck() == 0)
 
         if(getWebVersion() > DISPLAY_VERSION) //add more stuff to do here
         {
-                cout << "New version out " << getWebVersion() << "\n"; // print one line to console 
-                printf("New version out\n"); // print one line to debug
+		cout << "New version out " << getWebVersion() << "\n"; // print one line to console 
+		printf("New version out\n"); // print one line to debug
+		uiInterface.newVersion();
         }
 
 

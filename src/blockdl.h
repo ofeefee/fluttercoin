@@ -159,7 +159,7 @@ int downloadFile(	const char * getFilename, //what were going to save the files 
 		if (progress >= 128) //rate limit gui update of progress
 		{
 			progress = 0;
-			sprintf (mOut , "Downloading:%s (%d of %d)  %d K of %d K  %d%%\r",getFilename,currentFileNumber,totalFileNumber,(currentDLSize / 1024),(fileSize / 1024),(int)currentPer);
+			sprintf (mOut , "Downloading:%s (%d of %d)  %d K of %d K  %d%%",getFilename,currentFileNumber,totalFileNumber,(currentDLSize / 1024),(fileSize / 1024),(int)currentPer);
 			uiInterface.InitMessage(mOut);
 		}
 	}
@@ -191,7 +191,6 @@ void processFilelist()
         for(int a=0;a<i;++a)
         {
 workingPath += myArray[a];
-//printf ("File %d of %d \n",a,i);
 remoteFile += myArray[a];
 downloadFile((char*)myArray[a].c_str(),HTTP_SERVER,(char*)remoteFile.c_str(),(a+1),(i-1));
 remoteFile = URL_PATH;

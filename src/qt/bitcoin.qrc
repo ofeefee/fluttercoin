@@ -45,7 +45,7 @@
     </qresource>
     <qresource prefix="/images">
         <file alias="about">res/images/about2a.png</file>
-        <file alias="splash">res/images/splash2a.png</file>
+        <file alias="splash">res/images/splash2b.png</file>
     </qresource>
     <qresource prefix="/movies">
         <file alias="update_spinner">res/movies/update_spinner.mng</file>

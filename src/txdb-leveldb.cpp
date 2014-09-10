@@ -462,9 +462,9 @@ bool CTxDB::LoadBlockIndex()
 // Keep track of progress
       if (rLimit == 512)
             {
-              sprintf(mOut, "Verifying Block %ld of %i\n",curBlk,pindexBest->nHeight);
+              sprintf(mOut, "Verifying Block %ld of %i",curBlk,pindexBest->nHeight);
               uiInterface.InitMessage(mOut);
-              printf("%s",mOut);
+              printf("%s\n",mOut);
               rLimit=0;
             }
             rLimit++; curBlk++;

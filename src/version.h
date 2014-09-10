@@ -54,4 +54,10 @@ static const int MEMPOOL_GD_VERSION = 70000;
 #define DISPLAY_VERSION_REVISION    5
 #define DISPLAY_VERSION_BUILD       12 
 
+static const int DISPLAY_VERSION =
+                           1000000 * DISPLAY_VERSION_MAJOR
+                         +   10000 * DISPLAY_VERSION_MINOR
+                         +     100 * DISPLAY_VERSION_REVISION
+                         +       1 * DISPLAY_VERSION_BUILD;
+
 #endif

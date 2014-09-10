@@ -10,71 +10,15 @@
 
 static const std::string	HTTP_SERVER	=	"speed.fluttercoin.us";
 static const std::string	URL_PATH	=	"/~ubuntu/";
-static const std::string	VERSION_URL	=	"version.html";
 static const std::string	FILELIST_NAME	=	"filelist.lst";
 
-static const int DISPLAY_VERSION =
-                           1000000 * DISPLAY_VERSION_MAJOR
-                         +   10000 * DISPLAY_VERSION_MINOR
-                         +     100 * DISPLAY_VERSION_REVISION
-                         +       1 * DISPLAY_VERSION_BUILD;
 
 using namespace std;
 using namespace boost;
 using namespace boost::asio;
 using boost::asio::ip::tcp;
 
-int getWebVersion ()
-{
-
-	boost::asio::ip::tcp::iostream webStream;
-	// add a timeout
-	webStream.expires_from_now(boost::posix_time::seconds(15));
-	webStream.connect("fluttercoin.us", "http");
-	if(!webStream)
-	{
-		printf("Unable to connect to %s   Reason %s\n",(char*)HTTP_SERVER.c_str(),(char*)webStream.error().message().c_str());
-		return 1;
-	}
-	webStream << "GET /downloads/version.html HTTP/1.\r\n";
-	webStream << "Host: fluttercoin.us\r\n";
-	webStream << "Accept: */*\r\n"; /**/
-
-	webStream << "Connection: close\r\n\r\n";
-
-	std::string http_version;
-	webStream >> http_version;
-	unsigned int status_code;
-	webStream >> status_code;
-	std::string status_message;
-	std::getline(webStream, status_message);
-	if (!webStream || http_version.substr(0,5)  != "HTTP/")
-	{
-		printf("Invalid response\n");
-		return 2;
-	}
-	if (status_code != 200)
-	{
-		printf("Response returned with status code %d\n",status_code);
-		return status_code;
-	}
-
-	std::string header;
-	while(std::getline(webStream, header) && header != "\r")
-	{//grind though the headers I am sure there is a better way
-	}
-
-	std::ostringstream clientVersion;
-	clientVersion << webStream.rdbuf();
-
-//	printf("Version %s\n",(char*)clientVersion.str().c_str());
-	unsigned int returnVer;
-	returnVer = atoi((char*)clientVersion.str().c_str());
-//	printf("%d",ver);
-	return returnVer;
-}
-
-void removeBlockchain() 
+void removeBlockchain()
 {// basically a copy from txdb-leveldb.cpp init_blockindex
 
         boost::filesystem::path directory = GetDataDir() / "txleveldb";
@@ -99,6 +43,7 @@ int downloadFile(	const char * getFilename, //what were going to save the files 
 			int currentFileNumber,
 			int totalFileNumber)
 {
+	std::string errorOut;
   	boost::asio::io_service io_service;
 
 	// Get a list of endpoints corresponding to the server name.
@@ -113,7 +58,17 @@ int downloadFile(	const char * getFilename, //what were going to save the files 
   	while (error && endpoint_iterator != end)
   	{
 		socket.close();
-		socket.connect(*endpoint_iterator++, error);
+		try {
+			socket.connect(*endpoint_iterator++, error);
+		}
+		catch (boost::system::system_error& e) 
+		{
+			errorOut = "downloadFile: connection error";
+			errorOut +=  e.what();
+			errorOut += "\n";
+			printf("%s",(char*)errorOut.c_str());
+			return 3;
+		}
 	}
 
 	boost::asio::streambuf request;
@@ -127,7 +82,17 @@ int downloadFile(	const char * getFilename, //what were going to save the files 
 
 
 	// Send the request.
-	boost::asio::write(socket, request);
+	try {
+		boost::asio::write(socket, request);
+	}
+	catch (boost::system::system_error& e)
+	{
+			errorOut = "downloadFile: connection error"; 
+                        errorOut +=  e.what();
+                        errorOut += "\n";
+                        printf("%s",(char*)errorOut.c_str());
+                        return 3;
+	}
 
 	// Read the response status line.
 	boost::asio::streambuf response;
@@ -193,11 +158,8 @@ int downloadFile(	const char * getFilename, //what were going to save the files 
 		progress++;
 		if (progress >= 128) //rate limit gui update of progress
 		{
-//			std::cout << currentDLSize << " of " << fileSize << " " << currentPer <<"%\n";
 			progress = 0;
-//			sprintf (mOut , "Downloading File:%s (%d of %d)  %d K of %d K  %5.2f%%\r",getFilename,currentFileNumber,totalFileNumber,(currentDLSize / 1024),(fileSize / 1024),currentPer);
 			sprintf (mOut , "Downloading:%s (%d of %d)  %d K of %d K  %d%%\r",getFilename,currentFileNumber,totalFileNumber,(currentDLSize / 1024),(fileSize / 1024),(int)currentPer);
-//			printf ("%s",mOut);
 			uiInterface.InitMessage(mOut);
 		}
 	}
@@ -231,7 +193,7 @@ void processFilelist()
 workingPath += myArray[a];
 //printf ("File %d of %d \n",a,i);
 remoteFile += myArray[a];
-downloadFile((char*)myArray[a].c_str(),HTTP_SERVER,(char*)remoteFile.c_str(),(a+1),(i+1));
+downloadFile((char*)myArray[a].c_str(),HTTP_SERVER,(char*)remoteFile.c_str(),(a+1),(i-1));
 remoteFile = URL_PATH;
         }
 

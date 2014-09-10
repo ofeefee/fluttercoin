@@ -199,6 +199,8 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     connect(receiveCoinsPage, SIGNAL(signMessage(QString)), this, SLOT(gotoSignMessageTab(QString)));
 
     gotoOverviewPage();
+
+
 }
 
 BitcoinGUI::~BitcoinGUI()
@@ -987,3 +989,4 @@ void BitcoinGUI::updateStakingIcon()
             labelStakingIcon->setToolTip(tr("Not staking"));
     }
 }
+

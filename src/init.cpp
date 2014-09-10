@@ -430,21 +430,13 @@ if (firstRunCheck() == 0)
         SoftSetBoolArg("-rescan", true);
     }
 
-    if (GetBoolArg("-download")) 
+    if (GetBoolArg("-download"))
     {
         boost::filesystem::path fileList = GetDataDir() / "filelist.lst";
-        boost::filesystem::remove(fileList); 
+        boost::filesystem::remove(fileList);
 	downloadAndReplaceBlockchain();
     }
     // ********************************************************* Step 3: parameter-to-internal-flags
-
-        if(getWebVersion() > DISPLAY_VERSION) //add more stuff to do here
-        {
-		cout << "New version out " << getWebVersion() << "\n"; // print one line to console 
-		printf("New version out\n"); // print one line to debug
-		uiInterface.newVersion();
-        }
-
 
     fDebug = GetBoolArg("-debug");
 

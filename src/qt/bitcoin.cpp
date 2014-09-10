@@ -12,6 +12,7 @@
 #include "ui_interface.h"
 #include "qtipcserver.h"
 #include "newversion.h"
+#include "getwebversion.h"
 
 #include <QApplication>
 #include <QMessageBox>
@@ -84,7 +85,7 @@ static void InitMessage(const std::string &message)
 {
     if(splashref)
     {
-        splashref->showMessage(QString::fromStdString(message), Qt::AlignBottom|Qt::AlignHCenter, QColor(0,255,0));
+        splashref->showMessage(QString::fromStdString(message), Qt::AlignBottom | Qt::AlignHCenter, QColor(46,162,200));
         QApplication::instance()->processEvents();
     }
 }
@@ -110,11 +111,15 @@ static void handleRunawayException(std::exception *e)
     QMessageBox::critical(0, "Runaway exception", BitcoinGUI::tr("A fatal error occurred. FlutterCoin can no longer continue safely and will quit.") + QString("\n\n") + QString::fromStdString(strMiscWarning));
     exit(1);
 }
-
-static void newVersion()
+void checkVersion()
 {
-	NewVersion newVersionDLG;
-	newVersionDLG.exec();
+   if(DISPLAY_VERSION < getWebVersion()) //add more stuff to do here
+        {
+                cout << "New version out " << getWebVersion() << "\n"; // print one line to console 
+                printf("getWebVersion: New version out\n"); // print one line to debug
+	        NewVersion newVersionDLG;
+                newVersionDLG.exec();
+        }
 }
 
 #ifndef BITCOIN_QT_TEST
@@ -195,7 +200,6 @@ int main(int argc, char *argv[])
     uiInterface.InitMessage.connect(InitMessage);
     uiInterface.QueueShutdown.connect(QueueShutdown);
     uiInterface.Translate.connect(Translate);
-    uiInterface.newVersion.connect(newVersion);
 
     // Show help message immediately after parsing command-line options (for "-lang") and setting locale,
     // but before showing splash screen.
@@ -249,7 +253,8 @@ int main(int argc, char *argv[])
                 else
                 {
                     window.show();
-                }
+		    checkVersion();
+	        }
 
                 // Place this here as guiref has to be defined if we don't want to lose URIs
                 ipcInit(argc, argv);

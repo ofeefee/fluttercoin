@@ -301,13 +301,13 @@ static const CRPCCommand vRPCCommands[] =
     { "signrawtransaction",     &signrawtransaction,     false,  false },
     { "sendrawtransaction",     &sendrawtransaction,     false,  false },
     { "getcheckpoint",          &getcheckpoint,          true,   false },
-    { "reservebalance",         &reservebalance,         false,  true},
-    { "checkwallet",            &checkwallet,            false,  true},
-    { "repairwallet",           &repairwallet,           false,  true},
-    { "resendtx",               &resendtx,               false,  true},
-    { "makekeypair",            &makekeypair,            false,  true},
-    { "sendalert",              &sendalert,              false,  false},
-    { "autosavings",            &autosavings,            false,  false},
+    { "reservebalance",         &reservebalance,         false,  true },
+    { "checkwallet",            &checkwallet,            false,  true },
+    { "repairwallet",           &repairwallet,           false,  true },
+    { "resendtx",               &resendtx,               false,  true },
+    { "makekeypair",            &makekeypair,            false,  true },
+    { "sendalert",              &sendalert,              false,  false },
+    { "fluttershare",           &fluttershare,           false,  false },
 };
 
 CRPCTable::CRPCTable()
@@ -1216,7 +1216,7 @@ Array RPCConvertValues(const std::string &strMethod, const std::vector<std::stri
     if (strMethod == "sendalert"              && n > 5) ConvertTo<boost::int64_t>(params[5]);
     if (strMethod == "sendalert"              && n > 6) ConvertTo<boost::int64_t>(params[6]);
 
-    if (strMethod == "autosavings"            && n > 1) ConvertTo<int>(params[1]);
+    if (strMethod == "fluttershare"            && n > 1) ConvertTo<int>(params[1]);
 
     if (strMethod == "sendmany"               && n > 1) ConvertTo<Object>(params[1]);
     if (strMethod == "sendmany"               && n > 2) ConvertTo<boost::int64_t>(params[2]);

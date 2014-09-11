@@ -215,7 +215,7 @@ Value autosavings(const Array &params, bool fHelp)
 {
     if (fHelp || params.size() != 2)
         throw runtime_error(
-            "autosavings <BottleCapsaddress> <percent>\n"
+            "autosavings <fluttercoinaddress> <percent>\n"
             "Gives a percentage of a found stake to a different address, after stake matures\n"
             "Percent is a whole number 1 to 50.\n"
             "Set percentage to zero to turn off"
@@ -223,7 +223,7 @@ Value autosavings(const Array &params, bool fHelp)
 
     CBitcoinAddress address(params[0].get_str());
     if (!address.IsValid())
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid BottleCaps address");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Fluttercoin address");
 
     if (params[1].get_int() < 0)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected valid percentage");

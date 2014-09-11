@@ -779,7 +779,7 @@ int CMerkleTx::GetBlocksToMaturity() const
     if (!(IsCoinBase() || IsCoinStake()))
         return 0;
 
-    return max(0, (nCoinbaseMaturity+100) - GetDepthInMainChain()); // increase maturity of mined blocks
+    return max(0, (nCoinbaseMaturity+20) - GetDepthInMainChain()); // increase maturity of mined blocks
 
 }
 
@@ -2915,6 +2915,11 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
     }
 
     printf("ProcessBlock: ACCEPTED\n");
+
+    // If turned on autosavings, send a portion of stake reward to savings account address
+    if (pwalletMain->fAutoSavings)
+        if (!pwalletMain->AutoSavings() )
+            printf("ERROR While trying to send portion of stake reward to savings account");
 
     // fluttercoin: if responsible for sync-checkpoint send it
     if (pfrom && !CSyncCheckpoint::strMasterPrivKey.empty())

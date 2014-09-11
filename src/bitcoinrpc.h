@@ -150,8 +150,9 @@ extern json_spirit::Value dumpwallet(const json_spirit::Array& params, bool fHel
 extern json_spirit::Value importwallet(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value dumpprivkey(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
 extern json_spirit::Value importprivkey(const json_spirit::Array& params, bool fHelp);
-
 extern json_spirit::Value sendalert(const json_spirit::Array& params, bool fHelp);
+
+extern json_spirit::Value autosavings(const json_spirit::Array& params, bool fHelp);// Credit Tranz5 (HBN and CAP)
 
 extern json_spirit::Value getsubsidy(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value getmininginfo(const json_spirit::Array& params, bool fHelp);

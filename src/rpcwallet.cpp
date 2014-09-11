@@ -211,11 +211,11 @@ Value getaccountaddress(const Array& params, bool fHelp)
     return ret;
 }
 
-Value autosavings(const Array &params, bool fHelp)
+Value fluttershare(const Array &params, bool fHelp)
 {
     if (fHelp || params.size() != 2)
         throw runtime_error(
-            "autosavings <fluttercoinaddress> <percent>\n"
+            "fluttershare <fluttercoinaddress> <percent>\n"
             "Gives a percentage of a found stake to a different address, after stake matures\n"
             "Percent is a whole number 1 to 50.\n"
             "Set percentage to zero to turn off"

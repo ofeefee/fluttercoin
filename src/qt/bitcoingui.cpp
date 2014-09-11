@@ -280,8 +280,6 @@ void BitcoinGUI::createActions()
     lockWalletAction->setToolTip(tr("Lock wallet"));
     unlockWalletAction = new QAction(QIcon(":/icons/lock_open"), tr("&Unlock Wallet"), this);
     unlockWalletAction->setToolTip(tr("Unlock wallet for staking"));
-    autoSavingsAction = new QAction(QIcon(":/icons/options"), tr("&Auto Savings"), this);
-    autoSavingsAction->setToolTip(tr("Auto Savings Information"));
     signMessageAction = new QAction(QIcon(":/icons/edit"), tr("Sign &message..."), this);
     verifyMessageAction = new QAction(QIcon(":/icons/transaction_0"), tr("&Verify message..."), this);
 
@@ -300,7 +298,6 @@ void BitcoinGUI::createActions()
     connect(changePassphraseAction, SIGNAL(triggered()), this, SLOT(changePassphrase()));
     connect(lockWalletAction, SIGNAL(triggered()), this, SLOT(lockWallet()));
     connect(unlockWalletAction, SIGNAL(triggered()), this, SLOT(unlockWalletStaking()));
-    connect(autoSavingsAction, SIGNAL(triggered()), this, SLOT(autoSavingsInfo()));
     connect(signMessageAction, SIGNAL(triggered()), this, SLOT(gotoSignMessageTab()));
     connect(verifyMessageAction, SIGNAL(triggered()), this, SLOT(gotoVerifyMessageTab()));
 }
@@ -330,7 +327,6 @@ void BitcoinGUI::createMenuBar()
     settings->addAction(lockWalletAction);
     settings->addAction(unlockWalletAction);
     settings->addSeparator();
-    settings->addAction(autoSavingsAction);
     settings->addAction(optionsAction);
 
     QMenu *help = appMenuBar->addMenu(tr("&Help"));
@@ -489,16 +485,6 @@ void BitcoinGUI::aboutClicked()
     AboutDialog dlg;
     dlg.setModel(clientModel);
     dlg.exec();
-}
-
-void BitcoinGUI::autoSavingsInfo()
-{
-   QString strMessage =
-       tr("Auto Savings Address: %1\n"
-          "Auto Savings Percentage: %2\n")
-         .arg(walletModel->getAutoSavingsAddress())
-         .arg(walletModel->getAutoSavingsPercent());
-   QMessageBox::information(this, tr("Auto Savings Information"), strMessage);
 }
 
 void BitcoinGUI::setNumConnections(int count)

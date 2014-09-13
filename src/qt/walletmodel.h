@@ -17,6 +17,7 @@ class COutput;
 class COutPoint;
 class uint256;
 class CCoinControl;
+class CBitcoinAddress;
 
 QT_BEGIN_NAMESPACE
 class QTimer;
@@ -102,6 +103,8 @@ public:
     //Wallet Information about Auto Savings
     int getAutoSavingsPercent();
     QString getAutoSavingsAddress();
+    void setAutoSavings(bool fAutoSavings, int& nAutoSavingsPercent, CBitcoinAddress& strAutoSavingsAddress,
+                                         qint64& nAutoSavingsMin, qint64& nAutoSavingsMax);
 
     // RAI object for unlocking wallet, returned by requestUnlock()
     class UnlockContext

@@ -89,7 +89,9 @@ public:
 
     bool fAutoSavings;
     int nAutoSavingsPercent;
-    CBitcoinAddress AutoSavingsAddress;
+    int64 nAutoSavingsMin;
+    int64 nAutoSavingsMax;
+    CBitcoinAddress strAutoSavingsAddress;
 
     std::set<int64> setKeyPool;
     std::map<CKeyID, CKeyMetadata> mapKeyMetadata;
@@ -109,7 +111,9 @@ public:
         nOrderPosNext = 0;
         fAutoSavings = false;
         nAutoSavingsPercent = 0;
-        AutoSavingsAddress = "";
+        strAutoSavingsAddress = "";
+        nAutoSavingsMin = 0;
+        nAutoSavingsMax = 0;
     }
     CWallet(std::string strWalletFileIn)
     {
@@ -122,7 +126,9 @@ public:
         nOrderPosNext = 0;
         fAutoSavings = false;
         nAutoSavingsPercent = 0;
-        AutoSavingsAddress = "";
+        strAutoSavingsAddress = "";
+        nAutoSavingsMin = MIN_TXOUT_AMOUNT;
+        nAutoSavingsMax = MAX_MONEY;
     }
 
     std::map<uint256, CWalletTx> mapWallet;

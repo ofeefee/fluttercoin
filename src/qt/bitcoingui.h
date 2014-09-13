@@ -14,6 +14,7 @@ class SendCoinsDialog;
 class SignVerifyMessageDialog;
 class Notificator;
 class RPCConsole;
+class AutoSavingsDialog;
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -65,6 +66,7 @@ private:
     AddressBookPage *receiveCoinsPage;
     SendCoinsDialog *sendCoinsPage;
     SignVerifyMessageDialog *signVerifyMessageDialog;
+    AutoSavingsDialog *autoSavingsDialog;
 
     QLabel *labelEncryptionIcon;
     QLabel *labelStakingIcon;
@@ -93,6 +95,7 @@ private:
     QAction *unlockWalletAction;
     QAction *aboutQtAction;
     QAction *openRPCConsoleAction;
+    QAction *savingsAction;
 
     QSystemTrayIcon *trayIcon;
     Notificator *notificator;
@@ -176,6 +179,7 @@ private slots:
     void unlockWallet();
     /** Ask for passphrase to unlock wallet for staking */
     void unlockWalletStaking();
+    void savingsClicked(QString addr = "");
 
     /** Show window if hidden, unminimize when minimized, rise when obscured or show if hidden and fToggleHidden is true */
     void showNormalIfMinimized(bool fToggleHidden = false);

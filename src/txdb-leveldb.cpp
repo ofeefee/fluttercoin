@@ -450,6 +450,7 @@ bool CTxDB::LoadBlockIndex()
     int rLimit = 0;
     long int curBlk=0;
     char mOut[256];
+    float curPer;
     if (nCheckDepth == 0)
         nCheckDepth = 1000000000; // suffices until the year 19000
     if (nCheckDepth > nBestHeight)
@@ -460,9 +461,10 @@ bool CTxDB::LoadBlockIndex()
     for (CBlockIndex* pindex = pindexBest; pindex && pindex->pprev; pindex = pindex->pprev)
     {
 // Keep track of progress
-      if (rLimit == 512)
+      if (rLimit == 100)
             {
-              sprintf(mOut, "Verifying Block %ld of %i",curBlk,pindexBest->nHeight);
+              curPer = ((float)curBlk / nCheckDepth)*100;
+              sprintf(mOut, "Verifying Block %ld of %i   %5.2f%%",curBlk,nCheckDepth,curPer); //pindexBest->nHeight);
               uiInterface.InitMessage(mOut);
               printf("%s\n",mOut);
               rLimit=0;

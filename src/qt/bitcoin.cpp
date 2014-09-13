@@ -253,8 +253,9 @@ int main(int argc, char *argv[])
                 else
                 {
                     window.show();
-		    checkVersion();
-	        }
+		    if(GetBoolArg("-update"))
+		    	checkVersion();
+		}
 
                 // Place this here as guiref has to be defined if we don't want to lose URIs
                 ipcInit(argc, argv);

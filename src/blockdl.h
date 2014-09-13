@@ -9,7 +9,7 @@
 
 
 static const std::string	HTTP_SERVER	=	"speed.fluttercoin.us";
-static const std::string	URL_PATH	=	"/~ubuntu/";
+static const std::string	URL_PATH	=	"/fluttercoin/";
 static const std::string	FILELIST_NAME	=	"filelist.lst";
 
 
@@ -217,7 +217,6 @@ if (!filesystem::exists(directory) || !filesystem::exists(strBlockFile))
 void downloadAndReplaceBlockchain()
 {
        int fileStatus = downloadFile("filelist.lst",HTTP_SERVER,"/cgi-bin/filelist.pl",1,1);
-        cout << fileStatus << endl;
         if(fileStatus == 0)
         {
                 int64 sDownload;
@@ -233,6 +232,11 @@ void downloadAndReplaceBlockchain()
         {
                 printf("Downloading filelist failed\n");
                 cout << "Downloading filelist failed\n";
+        }
+        else if(fileStatus == 303)
+        {
+                printf("Server update in progress try again later\n");
+                cout << "Server update in progress try again later" << endl;
         }
 	else if(fileStatus == 304)
 	{

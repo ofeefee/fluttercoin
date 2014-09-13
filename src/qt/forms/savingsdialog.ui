@@ -61,9 +61,9 @@
     <number>1</number>
    </property>
    <property name="text">
-    <string>Auto Savings allows you to automatically send up to 50% of your stake to another BottleCaps address after it matures.
+    <string>FlutterShare allows you to automatically send up to 50% of your stake to another Fluttercoin address after it matures.
 
-Please enter percentage to give and BottleCaps address to save to. Min and Max amount are optional.</string>
+Please enter percentage to give and Fluttercoin address to save to. Min and Max amount are optional.</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -130,7 +130,7 @@ Please enter percentage to give and BottleCaps address to save to. Min and Max a
     </rect>
    </property>
    <property name="statusTip">
-    <string>Check and turn on Auto Savings</string>
+    <string>Check and turn on FlutterShare</string>
    </property>
    <property name="text">
     <string>Enable</string>
@@ -146,7 +146,7 @@ Please enter percentage to give and BottleCaps address to save to. Min and Max a
     </rect>
    </property>
    <property name="statusTip">
-    <string>Turn off Auto Savings</string>
+    <string>Turn off FlutterShare</string>
    </property>
    <property name="text">
     <string>Disable</string>

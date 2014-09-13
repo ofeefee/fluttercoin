@@ -261,7 +261,8 @@ std::string HelpMessage()
         "  -bantime=<n>           " + _("Number of seconds to keep misbehaving peers from reconnecting (default: 86400)") + "\n" +
         "  -maxreceivebuffer=<n>  " + _("Maximum per-connection receive buffer, <n>*1000 bytes (default: 5000)") + "\n" +
         "  -maxsendbuffer=<n>     " + _("Maximum per-connection send buffer, <n>*1000 bytes (default: 1000)") + "\n" +
-        "  -download		  " + _("Download blockchain files from HTTP server (removes current files)") + "\n" +
+        "  -download              " + _("Download blockchain files from HTTP server (removes current files)") + "\n" +
+        "  -update=<n>            " + _("Bypass online checking of new versions 0 or 1 (Settings -> Options -> Network)") + "\n" +
 #ifdef USE_UPNP
 #if USE_UPNP
         "  -upnp                  " + _("Use UPnP to map the listening port (default: 1 when listening)") + "\n" +
@@ -370,7 +371,6 @@ if (firstRunCheck() == 0)
 	{// check to see if any of the chain files exist if not redownload them
         boost::filesystem::path fileList = GetDataDir() / "filelist.lst";
         boost::filesystem::remove(fileList);
-
 	downloadAndReplaceBlockchain();
 	}
 

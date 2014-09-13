@@ -31,6 +31,7 @@ public:
         DetachDatabases,   // bool
         Language,          // QString
         CoinControlFeatures, // bool
+	CheckOnlineUpdate,   // bool
         OptionIDRowCount,
     };
 
@@ -47,6 +48,7 @@ public:
     int getDisplayUnit();
     bool getDisplayAddresses();
     bool getCoinControlFeatures();
+    bool getCheckOnlineUpdate();
     QString getLanguage() { return language; }
 
 private:
@@ -55,6 +57,7 @@ private:
     bool fMinimizeToTray;
     bool fMinimizeOnClose;
     bool fCoinControlFeatures;
+    bool fCheckOnlineUpdate;
     QString language;
 
 signals:

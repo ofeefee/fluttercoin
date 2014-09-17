@@ -258,7 +258,8 @@ HEADERS += src/qt/bitcoingui.h \
     src/version.h \
     src/netbase.h \
     src/clientversion.h\
-    src/qt/newversion.h
+    src/qt/newversion.h\
+    src/qt/flutterspeed.h
 
 SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/transactiontablemodel.cpp \
@@ -338,7 +339,8 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/zerocoin/SerialNumberSignatureOfKnowledge.cpp \
     src/zerocoin/SpendMetaData.cpp \
     src/zerocoin/ZeroTest.cpp\
-    src/qt/newversion.cpp
+    src/qt/newversion.cpp\
+    src/qt/flutterspeed.cpp
 
 RESOURCES += \
     src/qt/bitcoin.qrc
@@ -356,7 +358,8 @@ FORMS += \
     src/qt/forms/askpassphrasedialog.ui \
     src/qt/forms/rpcconsole.ui \
     src/qt/forms/optionsdialog.ui\
-    src/qt/forms/newversion.ui
+    src/qt/forms/newversion.ui\
+    src/qt/forms/flutterspeed.ui
 
 contains(USE_QRCODE, 1) {
 HEADERS += src/qt/qrcodedialog.h

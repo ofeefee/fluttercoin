@@ -1,3 +1,7 @@
+#ifndef BLOCKDL_H
+#define BLOCKDL_H
+
+#include <fstream>
 #include <iostream>
 #include <istream>
 #include <ostream>
@@ -6,6 +10,7 @@
 #include <boost/asio.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include "ui_interface.h"
 
 
 static const std::string	HTTP_SERVER	=	"speed.fluttercoin.us";
@@ -18,7 +23,7 @@ using namespace boost;
 using namespace boost::asio;
 using boost::asio::ip::tcp;
 
-void removeBlockchain()
+extern void removeBlockchain()
 {// basically a copy from txdb-leveldb.cpp init_blockindex
 
         boost::filesystem::path directory = GetDataDir() / "txleveldb";
@@ -35,7 +40,9 @@ void removeBlockchain()
 
         boost::filesystem::create_directory(GetDataDir() / "txleveldb");
 
+
 }
+
 
 int downloadFile(	const char * getFilename, //what were going to save the files as
 			const std::string& serverName,
@@ -75,7 +82,6 @@ int downloadFile(	const char * getFilename, //what were going to save the files 
 	std::ostream request_stream(&request);
 
 	request_stream << "GET " << getCommand << " HTTP/1.0\r\n";
-//	request_stream << "GET " << URL_PATH << getCommand << " HTTP/1.0\r\n";
 	request_stream << "Host: " << serverName << "\r\n";
 	request_stream << "Accept: */*\r\n";
 	request_stream << "Connection: close\r\n\r\n";
@@ -160,7 +166,10 @@ int downloadFile(	const char * getFilename, //what were going to save the files 
 		{
 			progress = 0;
 			sprintf (mOut , "Downloading:%s (%d of %d)  %d K of %d K  %d%%",getFilename,currentFileNumber,totalFileNumber,(currentDLSize / 1024),(fileSize / 1024),(int)currentPer);
+			#ifdef QT_GUI
 			uiInterface.InitMessage(mOut);
+			#endif
+
 		}
 	}
 outFile.close();
@@ -216,12 +225,15 @@ if (!filesystem::exists(directory) || !filesystem::exists(strBlockFile))
 
 void downloadAndReplaceBlockchain()
 {
+        boost::filesystem::path fileList = GetDataDir() / "filelist.lst";
+        boost::filesystem::remove(fileList);
+
        int fileStatus = downloadFile("filelist.lst",HTTP_SERVER,"/cgi-bin/filelist.pl",1,1);
         if(fileStatus == 0)
         {
                 int64 sDownload;
                 sDownload = GetTimeMillis();
-                removeBlockchain();     //this removes all the block chain from .fluttercoin dir
+		removeBlockchain();     //this removes all the block chain from .fluttercoin dir
                                         //blk????.dat and txleveldb dir
                 processFilelist();      //reads the filelist and downloads all files in the list
                 //        SoftSetBoolArg("-checkblocks", 0);// Once were done check entire chain
@@ -232,6 +244,7 @@ void downloadAndReplaceBlockchain()
         {
                 printf("Downloading filelist failed\n");
                 cout << "Downloading filelist failed\n";
+
         }
         else if(fileStatus == 303)
         {
@@ -245,3 +258,4 @@ void downloadAndReplaceBlockchain()
 	}
 }
 
+#endif

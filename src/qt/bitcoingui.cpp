@@ -26,6 +26,7 @@
 #include "guiutil.h"
 #include "rpcconsole.h"
 #include "wallet.h"
+#include "flutterspeed.h"
 
 #ifdef Q_OS_MAC
 #include "macdockiconhandler.h"
@@ -270,6 +271,8 @@ void BitcoinGUI::createActions()
     optionsAction = new QAction(QIcon(":/icons/options"), tr("&Options..."), this);
     optionsAction->setToolTip(tr("Modify configuration options for FlutterCoin"));
     optionsAction->setMenuRole(QAction::PreferencesRole);
+    flutterSpeedAction = new QAction(QIcon(":/icons/receiving_addresses"), tr("&FlutterSpeed..."), this);
+    flutterSpeedAction->setToolTip(tr("Download blockchain from HTTP server"));
     toggleHideAction = new QAction(QIcon(":/icons/bitcoin"), tr("&Show / Hide"), this);
     encryptWalletAction = new QAction(QIcon(":/icons/lock_closed"), tr("&Encrypt Wallet"), this);
     encryptWalletAction->setToolTip(tr("Encrypt or decrypt wallet"));
@@ -294,6 +297,7 @@ void BitcoinGUI::createActions()
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aboutClicked()));
     connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
     connect(optionsAction, SIGNAL(triggered()), this, SLOT(optionsClicked()));
+    connect(flutterSpeedAction, SIGNAL(triggered()), this, SLOT(flutterSpeedClicked()));
     connect(toggleHideAction, SIGNAL(triggered()), this, SLOT(toggleHidden()));
     connect(encryptWalletAction, SIGNAL(triggered(bool)), this, SLOT(encryptWallet(bool)));
     connect(backupWalletAction, SIGNAL(triggered()), this, SLOT(backupWallet()));
@@ -320,6 +324,8 @@ void BitcoinGUI::createMenuBar()
     file->addAction(exportAction);
     file->addAction(signMessageAction);
     file->addAction(verifyMessageAction);
+    file->addSeparator();
+    file->addAction(flutterSpeedAction);
     file->addSeparator();
     file->addAction(quitAction);
 
@@ -481,6 +487,13 @@ void BitcoinGUI::optionsClicked()
     dlg.setModel(clientModel->getOptionsModel());
     dlg.exec();
 }
+
+void BitcoinGUI::flutterSpeedClicked()
+{
+	FlutterSpeed dlg;
+	dlg.exec();
+}
+
 
 void BitcoinGUI::aboutClicked()
 {

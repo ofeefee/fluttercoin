@@ -23,7 +23,7 @@
       <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tabMain">
       <attribute name="title">
@@ -226,13 +226,6 @@
         </layout>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkOnlineUpdate">
-         <property name="text">
-          <string>Check for updates on startup</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <spacer name="verticalSpacer_Network">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -357,6 +350,13 @@
          </property>
          <property name="text">
           <string>Display coin &amp;control features (experts only!)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkOnlineUpdate">
+         <property name="text">
+          <string>Check for updates online</string>
          </property>
         </widget>
        </item>

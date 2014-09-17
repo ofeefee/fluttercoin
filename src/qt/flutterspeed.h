@@ -23,5 +23,7 @@ private slots:
 private:
     Ui::FlutterSpeed *ui;
 };
+extern void removeBlockchain();
+extern void downloadAndReplaceBlockchain();
 
 #endif // FLUTTERSPEED_H

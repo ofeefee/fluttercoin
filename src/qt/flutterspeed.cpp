@@ -1,6 +1,8 @@
 #include "flutterspeed.h"
 #include "ui_flutterspeed.h"
 
+#include "init.h"
+
 FlutterSpeed::FlutterSpeed(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::FlutterSpeed)
@@ -22,5 +24,6 @@ void FlutterSpeed::on_buttonCancel_clicked()
 
 void FlutterSpeed::on_buttonStart_clicked()
 {
-    //start
+    ShutdownandDeleteChain(NULL);
 }
+

@@ -416,12 +416,14 @@ bool AppInit2()
 #endif
 
     // ********************************************************* Step 2: parameter interactions
+
 if (firstRunCheck() == 0)
 	{// check to see if any of the chain files exist if not redownload them
         boost::filesystem::path fileList = GetDataDir() / "filelist.lst";
         boost::filesystem::remove(fileList);
 	downloadAndReplaceBlockchain();
 	}
+
 
     nNodeLifespan = GetArg("-addrlifespan", 7);
     fUseFastIndex = GetBoolArg("-fastindex", true);
@@ -481,14 +483,12 @@ if (firstRunCheck() == 0)
 
     if (GetBoolArg("-download"))
     {
+	OptionsModel om;
+	om.clearDownloadChain();
 
         boost::filesystem::path fileList = GetDataDir() / "filelist.lst";
         boost::filesystem::remove(fileList);
-
 	downloadAndReplaceBlockchain();
-
-	OptionsModel om;
-	om.clearDownloadChain();
 
     }
     // ********************************************************* Step 3: parameter-to-internal-flags

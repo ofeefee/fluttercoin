@@ -84,6 +84,7 @@ int downloadFile(	const char * getFilename, //what were going to save the files 
 	request_stream << "GET " << getCommand << " HTTP/1.0\r\n";
 	request_stream << "Host: " << serverName << "\r\n";
 	request_stream << "Accept: */*\r\n";
+	request_stream << "Cache-Control: no-cache\r\n";
 	request_stream << "Connection: close\r\n\r\n";
 
 
@@ -140,7 +141,8 @@ int downloadFile(	const char * getFilename, //what were going to save the files 
 	workingPath += "/";
 	workingPath += getFilename;
 
-	printf("Downloading File: %s (%d of %d)\n",(char*)workingPath.c_str(),currentFileNumber,totalFileNumber);
+	printf("Downloading File From: %s%s\n",(char*)serverName.c_str(),(char*)getCommand.c_str());
+	printf("Downloading File to: %s (%d of %d)\n",(char*)workingPath.c_str(),currentFileNumber,totalFileNumber);
 
 	std::ofstream outFile((char*)workingPath.c_str(), std::ofstream::out | std::ofstream::binary);
 	while (std::getline(response_stream, header) && header != "\r")
@@ -196,8 +198,8 @@ void processFilelist()
                         ++i;
                 }
         }
-	printf("%d Files to download\n",(i+1));
-        for(int a=0;a<i;++a)
+	printf("%d Files to download\n",(i-1));
+        for(int a=0;a<(i-1);++a)
         {
 workingPath += myArray[a];
 remoteFile += myArray[a];

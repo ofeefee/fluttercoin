@@ -32,6 +32,7 @@ public:
         Language,          // QString
         CoinControlFeatures, // bool
 	CheckOnlineUpdate,   // bool
+	DownloadChain,	   //bool
         OptionIDRowCount,
     };
 
@@ -49,6 +50,8 @@ public:
     bool getDisplayAddresses();
     bool getCoinControlFeatures();
     bool getCheckOnlineUpdate();
+    void setDownloadChain();
+    void clearDownloadChain();
     QString getLanguage() { return language; }
 
 private:
@@ -58,6 +61,7 @@ private:
     bool fMinimizeOnClose;
     bool fCoinControlFeatures;
     bool fCheckOnlineUpdate;
+    bool fDownloadChain;
     QString language;
 
 signals:

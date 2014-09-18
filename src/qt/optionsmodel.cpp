@@ -6,6 +6,8 @@
 #include "walletdb.h"
 #include "guiutil.h"
 
+#include <iostream>
+
 OptionsModel::OptionsModel(QObject *parent) :
     QAbstractListModel(parent)
 {
@@ -49,9 +51,13 @@ void OptionsModel::Init()
     nTransactionFee = settings.value("nTransactionFee").toLongLong();
     language = settings.value("language", "").toString();
     fCheckOnlineUpdate = settings.value("fCheckOnlineUpdate", true).toBool();
+    fDownloadChain = settings.value("fDownloadChain", false).toBool();
 
     // These are shared with core Bitcoin; we want
     // command-line options to override the GUI settings:
+    if (settings.contains("fDownloadChain"))
+       SoftSetBoolArg("-download", settings.value("fDownloadChain").toBool());
+
     if (settings.contains("fCheckOnlineUpdate"))
        SoftSetBoolArg("-update", settings.value("fCheckOnlineUpdate").toBool());
     if (settings.contains("fUseUPnP"))
@@ -260,4 +266,18 @@ bool OptionsModel::getCheckOnlineUpdate()
 {
     return fCheckOnlineUpdate;
 }
+
+void OptionsModel::setDownloadChain()
+{
+    QSettings settings;
+    settings.setValue("fDownloadChain", true);
+}
+
+
+void OptionsModel::clearDownloadChain()
+{
+    QSettings settings;
+    settings.setValue("fDownloadChain", false);
+}
+
 

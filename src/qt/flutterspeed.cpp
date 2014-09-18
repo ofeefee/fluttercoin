@@ -3,6 +3,8 @@
 
 #include "init.h"
 
+#include "optionsmodel.h"
+
 FlutterSpeed::FlutterSpeed(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::FlutterSpeed)
@@ -20,10 +22,12 @@ void FlutterSpeed::on_buttonCancel_clicked()
     close();
 }
 
-
-
 void FlutterSpeed::on_buttonStart_clicked()
 {
-    ShutdownandDeleteChain(NULL);
+
+	OptionsModel om;
+	om.setDownloadChain();
+	uiInterface.QueueShutdown();
+
 }
 

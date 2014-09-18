@@ -18,6 +18,8 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <openssl/crypto.h>
 #include "blockdl.h"
+#include "optionsmodel.h"
+#include <QSettings>
 
 #ifndef WIN32
 #include <signal.h>
@@ -479,10 +481,15 @@ if (firstRunCheck() == 0)
 
     if (GetBoolArg("-download"))
     {
+
         boost::filesystem::path fileList = GetDataDir() / "filelist.lst";
         boost::filesystem::remove(fileList);
 
 	downloadAndReplaceBlockchain();
+
+	OptionsModel om;
+	om.clearDownloadChain();
+
     }
     // ********************************************************* Step 3: parameter-to-internal-flags
 

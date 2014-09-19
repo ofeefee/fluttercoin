@@ -280,4 +280,3 @@ void OptionsModel::clearDownloadChain()
     settings.setValue("fDownloadChain", false);
 }
 
-

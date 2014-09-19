@@ -12,6 +12,12 @@
 #include <boost/asio/ip/tcp.hpp>
 #include "ui_interface.h"
 
+#ifdef QT_GUI
+#include <QSettings>
+#include "optionsmodel.h"
+#endif
+
+
 
 static const std::string	HTTP_SERVER	=	"speed.fluttercoin.us";
 static const std::string	URL_PATH	=	"/fluttercoin/";
@@ -210,7 +216,17 @@ remoteFile = URL_PATH;
 }
 
 int firstRunCheck ()
-{//check to see if both items exist if not delete them and download it directly
+{
+// check to see if online update has been defined if not define it
+#ifdef QT_GUI
+OptionsModel om;
+QSettings settings;
+if (!settings.contains("fCheckOnlineUpdate"))
+	settings.setValue("fCheckOnlineUpdate",true);
+
+#endif
+
+//check to see if both items exist if not delete them and download it directly
 unsigned int nFile = 1;
 filesystem::path directory = GetDataDir() / "txleveldb";
 filesystem::path strBlockFile = GetDataDir() / strprintf("blk%04u.dat", nFile);

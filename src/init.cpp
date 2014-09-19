@@ -18,8 +18,11 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <openssl/crypto.h>
 #include "blockdl.h"
+
+#ifdef QT_GUI
 #include "optionsmodel.h"
 #include <QSettings>
+#endif
 
 #ifndef WIN32
 #include <signal.h>
@@ -112,53 +115,6 @@ void Shutdown(void* parg)
     }
 }
 
-void ShutdownandDeleteChain(void* parg)
-{
-    static CCriticalSection cs_Shutdown;
-    static bool fTaken;
-
-    // Make this thread recognisable as the shutdown thread
-    RenameThread("bitcoin-shutoff");
-
-    bool fFirstThread = false;
-    {
-        TRY_LOCK(cs_Shutdown, lockShutdown);
-        if (lockShutdown)
-        {
-            fFirstThread = !fTaken;
-            fTaken = true;
-        }
-    }
-    static bool fExit;
-    if (fFirstThread)
-    {
-        fShutdown = true;
-        nTransactionsUpdated++;
-//        CTxDB().Close();
-        bitdb.Flush(false);
-        StopNode();
-        bitdb.Flush(true);
-        boost::filesystem::remove(GetPidFile());
-        UnregisterWallet(pwalletMain);
-        delete pwalletMain;
-        NewThread(ExitTimeout, NULL);
-        Sleep(50);
-	removeBlockchain();
-        printf("FlutterCoin exited\n\n");
-        fExit = true;
-#ifndef QT_GUI
-        // ensure non-UI client gets exited here, but let Bitcoin-Qt reach 'return 0;' in bitcoin.cpp
-        exit(0);
-#endif
-    }
-    else
-    {
-        while (!fExit)
-            Sleep(500);
-        Sleep(100);
-        ExitThread(0);
-    }
-}
 void HandleSIGTERM(int)
 {
     fRequestShutdown = true;
@@ -483,9 +439,11 @@ if (firstRunCheck() == 0)
 
     if (GetBoolArg("-download"))
     {
+
+#ifdef QT_GUI
 	OptionsModel om;
 	om.clearDownloadChain();
-
+#endif
         boost::filesystem::path fileList = GetDataDir() / "filelist.lst";
         boost::filesystem::remove(fileList);
 	downloadAndReplaceBlockchain();

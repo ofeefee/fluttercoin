@@ -375,7 +375,7 @@ void CWallet::WalletUpdateSpent(const CTransaction &tx, bool fBlock)
                     printf("WalletUpdateSpent: bad wtx %s\n", wtx.GetHash().ToString().c_str());
                 else if (!wtx.IsSpent(txin.prevout.n) && IsMine(wtx.vout[txin.prevout.n]))
                 {
-                    printf("WalletUpdateSpent found spent coin %snvc %s\n", FormatMoney(wtx.GetCredit()).c_str(), wtx.GetHash().ToString().c_str());
+                    printf("WalletUpdateSpent found spent coin %sflt %s\n", FormatMoney(wtx.GetCredit()).c_str(), wtx.GetHash().ToString().c_str());
                     wtx.MarkSpent(txin.prevout.n);
                     wtx.WriteToDisk();
                     NotifyTransactionChanged(this, txin.prevout.hash, CT_UPDATED);
@@ -926,7 +926,7 @@ void CWallet::ReacceptWalletTransactions()
                 }
                 if (fUpdated)
                 {
-                    printf("ReacceptWalletTransactions found spent coin %snvc %s\n", FormatMoney(wtx.GetCredit()).c_str(), wtx.GetHash().ToString().c_str());
+                    printf("ReacceptWalletTransactions found spent coin %sflt %s\n", FormatMoney(wtx.GetCredit()).c_str(), wtx.GetHash().ToString().c_str());
                     wtx.MarkDirty();
                     wtx.WriteToDisk();
                 }
@@ -1197,6 +1197,42 @@ int64 CWallet::GetNewMint() const
             nTotal += CWallet::GetCredit(*pcoin);
     }
     return nTotal;
+}
+
+bool CWallet::AutoSavings()
+{
+
+    if ( IsInitialBlockDownload() || IsLocked() )
+        return false;
+
+    CWalletTx wtx;
+    int64 nNet = 0;
+
+    {
+        LOCK(cs_wallet);
+        for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it)
+        {
+            const CWalletTx* pcoin = &(*it).second;
+            if (pcoin->IsCoinStake() && pcoin->GetBlocksToMaturity() == 0 && pcoin->GetDepthInMainChain() == nCoinbaseMaturity+20)
+            {
+                // Calculate Amount for Savings
+                nNet = ( ( pcoin->GetCredit() - pcoin->GetDebit() ) * nAutoSavingsPercent )/100;
+
+                // Do not send if amount is too low/high
+                if (nNet <= nAutoSavingsMin || nNet >= nAutoSavingsMax )
+                {
+                    printf("AutoSavings: Amount: %s is not in range of Min: %s and Max:%s\n",FormatMoney(nNet).c_str(),FormatMoney
+                           (nAutoSavingsMin).c_str(),FormatMoney
+                           (nAutoSavingsMax).c_str());
+                    return false;
+                }
+
+                printf("AutoSavings Sending: %s to Address: %s\n", FormatMoney(nNet).c_str(), strAutoSavingsAddress.ToString().c_str());
+                SendMoneyToDestination(strAutoSavingsAddress.Get(), nNet, wtx, false,true);
+            }
+        }
+    }
+    return true;
 }
 
 bool CWallet::SelectCoinsMinConf(int64 nTargetValue, unsigned int nSpendTime, int nConfMine, int nConfTheirs, vector<COutput> vCoins, set<pair<const CWalletTx*,unsigned int> >& setCoinsRet, int64& nValueRet) const
@@ -1908,7 +1944,7 @@ bool CWallet::CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey)
 
 
 
-string CWallet::SendMoney(CScript scriptPubKey, int64 nValue, CWalletTx& wtxNew, bool fAskFee)
+string CWallet::SendMoney(CScript scriptPubKey, int64 nValue, CWalletTx& wtxNew, bool fAskFee, bool fAllowAutoSavings)
 {
     CReserveKey reservekey(this);
     int64 nFeeRequired;
@@ -1919,7 +1955,8 @@ string CWallet::SendMoney(CScript scriptPubKey, int64 nValue, CWalletTx& wtxNew,
         printf("SendMoney() : %s", strError.c_str());
         return strError;
     }
-    if (fWalletUnlockStakingOnly)
+    // Auto Savings is the only allowable option to send coins when the UnlockMintOnly flag is set.
+    if ( fWalletUnlockStakingOnly && !fAllowAutoSavings )
     {
         string strError = _("Error: Wallet unlocked for block minting only, unable to create transaction.");
         printf("SendMoney() : %s", strError.c_str());
@@ -1947,7 +1984,7 @@ string CWallet::SendMoney(CScript scriptPubKey, int64 nValue, CWalletTx& wtxNew,
 
 
 
-string CWallet::SendMoneyToDestination(const CTxDestination& address, int64 nValue, CWalletTx& wtxNew, bool fAskFee)
+string CWallet::SendMoneyToDestination(const CTxDestination& address, int64 nValue, CWalletTx& wtxNew, bool fAskFee, bool fAllowAutoSavings)
 {
     // Check amount
     if (nValue <= 0)
@@ -1959,7 +1996,7 @@ string CWallet::SendMoneyToDestination(const CTxDestination& address, int64 nVal
     CScript scriptPubKey;
     scriptPubKey.SetDestination(address);
 
-    return SendMoney(scriptPubKey, nValue, wtxNew, fAskFee);
+    return SendMoney(scriptPubKey, nValue, wtxNew, fAskFee, fAllowAutoSavings);
 }
 
 

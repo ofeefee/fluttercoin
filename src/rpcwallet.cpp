@@ -211,7 +211,94 @@ Value getaccountaddress(const Array& params, bool fHelp)
     return ret;
 }
 
+Value fluttershare(const Array &params, bool fHelp)
+{
+    if (fHelp || params.size() < 2 || params.size() > 4)
+        throw runtime_error(
+            "fluttershare <fluttercoinaddress> <percent> [min amount] [max amount]\n"
+            "Gives a percentage of a found stake to a different address, after stake matures\n"
+            "Percent is a whole number 1 to 50.\n"
+            "Min and Max Amount are optional\n"
+            "Set percentage to zero to turn off"
+            + HelpRequiringPassphrase());
 
+    CBitcoinAddress address(params[0].get_str());
+    if (!address.IsValid())
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Fluttercoin address");
+
+    if (params[1].get_int() < 0)
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected valid percentage");
+
+    if (pwalletMain->IsLocked())
+        throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
+
+    unsigned int nPer = (unsigned int) params[1].get_int();
+
+    int64 nMinAmount = MIN_TXOUT_AMOUNT;
+    int64 nMaxAmount = MAX_MONEY;
+
+    // Optional Min Amount
+    if (params.size() > 2)
+    {
+        int64 nAmount = AmountFromValue(params[2]);
+        if (nAmount < MIN_TXOUT_AMOUNT)
+            throw JSONRPCError(-101, "Send amount too small");
+        else
+            nMinAmount = nAmount;
+    }
+
+    // Optional Max Amount
+    if (params.size() > 3)
+    {
+        int64 nAmount = AmountFromValue(params[3]);
+
+         if (nAmount < MIN_TXOUT_AMOUNT)
+            throw JSONRPCError(-101, "Send amount too big");
+         else
+             nMaxAmount = nAmount;
+    }
+
+    CWalletDB walletdb(pwalletMain->strWalletFile);
+
+    LOCK(pwalletMain->cs_wallet);
+    {
+        bool fFileBacked = pwalletMain->fFileBacked;
+        //Turn off if we set to zero.
+        //Future: After we allow multiple addresses, only turn of this address
+        if(nPer == 0)
+        {
+            pwalletMain->fAutoSavings = false;
+            pwalletMain->nAutoSavingsPercent = 0;
+            pwalletMain->nAutoSavingsMin = nMinAmount;
+            pwalletMain->nAutoSavingsMax = nMaxAmount;
+
+            if(fFileBacked)
+                walletdb.EraseAutoSavings(pwalletMain->strAutoSavingsAddress.ToString());
+
+            pwalletMain->strAutoSavingsAddress = "";
+
+            return Value::null;
+        }
+
+          //For now max percentage is 50.
+          if (nPer > 50 )
+             nPer = 50;
+
+          if(fFileBacked)
+              walletdb.EraseAutoSavings(pwalletMain->strAutoSavingsAddress.ToString());
+
+          pwalletMain->strAutoSavingsAddress = address;
+          pwalletMain->nAutoSavingsPercent = nPer;
+          pwalletMain->fAutoSavings = true;
+          pwalletMain->nAutoSavingsMin = nMinAmount;
+          pwalletMain->nAutoSavingsMax = nMaxAmount;
+
+          if(fFileBacked)
+              walletdb.WriteAutoSavings(address.ToString(), nPer);
+    }
+
+    return Value::null;
+}
 
 Value setaccount(const Array& params, bool fHelp)
 {
@@ -311,7 +398,7 @@ Value sendtoaddress(const Array& params, bool fHelp)
     if (pwalletMain->IsLocked())
         throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
 
-    string strError = pwalletMain->SendMoneyToDestination(address.Get(), nAmount, wtx);
+    string strError = pwalletMain->SendMoneyToDestination(address.Get(), nAmount, wtx, false, false);
     if (strError != "")
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
 
@@ -685,7 +772,7 @@ Value sendfrom(const Array& params, bool fHelp)
         throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, "Account has insufficient funds");
 
     // Send
-    string strError = pwalletMain->SendMoneyToDestination(address.Get(), nAmount, wtx);
+    string strError = pwalletMain->SendMoneyToDestination(address.Get(), nAmount, wtx, false, false);
     if (strError != "")
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
 

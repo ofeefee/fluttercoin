@@ -25,6 +25,7 @@
 #include "notificator.h"
 #include "guiutil.h"
 #include "rpcconsole.h"
+#include "savingsdialog.h"
 #include "wallet.h"
 #include "flutterspeed.h"
 
@@ -119,6 +120,7 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     sendCoinsPage = new SendCoinsDialog(this);
 
     signVerifyMessageDialog = new SignVerifyMessageDialog(this);
+    autoSavingsDialog = new AutoSavingsDialog(this);
 
     centralWidget = new QStackedWidget(this);
     centralWidget->addWidget(overviewPage);
@@ -126,6 +128,7 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     centralWidget->addWidget(addressBookPage);
     centralWidget->addWidget(receiveCoinsPage);
     centralWidget->addWidget(sendCoinsPage);
+    centralWidget->addWidget(autoSavingsDialog);
     setCentralWidget(centralWidget);
 
     // Create status bar
@@ -196,12 +199,14 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
 
     // Clicking on "Verify Message" in the address book sends you to the verify message tab
     connect(addressBookPage, SIGNAL(verifyMessage(QString)), this, SLOT(gotoVerifyMessageTab(QString)));
+
     // Clicking on "Sign Message" in the receive coins page sends you to the sign message tab
     connect(receiveCoinsPage, SIGNAL(signMessage(QString)), this, SLOT(gotoSignMessageTab(QString)));
 
+    // Clicking on "Auto Savings" in the address book sends you to the auto savings page
+    connect(addressBookPage, SIGNAL(autoSavingsSignal(QString)), this, SLOT(savingsClicked(QString)));
+
     gotoOverviewPage();
-
-
 }
 
 BitcoinGUI::~BitcoinGUI()
@@ -247,6 +252,13 @@ void BitcoinGUI::createActions()
     addressBookAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
     tabGroup->addAction(addressBookAction);
 
+    savingsAction = new QAction(QIcon(":/icons/send"), tr("FlutterShare"), this);
+    savingsAction->setStatusTip(tr("Enable FlutterShare"));
+    savingsAction->setToolTip(savingsAction->statusTip());
+    savingsAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_7));
+    savingsAction->setCheckable(true);
+    tabGroup->addAction(savingsAction);
+
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(gotoOverviewPage()));
     connect(sendCoinsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
@@ -257,6 +269,8 @@ void BitcoinGUI::createActions()
     connect(historyAction, SIGNAL(triggered()), this, SLOT(gotoHistoryPage()));
     connect(addressBookAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(addressBookAction, SIGNAL(triggered()), this, SLOT(gotoAddressBookPage()));
+    connect(savingsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(savingsAction, SIGNAL(triggered()), this, SLOT(savingsClicked()));
 
     quitAction = new QAction(QIcon(":/icons/quit"), tr("E&xit"), this);
     quitAction->setToolTip(tr("Quit application"));
@@ -353,6 +367,7 @@ void BitcoinGUI::createToolBars()
     toolbar->addAction(receiveCoinsAction);
     toolbar->addAction(historyAction);
     toolbar->addAction(addressBookAction);
+    toolbar->addAction(savingsAction);
 
     QToolBar *toolbar2 = addToolBar(tr("Actions toolbar"));
     toolbar2->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -416,6 +431,7 @@ void BitcoinGUI::setWalletModel(WalletModel *walletModel)
         receiveCoinsPage->setModel(walletModel->getAddressTableModel());
         sendCoinsPage->setModel(walletModel);
         signVerifyMessageDialog->setModel(walletModel);
+        autoSavingsDialog->setModel(walletModel);
 
         setEncryptionStatus(walletModel->getEncryptionStatus());
         connect(walletModel, SIGNAL(encryptionStatusChanged(int)), this, SLOT(setEncryptionStatus(int)));
@@ -763,6 +779,18 @@ void BitcoinGUI::gotoSendCoinsPage()
     disconnect(exportAction, SIGNAL(triggered()), 0, 0);
 }
 
+void BitcoinGUI::savingsClicked(QString addr)
+{
+    savingsAction->setChecked(true);
+    centralWidget->setCurrentWidget(autoSavingsDialog);
+
+    if(!addr.isEmpty())
+        autoSavingsDialog->setAddress(addr);
+
+    exportAction->setEnabled(false);
+    disconnect(exportAction, SIGNAL(triggered()), 0, 0);
+}
+
 void BitcoinGUI::gotoSignMessageTab(QString addr)
 {
     // call show() in showTab_SM()
@@ -958,6 +986,7 @@ void BitcoinGUI::toggleHidden()
 void BitcoinGUI::updateStakingIcon()
 {
     uint64 nMinWeight = 0, nMaxWeight = 0, nWeight = 0;
+
     if (pwalletMain)
         pwalletMain->GetStakeWeight(*pwalletMain, nMinWeight, nMaxWeight, nWeight);
 

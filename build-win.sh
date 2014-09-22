@@ -5,10 +5,10 @@
 #there is no errorchecking to see if gitian builds or not, if it works there will be two zip files in gitian directory
 #with the programs in them.
 
-major=`grep DISPLAY_VERSION_MAJOR src/version.h | awk {'print $3'}`
-minor=`grep DISPLAY_VERSION_MINOR src/version.h | awk {'print $3'}`
-revision=`grep DISPLAY_VERSION_REVISION src/version.h | awk {'print $3'}`
-build=`grep DISPLAY_VERSION_BUILD src/version.h | awk {'print $3'}`
+major=`grep DISPLAY_VERSION_MAJOR src/version.h | awk {'print $3'} | head -n1`
+minor=`grep DISPLAY_VERSION_MINOR src/version.h | awk {'print $3'} | head -n1`
+revision=`grep DISPLAY_VERSION_REVISION src/version.h | awk {'print $3'} | head -n1`
+build=`grep DISPLAY_VERSION_BUILD src/version.h | awk {'print $3'} | head -n1`
 cd ..
 rm gitian/inputs/fluttercoin-src.zip
 rm gitian/fluttercoin-??-windows*

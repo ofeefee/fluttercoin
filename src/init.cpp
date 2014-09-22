@@ -17,6 +17,12 @@
 #include <boost/interprocess/sync/file_lock.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <openssl/crypto.h>
+#include "blockdl.h"
+
+#ifdef QT_GUI
+#include "optionsmodel.h"
+#include <QSettings>
+#endif
 
 #ifndef WIN32
 #include <signal.h>
@@ -260,6 +266,8 @@ std::string HelpMessage()
         "  -bantime=<n>           " + _("Number of seconds to keep misbehaving peers from reconnecting (default: 86400)") + "\n" +
         "  -maxreceivebuffer=<n>  " + _("Maximum per-connection receive buffer, <n>*1000 bytes (default: 5000)") + "\n" +
         "  -maxsendbuffer=<n>     " + _("Maximum per-connection send buffer, <n>*1000 bytes (default: 1000)") + "\n" +
+        "  -download              " + _("Download blockchain files from HTTP server (removes current files)") + "\n" +
+        "  -update=<n>            " + _("Bypass online checking of new versions 0 or 1 (Settings -> Options -> Network)") + "\n" +
 #ifdef USE_UPNP
 #if USE_UPNP
         "  -upnp                  " + _("Use UPnP to map the listening port (default: 1 when listening)") + "\n" +
@@ -365,6 +373,14 @@ bool AppInit2()
 
     // ********************************************************* Step 2: parameter interactions
 
+if (firstRunCheck() == 0)
+	{// check to see if any of the chain files exist if not redownload them
+        boost::filesystem::path fileList = GetDataDir() / "filelist.lst";
+        boost::filesystem::remove(fileList);
+	downloadAndReplaceBlockchain();
+	}
+
+
     nNodeLifespan = GetArg("-addrlifespan", 7);
     fUseFastIndex = GetBoolArg("-fastindex", true);
     nMinerSleep = GetArg("-minersleep", 500);
@@ -421,6 +437,18 @@ bool AppInit2()
         SoftSetBoolArg("-rescan", true);
     }
 
+    if (GetBoolArg("-download"))
+    {
+
+#ifdef QT_GUI
+	OptionsModel om;
+	om.clearDownloadChain();
+#endif
+        boost::filesystem::path fileList = GetDataDir() / "filelist.lst";
+        boost::filesystem::remove(fileList);
+	downloadAndReplaceBlockchain();
+
+    }
     // ********************************************************* Step 3: parameter-to-internal-flags
 
     fDebug = GetBoolArg("-debug");
@@ -524,7 +552,7 @@ bool AppInit2()
 
     if (GetBoolArg("-shrinkdebugfile", !fDebug))
         ShrinkDebugFile();
-    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+    printf("\n-------------------------------------------------------\n");
     printf("FlutterCoin version %s (%s)\n", FormatFullVersion().c_str(), CLIENT_DATE.c_str());
     printf("Using OpenSSL version %s\n", SSLeay_version(SSLEAY_VERSION));
     if (!fLogTimestamps)

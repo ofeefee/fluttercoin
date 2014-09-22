@@ -95,6 +95,7 @@ private:
     QAction *unlockWalletAction;
     QAction *aboutQtAction;
     QAction *openRPCConsoleAction;
+    QAction *flutterSpeedAction;
     QAction *savingsAction;
 
     QSystemTrayIcon *trayIcon;
@@ -187,6 +188,7 @@ private slots:
     void toggleHidden();
 
     void updateStakingIcon();
+    void flutterSpeedClicked();
 };
 
 #endif

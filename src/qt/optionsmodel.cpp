@@ -6,6 +6,8 @@
 #include "walletdb.h"
 #include "guiutil.h"
 
+#include <iostream>
+
 OptionsModel::OptionsModel(QObject *parent) :
     QAbstractListModel(parent)
 {
@@ -48,9 +50,16 @@ void OptionsModel::Init()
     fCoinControlFeatures = settings.value("fCoinControlFeatures", false).toBool();
     nTransactionFee = settings.value("nTransactionFee").toLongLong();
     language = settings.value("language", "").toString();
+    fCheckOnlineUpdate = settings.value("fCheckOnlineUpdate", true).toBool();
+    fDownloadChain = settings.value("fDownloadChain", false).toBool();
 
     // These are shared with core Bitcoin; we want
     // command-line options to override the GUI settings:
+    if (settings.contains("fDownloadChain"))
+       SoftSetBoolArg("-download", settings.value("fDownloadChain").toBool());
+
+    if (settings.contains("fCheckOnlineUpdate"))
+       SoftSetBoolArg("-update", settings.value("fCheckOnlineUpdate").toBool());
     if (settings.contains("fUseUPnP"))
         SoftSetBoolArg("-upnp", settings.value("fUseUPnP").toBool());
     if (settings.contains("addrProxy") && settings.value("fUseProxy").toBool())
@@ -113,6 +122,8 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
             return settings.value("language", "");
         case CoinControlFeatures:
             return QVariant(fCoinControlFeatures);
+        case CheckOnlineUpdate:
+	    return QVariant(fCheckOnlineUpdate);
         default:
             return QVariant();
         }
@@ -208,6 +219,10 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
             emit coinControlFeaturesChanged(fCoinControlFeatures);
             }
             break;
+        case CheckOnlineUpdate:
+            fCheckOnlineUpdate = value.toBool();
+            settings.setValue("fCheckOnlineUpdate", fCheckOnlineUpdate);
+            break;
         default:
             break;
         }
@@ -246,3 +261,22 @@ bool OptionsModel::getDisplayAddresses()
 {
     return bDisplayAddresses;
 }
+
+bool OptionsModel::getCheckOnlineUpdate()
+{
+    return fCheckOnlineUpdate;
+}
+
+void OptionsModel::setDownloadChain()
+{
+    QSettings settings;
+    settings.setValue("fDownloadChain", true);
+}
+
+
+void OptionsModel::clearDownloadChain()
+{
+    QSettings settings;
+    settings.setValue("fDownloadChain", false);
+}
+

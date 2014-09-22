@@ -435,7 +435,6 @@ void BitcoinGUI::setWalletModel(WalletModel *walletModel)
 
         setEncryptionStatus(walletModel->getEncryptionStatus());
         connect(walletModel, SIGNAL(encryptionStatusChanged(int)), this, SLOT(setEncryptionStatus(int)));
-        connect(walletModel, SIGNAL(encryptionStatusChanged(int)), this, SLOT(updateStakingIcon()));
 
         // Balloon pop-up for new transaction
         connect(walletModel->getTransactionTableModel(), SIGNAL(rowsInserted(QModelIndex,int,int)),
@@ -990,7 +989,7 @@ void BitcoinGUI::updateStakingIcon()
     if (pwalletMain)
         pwalletMain->GetStakeWeight(*pwalletMain, nMinWeight, nMaxWeight, nWeight);
 
-    if (nLastCoinStakeSearchInterval && nWeight)
+    if (nLastCoinStakeSearchInterval && nWeight && !pwalletMain->IsLocked())
     {
         uint64_t nNetworkWeight = GetPoSKernelPS();
         unsigned nEstimateTime = nStakeTargetSpacing * nNetworkWeight / nWeight;

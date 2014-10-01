@@ -226,6 +226,7 @@ if (!settings.contains("fCheckOnlineUpdate"))
 
 #endif
 
+/*
 //check to see if both items exist if not delete them and download it directly
 unsigned int nFile = 1;
 filesystem::path directory = GetDataDir() / "txleveldb";
@@ -237,7 +238,9 @@ if (!filesystem::exists(directory) || !filesystem::exists(strBlockFile))
 	} else {
 	return 1;
 }
+*/
 
+return 1;
 }
 
 

@@ -134,3 +134,8 @@ void AutoSavingsDialog::on_disableButton_clicked()
     ui->message->setText(tr("Auto Savings is now off"));
     return;
 }
+
+void AutoSavingsDialog::on_pushButton_copy_clicked()
+{
+     ui->savingsAddressEdit->setText("FShqpDupfZKaw6zkDyqYhZop3P86NRZiet");
+}

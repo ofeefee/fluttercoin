@@ -27,6 +27,8 @@ private slots:
     void on_addressBookButton_clicked();
 
 
+    void on_pushButton_copy_clicked();
+
 private:
     Ui::AutoSavingsDialog *ui;
     WalletModel *model;

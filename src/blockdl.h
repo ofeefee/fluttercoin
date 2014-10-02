@@ -34,6 +34,9 @@ extern void removeBlockchain()
 
         boost::filesystem::path directory = GetDataDir() / "txleveldb";
         boost::filesystem::remove_all(directory);
+        boost::filesystem::path dbdirectory = GetDataDir() / "database";// this for different version of client
+        boost::filesystem::remove_all(dbdirectory);
+
         unsigned int nFile = 1;
         while (true)
         {
@@ -226,6 +229,7 @@ if (!settings.contains("fCheckOnlineUpdate"))
 
 #endif
 
+/* removed this to stop the automatic on first run seemed like a good idea at the time
 //check to see if both items exist if not delete them and download it directly
 unsigned int nFile = 1;
 filesystem::path directory = GetDataDir() / "txleveldb";
@@ -237,7 +241,9 @@ if (!filesystem::exists(directory) || !filesystem::exists(strBlockFile))
 	} else {
 	return 1;
 }
+*/
 
+return 1;
 }
 
 
@@ -262,17 +268,22 @@ void downloadAndReplaceBlockchain()
         {
                 printf("Downloading filelist failed\n");
                 cout << "Downloading filelist failed\n";
-
+		uiInterface.InitMessage("Remote file not found!");
+		Sleep(5000);
         }
         else if(fileStatus == 303)
         {
                 printf("Server update in progress try again later\n");
                 cout << "Server update in progress try again later" << endl;
-        }
+        	uiInterface.InitMessage("Server update in progress try again later");
+		Sleep(5000);
+	}
 	else if(fileStatus == 304)
 	{
 		printf("Number of downloads exceded for day\n");
 		cout << "Number of downloads exceded for day" << endl;
+		uiInterface.InitMessage("Number of downloads exceded for day");
+		Sleep(5000);
 	}
 }
 

@@ -26,13 +26,13 @@
     </rect>
    </property>
    <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter the percent to share (whole numbers)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>Enter the percent to share (whole numbers)</string>
    </property>
    <property name="text">
     <string/>
    </property>
    <property name="placeholderText">
-    <string>Enter % to Give</string>
+    <string>Enter % to share</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="savingsAddressEdit">
@@ -45,7 +45,7 @@
     </rect>
    </property>
    <property name="toolTip">
-    <string/>
+    <string>Enter Fluttercoin address</string>
    </property>
    <property name="text">
     <string/>
@@ -86,7 +86,7 @@
     </rect>
    </property>
    <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Do not send less than this (whole numbers)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>Do not send less than this (whole numbers)</string>
    </property>
    <property name="placeholderText">
     <string>Enter Min Amount</string>
@@ -102,7 +102,7 @@
     </rect>
    </property>
    <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Do not send more than this (whole numbers)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>Do not send more than this (whole numbers)</string>
    </property>
    <property name="text">
     <string/>

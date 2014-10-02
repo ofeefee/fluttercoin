@@ -34,7 +34,7 @@ void AutoSavingsDialog::setModel(WalletModel *model)
         ui->savingsAddressEdit->setText(strAddress);
         ui->savingsPercentEdit->setText(strPer);
         ui->message->setStyleSheet("QLabel { color: green; }");
-        ui->message->setText(tr("You are now saving to\n") + strAddress + tr("."));
+        ui->message->setText(tr("You are now saving to: ") + strAddress + tr("."));
     }
 }
 
@@ -74,7 +74,7 @@ void AutoSavingsDialog::on_enableButton_clicked()
     if (!address.IsValid())
     {
         ui->message->setStyleSheet("QLabel { color: red; }");
-        ui->message->setText(tr("The entered address: ") + ui->savingsAddressEdit->text() + tr(" is invalid.\nPlease check the address and try again."));
+        ui->message->setText(tr("The entered address: ") + ui->savingsAddressEdit->text() + tr(" is invalid."));
         ui->savingsAddressEdit->setFocus();
         return;
     }
@@ -114,7 +114,7 @@ void AutoSavingsDialog::on_enableButton_clicked()
 
     model->setAutoSavings(true, nSavingsPercent, address, nMinAmount, nMaxAmount);
     ui->message->setStyleSheet("QLabel { color: green; }");
-    ui->message->setText(tr("You are now saving to\n") + QString(address.ToString().c_str()) + tr("."));
+    ui->message->setText(tr("You are now saving to: ") + QString(address.ToString().c_str()) + tr("."));
     return;
 }
 

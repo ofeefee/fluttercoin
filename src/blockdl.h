@@ -34,8 +34,8 @@ extern void removeBlockchain()
 
         boost::filesystem::path directory = GetDataDir() / "txleveldb";
         boost::filesystem::remove_all(directory);
-        boost::filesystem::path directory = GetDataDir() / "database";// this for different version of client
-        boost::filesystem::remove_all(directory);
+        boost::filesystem::path dbdirectory = GetDataDir() / "database";// this for different version of client
+        boost::filesystem::remove_all(dbdirectory);
 
         unsigned int nFile = 1;
         while (true)

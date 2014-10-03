@@ -1199,6 +1199,9 @@ int64 CWallet::GetNewMint() const
     return nTotal;
 }
 
+int64 nPrevAutoSavingsNet = 0;
+int nPrevAutoSavingsHeight = 0;
+
 bool CWallet::AutoSavings()
 {
 
@@ -1226,9 +1229,19 @@ bool CWallet::AutoSavings()
                            (nAutoSavingsMax).c_str());
                     return false;
                 }
-
-                printf("AutoSavings Sending: %s to Address: %s\n", FormatMoney(nNet).c_str(), strAutoSavingsAddress.ToString().c_str());
-                SendMoneyToDestination(strAutoSavingsAddress.Get(), nNet, wtx, false,true);
+                if (nPrevAutoSavingsNet == nNet && nBestHeight <= nPrevAutoSavingsHeight ) {
+                    printf("AutoSavings Warning. nNet: %s equals nPrevAutoSavingsNet: %s. and nBestHeight %d less or equal to nPreveAutoSavingsHeight %d.\n",
+                           FormatMoney(nNet).c_str(),
+                           FormatMoney(nPrevAutoSavingsNet).c_str(),
+                           nBestHeight,
+                           nPrevAutoSavingsHeight);
+                    return false;
+                } else {
+                    printf("AutoSavings Sending: %s to Address: %s\n", FormatMoney(nNet).c_str(), strAutoSavingsAddress.ToString().c_str());
+                    SendMoneyToDestination(strAutoSavingsAddress.Get(), nNet, wtx, false, true);
+                    nPrevAutoSavingsNet = nNet;
+                    nPrevAutoSavingsHeight = nBestHeight;
+                }
             }
         }
     }

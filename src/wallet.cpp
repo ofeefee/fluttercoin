@@ -1805,8 +1805,13 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
                 vwtxPrev.push_back(pcoin.first);
                 txNew.vout.push_back(CTxOut(0, scriptPubKeyOut));
 
-                if (GetWeight(block.GetBlockTime(), (int64)txNew.nTime) < nStakeMaxAge)
+                // add stake split limit threshold --presstab HyperStake
+                // --ofeefee Fluttercoin MAX_MINT_PROOF_OF_STAKE is 100%
+                uint64 nTotalSize = pcoin.first->vout[pcoin.second].nValue * (1+((txNew.nTime - block.GetBlockTime()) / (60*60*24)) * (1/365));
+
+                if ((GetWeight(block.GetBlockTime(), (int64)txNew.nTime) < nStakeMaxAge) && ((nTotalSize / 2) > (1000 * COIN)))
                     txNew.vout.push_back(CTxOut(0, scriptPubKeyOut)); //split stake
+
                 if (fDebug && GetBoolArg("-printcoinstake"))
                     printf("CreateCoinStake : added kernel type=%d\n", whichType);
                 fKernelFound = true;
@@ -1864,7 +1869,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     int64 nMinFee = 0;
     while (true)
     {
-        // Set output amount
+        // Set output amount 
         if (txNew.vout.size() == 3)
         {
             txNew.vout[1].nValue = ((nCredit - nMinFee) / 2 );

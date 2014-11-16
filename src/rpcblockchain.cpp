@@ -43,7 +43,7 @@ double GetDifficulty(const CBlockIndex* blockindex)
     return dDiff;
 }
 
-double GetPoWMHashPS()
+double GetPoWMHashPS(const CBlockIndex* blockindex)
 {
     int nPoWInterval = 72;
     int64 nTargetSpacingWorkMin = 30, nTargetSpacingWork = 30;
@@ -67,14 +67,17 @@ double GetPoWMHashPS()
     return GetDifficulty() * 4294.967296 / nTargetSpacingWork;
 }
 
-double GetPoSKernelPS()
+double GetPoSKernelPS(const CBlockIndex* blockindex)
 {
     int nPoSInterval = 72;
     double dStakeKernelsTriedAvg = 0;
     int nStakesHandled = 0, nStakesTime = 0;
 
-    CBlockIndex* pindex = pindexBest;;
-    CBlockIndex* pindexPrevStake = NULL;
+    const CBlockIndex* pindex = pindexBest;
+    const CBlockIndex* pindexPrevStake = NULL;
+
+    if (blockindex != NULL)
+        pindex = blockindex;
 
     while (pindex && nStakesHandled < nPoSInterval)
     {

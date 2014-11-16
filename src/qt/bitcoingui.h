@@ -15,6 +15,7 @@ class SignVerifyMessageDialog;
 class Notificator;
 class RPCConsole;
 class AutoSavingsDialog;
+class BlockBrowser;
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -66,7 +67,9 @@ private:
     AddressBookPage *receiveCoinsPage;
     SendCoinsDialog *sendCoinsPage;
     SignVerifyMessageDialog *signVerifyMessageDialog;
+
     AutoSavingsDialog *autoSavingsDialog;
+    BlockBrowser *blockBrowser;
 
     QLabel *labelEncryptionIcon;
     QLabel *labelStakingIcon;
@@ -95,8 +98,10 @@ private:
     QAction *unlockWalletAction;
     QAction *aboutQtAction;
     QAction *openRPCConsoleAction;
+
     QAction *flutterSpeedAction;
     QAction *savingsAction;
+    QAction *blockAction;
 
     QSystemTrayIcon *trayIcon;
     Notificator *notificator;
@@ -181,7 +186,11 @@ private slots:
     void unlockWallet();
     /** Ask for passphrase to unlock wallet for staking */
     void unlockWalletStaking();
+
+    /** Switch to FlutterShare page */
     void savingsClicked(QString addr = "");
+    /** Switch to block browser page */
+    void gotoBlockBrowser(QString transactionId = "");
 
     /** Show window if hidden, unminimize when minimized, rise when obscured or show if hidden and fToggleHidden is true */
     void showNormalIfMinimized(bool fToggleHidden = false);

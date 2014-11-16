@@ -12,6 +12,8 @@
 #include <QTimer>
 
 static const int64 nClientStartupTime = GetTime();
+double GetPoWMHashPS(const CBlockIndex* blockindex = NULL);
+double GetPoSKernelPS(const CBlockIndex* blockindex = NULL);
 
 ClientModel::ClientModel(OptionsModel *optionsModel, QObject *parent) :
     QObject(parent), optionsModel(optionsModel),

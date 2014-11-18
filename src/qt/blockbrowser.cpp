@@ -141,7 +141,7 @@ std::string getOutputs(std::string txid)
         str.append(CBitcoinAddress(address).ToString());
         str.append(": ");
         str.append(amount);
-        str.append(" CAP");
+        str.append(" FLT");
         str.append("\n");
     }
 
@@ -179,7 +179,7 @@ std::string getInputs(std::string txid)
         str.append(CBitcoinAddress(address).ToString());
         str.append(": ");
         str.append(amount);
-        str.append(" CAP");
+        str.append(" FLT");
         str.append("\n");
     }
 
@@ -265,11 +265,11 @@ void BlockBrowser::updateExplorer(bool block)
     else {
         std::string txid = ui->txBox->text().toUtf8().constData();
 
-        ui->valueBox->setText(QString::number(getTxTotalValue(txid), 'f', 6) + " CAP");
+        ui->valueBox->setText(QString::number(getTxTotalValue(txid), 'f', 6) + " FLT");
         ui->txID->setText(QString::fromUtf8(txid.c_str()));
         ui->outputBox->setText(QString::fromUtf8(getOutputs(txid).c_str()));
         ui->inputBox->setText(QString::fromUtf8(getInputs(txid).c_str()));
-        ui->feesBox->setText(QString::number(getTxFees(txid), 'f', 6) + " CAP");
+        ui->feesBox->setText(QString::number(getTxFees(txid), 'f', 6) + " FLT");
     }
 }
 

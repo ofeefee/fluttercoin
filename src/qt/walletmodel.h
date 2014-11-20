@@ -97,7 +97,6 @@ public:
     // Wallet backup
     bool backupWallet(const QString &filename);
     
-    void getStakeWeight(quint64& nMinWeight, quint64& nMaxWeight, quint64& nWeight);
     void getStakeWeightFromValue(const qint64& nTime, const qint64& nValue, quint64& nWeight);
 
     //Wallet Information about Auto Savings

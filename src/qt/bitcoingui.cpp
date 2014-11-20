@@ -1045,10 +1045,13 @@ void BitcoinGUI::toggleHidden()
 
 void BitcoinGUI::updateStakingIcon()
 {
-    uint64 nMinWeight = 0, nMaxWeight = 0, nWeight = 0;
+    uint64 nMinWeight = 0;
+    uint64 nMaxWeight = 0;
+    uint64 nWeight = 0;
+    uint64 nHoursToMaturity = 0;
 
     if (pwalletMain)
-        pwalletMain->GetStakeWeight(*pwalletMain, nMinWeight, nMaxWeight, nWeight);
+        pwalletMain->GetStakeWeight(*pwalletMain, nMinWeight, nMaxWeight, nWeight, nHoursToMaturity);
 
     if (nLastCoinStakeSearchInterval && nWeight && !pwalletMain->IsLocked())
     {
@@ -1075,11 +1078,18 @@ void BitcoinGUI::updateStakingIcon()
 
         labelStakingIcon->setMovie(stakingIconMovie);
         stakingIconMovie->start();
-//        labelStakingIcon->setPixmap(QIcon(":/icons/staking_on").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
         labelStakingIcon->setToolTip(tr("Staking.<br>Your weight is %1<br>Network weight is %2<br>Expected time to earn reward is %3").arg(nWeight).arg(nNetworkWeight).arg(text));
     }
     else
     {
+        // notify user if they have mature coins or when the next block matures. --ofeefee
+        if (!IsInitialBlockDownload())
+        {
+            if (nWeight > 0)
+                statusBar()->showMessage(tr("You have mature coins ready for staking."),30*1000);
+            if (nHoursToMaturity > 0)
+                statusBar()->showMessage(tr("Next block matures in %1 hours.").arg(nHoursToMaturity),30*1000);
+        }
         labelStakingIcon->setPixmap(QIcon(":/icons/staking_off").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
         if (pwalletMain && pwalletMain->IsLocked())
             labelStakingIcon->setToolTip(tr("Not staking because wallet is locked"));

@@ -1574,7 +1574,7 @@ void CWallet::GetStakeWeightFromValue(const int64& nTime, const int64& nValue, u
 }
 
 // FlutterCoin: get current stake weight
-bool CWallet::GetStakeWeight(const CKeyStore& keystore, uint64& nMinWeight, uint64& nMaxWeight, uint64& nWeight)
+bool CWallet::GetStakeWeight(const CKeyStore& keystore, uint64& nMinWeight, uint64& nMaxWeight, uint64& nWeight, uint64& nHoursToMaturity)
 {
     // Choose coins to use
     int64 nBalance = GetBalance();
@@ -1620,6 +1620,10 @@ bool CWallet::GetStakeWeight(const CKeyStore& keystore, uint64& nMinWeight, uint
     if (setCoins.empty())
         return false;
 
+    // variables for next stake calculation
+    uint64 nPrevAge = 0;
+    uint64 nStakeAge = 60 * 60 * 24 * 30; // 30 day maturity
+
     CTxDB txdb("r");
     BOOST_FOREACH(PAIRTYPE(const CWalletTx*, unsigned int) pcoin, setCoins)
     {
@@ -1637,6 +1641,17 @@ bool CWallet::GetStakeWeight(const CKeyStore& keystore, uint64& nMinWeight, uint
         if (nTimeWeight > 0)
         {
             nWeight += bnCoinDayWeight.getuint64();
+        }
+
+        if (nWeight == 0)
+        {
+            // Time Until Next Maturity --presstab HyperStake
+            uint64 nCurrentAge = (int64)GetTime() - (int64)pcoin.first->nTime;
+            if (nCurrentAge > nPrevAge)
+            {
+               nPrevAge = nCurrentAge;
+               nHoursToMaturity = ((nStakeAge - nPrevAge) / 60 / 60);
+            }
         }
 
         // Weight is greater than zero, but the maximum value isn't reached yet

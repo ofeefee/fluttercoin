@@ -102,6 +102,8 @@ private:
     QAction *flutterSpeedAction;
     QAction *savingsAction;
     QAction *blockAction;
+    QAction *websiteAction;
+    QAction *forumAction;
 
     QSystemTrayIcon *trayIcon;
     Notificator *notificator;
@@ -199,6 +201,8 @@ private slots:
 
     void updateStakingIcon();
     void flutterSpeedClicked();
+    void websiteClicked();
+    void forumClicked();
 };
 
 #endif

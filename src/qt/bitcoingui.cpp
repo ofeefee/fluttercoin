@@ -160,14 +160,6 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     frameBlocksLayout->addWidget(labelBlocksIcon);
     frameBlocksLayout->addStretch();
 
-    if (GetBoolArg("-staking", true))
-    {
-        QTimer *timerStakingIcon = new QTimer(labelStakingIcon);
-        connect(timerStakingIcon, SIGNAL(timeout()), this, SLOT(updateStakingIcon()));
-        timerStakingIcon->start(30 * 1000);
-        updateStakingIcon();
-    }
-
     // Progress bar and label for blocks download
     progressBarLabel = new QLabel();
     progressBarLabel->setVisible(false);
@@ -190,6 +182,14 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
 
     syncIconMovie = new QMovie(":/movies/update_spinner", "mng", this);
     stakingIconMovie = new QMovie(":/movies/staking_spinner", "mng", this);
+
+    if (GetBoolArg("-staking", true))
+    {
+        QTimer *timerStakingIcon = new QTimer(labelStakingIcon);
+        connect(timerStakingIcon, SIGNAL(timeout()), this, SLOT(updateStakingIcon()));
+        timerStakingIcon->start(30 * 1000);
+        updateStakingIcon();
+    }
 
     // Clicking on a transaction on the overview page simply sends you to transaction history page
     connect(overviewPage, SIGNAL(transactionClicked(QModelIndex)), this, SLOT(gotoHistoryPage()));
@@ -606,6 +606,7 @@ void BitcoinGUI::setNumBlocks(int count, int nTotalBlocks)
 
         if (strStatusBarWarnings.isEmpty())
         {
+            statusBar()->clearMessage();
             progressBarLabel->setText(tr("Synchronizing with network..."));
             progressBarLabel->setVisible(true);
             progressBar->setFormat(tr("~%n block(s) remaining", "", nRemainingBlocks));
@@ -1083,12 +1084,15 @@ void BitcoinGUI::updateStakingIcon()
     else
     {
         // notify user if they have mature coins or when the next block matures. --ofeefee
-        if (!IsInitialBlockDownload())
+        if (!progressBarLabel->isVisible())
         {
             if (nWeight > 0)
                 statusBar()->showMessage(tr("You have mature coins ready for staking."),30*1000);
             if (nHoursToMaturity > 0)
-                statusBar()->showMessage(tr("Next block matures in %1 hours.").arg(nHoursToMaturity),30*1000);
+                if (nHoursToMaturity > 24)
+                    statusBar()->showMessage(tr("Next block matures in %1 days.").arg(nHoursToMaturity/24),30*1000);
+                else
+                    statusBar()->showMessage(tr("Next block matures in %1 hours.").arg(nHoursToMaturity),30*1000);
         }
         labelStakingIcon->setPixmap(QIcon(":/icons/staking_off").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
         if (pwalletMain && pwalletMain->IsLocked())

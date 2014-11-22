@@ -1667,6 +1667,10 @@ bool CWallet::GetStakeWeight(const CKeyStore& keystore, uint64& nMinWeight, uint
         }
     }
 
+    // fix nHoursToMaturity when nWeight found
+    if (nWeight > 0)
+        nHoursToMaturity = 0;
+
     return true;
 }
 

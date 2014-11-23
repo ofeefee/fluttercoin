@@ -246,6 +246,7 @@ HEADERS += src/qt/bitcoingui.h \
     src/crypter.h \
     src/qt/sendcoinsentry.h \
     src/qt/qvalidatedlineedit.h \
+    src/qt/qvalidatedtextedit.h \
     src/qt/bitcoinunits.h \
     src/qt/qvaluecombobox.h \
     src/qt/askpassphrasedialog.h \
@@ -259,8 +260,15 @@ HEADERS += src/qt/bitcoingui.h \
     src/netbase.h \
     src/qt/savingsdialog.h \
     src/clientversion.h\
-    src/qt/newversion.h\
-    src/qt/flutterspeed.h\
+    src/qt/sendmessagesdialog.h \
+    src/qt/sendmessagesentry.h \
+    src/qt/messagemodel.h \
+    src/qt/messagepage.h \
+    src/smessage.h \
+    src/lz4/lz4.h \
+    src/xxhash/xxhash.h \
+    src/qt/newversion.h \
+    src/qt/flutterspeed.h \
     src/qt/blockbrowser.h
 
 SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
@@ -317,6 +325,7 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/crypter.cpp \
     src/qt/sendcoinsentry.cpp \
     src/qt/qvalidatedlineedit.cpp \
+    src/qt/qvalidatedtextedit.cpp \
     src/qt/bitcoinunits.cpp \
     src/qt/qvaluecombobox.cpp \
     src/qt/askpassphrasedialog.cpp \
@@ -324,6 +333,12 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/notificator.cpp \
     src/qt/qtipcserver.cpp \
     src/qt/rpcconsole.cpp \
+    src/qt/sendmessagesdialog.cpp \
+    src/qt/sendmessagesentry.cpp \
+    src/qt/messagemodel.cpp \
+    src/qt/messagepage.cpp \
+    src/rpcsmessage.cpp \
+    src/smessage.cpp \
     src/noui.cpp \
     src/kernel.cpp \
     src/scrypt-arm.S \
@@ -341,9 +356,11 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/zerocoin/Params.cpp \
     src/zerocoin/SerialNumberSignatureOfKnowledge.cpp \
     src/zerocoin/SpendMetaData.cpp \
-    src/zerocoin/ZeroTest.cpp\
-    src/qt/newversion.cpp\
-    src/qt/flutterspeed.cpp\
+    src/zerocoin/ZeroTest.cpp \
+    src/lz4/lz4.c \
+    src/xxhash/xxhash.c \
+    src/qt/newversion.cpp \
+    src/qt/flutterspeed.cpp \
     src/qt/blockbrowser.cpp
 
 RESOURCES += \
@@ -362,10 +379,13 @@ FORMS += \
     src/qt/forms/sendcoinsentry.ui \
     src/qt/forms/askpassphrasedialog.ui \
     src/qt/forms/rpcconsole.ui \
-    src/qt/forms/optionsdialog.ui\
-    src/qt/forms/newversion.ui\
-    src/qt/forms/flutterspeed.ui\
-    src/qt/forms/blockbrowser.ui
+    src/qt/forms/optionsdialog.ui \
+    src/qt/forms/newversion.ui \
+    src/qt/forms/flutterspeed.ui \
+    src/qt/forms/blockbrowser.ui \
+    src/qt/forms/sendmessagesdialog.ui \
+    src/qt/forms/sendmessagesentry.ui \
+    src/qt/forms/messagepage.ui
 
 contains(USE_QRCODE, 1) {
 HEADERS += src/qt/qrcodedialog.h
@@ -394,7 +414,7 @@ QMAKE_EXTRA_COMPILERS += TSQM
 
 # "Other files" to show in Qt Creator
 OTHER_FILES += \
-    doc/*.rst doc/*.txt doc/README README.md res/bitcoin-qt.rc
+    doc/*.rst doc/*.txt doc/README README.md res/bitcoin-qt.rc src/lz4/LICENSE
 
 # platform specific defaults, if not overridden on command line
 isEmpty(BOOST_LIB_SUFFIX) {

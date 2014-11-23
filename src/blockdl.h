@@ -140,16 +140,19 @@ int downloadFile(	const char * getFilename, //what were going to save the files 
 
 	// Process the response headers.
 	std::string header;
+    int64 preTime;
 	unsigned int fileSize=0;
-	unsigned int currentDLSize;
+    unsigned int currentDLSize=1;
+    unsigned int preFileSize=1;
 	float currentPer;
 	char mOut[256];
 	unsigned int progress;
+    unsigned int dataRate;
 	filesystem::path workingDir = GetDataDir();
 	std::string workingPath = workingDir.string();
 	workingPath += "/";
 	workingPath += getFilename;
-
+    preTime = GetTimeMillis();
 	printf("Downloading File From: %s%s\n",(char*)serverName.c_str(),(char*)getCommand.c_str());
 	printf("Downloading File to: %s (%d of %d)\n",(char*)workingPath.c_str(),currentFileNumber,totalFileNumber);
 
@@ -176,11 +179,13 @@ int downloadFile(	const char * getFilename, //what were going to save the files 
 		if (progress >= 128) //rate limit gui update of progress
 		{
 			progress = 0;
-			sprintf (mOut , "Downloading:%s (%d of %d)  %d K of %d K  %d%%",getFilename,currentFileNumber,totalFileNumber,(currentDLSize / 1024),(fileSize / 1024),(int)currentPer);
+            dataRate = (int)(((currentDLSize - preFileSize)/(GetTimeMillis()-preTime))*1000)/1024;
+            sprintf (mOut , "Downloading:%s (%d of %d) %dM of %dM %d%% %dKB/s",getFilename,currentFileNumber,totalFileNumber,(currentDLSize / (1024*1024)),(fileSize / (1024*1024)),(int)currentPer,dataRate);
 			#ifdef QT_GUI
 			uiInterface.InitMessage(mOut);
 			#endif
-
+            preFileSize = currentDLSize;
+            preTime = GetTimeMillis();
 		}
 	}
 outFile.close();

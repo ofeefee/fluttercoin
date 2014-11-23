@@ -62,14 +62,14 @@ Notes:
 
 
 // On 64 bit system ld is 64bits
-// #ifdef IS_ARCH_64
-// #undef PRId64
-// #undef PRIu64
-// #undef PRIx64
-// #define PRId64  "ld"
-// #define PRIu64  "lu"
-// #define PRIx64  "lx"
-// #endif // IS_ARCH_64
+#ifdef IS_ARCH_64
+#undef PRId64
+#undef PRIu64
+#undef PRIx64
+#define PRId64  "ld"
+#define PRIu64  "lu"
+#define PRIx64  "lx"
+#endif // IS_ARCH_64
 
 
 // TODO: For buckets older than current, only need to store no. messages and hash in memory
@@ -625,7 +625,7 @@ void ThreadSecureMsg(void* parg)
                 if (it->first < cutoffTime)
                 {
                     if (fDebugSmsg)
-                        printf("Removing bucket %" PRId64" \n", it->first);
+                        printf("Removing bucket %"PRId64" \n", it->first);
                     std::string fileName = boost::lexical_cast<std::string>(it->first) + "_01.dat";
                     fs::path fullPath = GetDataDir() / "smsgStore" / fileName;
                     if (fs::exists(fullPath))
@@ -666,7 +666,7 @@ void ThreadSecureMsg(void* parg)
                             int64_t     ignoreUntil = GetTime() + SMSG_TIME_IGNORE;
                             
                             if (fDebugSmsg)
-                                printf("Lock on bucket %" PRId64 " for peer %u timed out.\n", it->first, nPeerId);
+                                printf("Lock on bucket %"PRId64" for peer %u timed out.\n", it->first, nPeerId);
                             // -- look through the nodes for the peer that locked this bucket
                             LOCK(cs_vNodes);
                             BOOST_FOREACH(CNode* pnode, vNodes)

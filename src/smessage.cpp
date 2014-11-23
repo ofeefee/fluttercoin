@@ -30,12 +30,6 @@ Notes:
 
 #include "smessage.h"
 
-// --gcc 4.6 gitian fix
-#define __STDC_FORMAT_MACROS 1
-#include <inttypes.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 #include <stdint.h>
 #include <time.h>
 #include <map>

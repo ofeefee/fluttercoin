@@ -264,14 +264,14 @@ void BitcoinGUI::createActions()
     addressBookAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
     tabGroup->addAction(addressBookAction);
 
-    messageAction = new QAction(QIcon(":/icons/social"), tr("&Messages"), this);
+    messageAction = new QAction(QIcon(":/icons/smessage"), tr("&Messaging"), this);
     messageAction->setStatusTip(tr("View and Send Encrypted messages"));
     messageAction->setToolTip(messageAction->statusTip());
     messageAction->setCheckable(true);
     messageAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_6));
     tabGroup->addAction(messageAction);
 
-    savingsAction = new QAction(QIcon(":/icons/send"), tr("FlutterShare"), this);
+    savingsAction = new QAction(QIcon(":/icons/send"), tr("&FlutterShare"), this);
     savingsAction->setStatusTip(tr("Enable FlutterShare"));
     savingsAction->setToolTip(savingsAction->statusTip());
     savingsAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_7));
@@ -281,6 +281,8 @@ void BitcoinGUI::createActions()
     blockAction = new QAction(QIcon(":/icons/blexp"), tr("Block Bro&wser"), this);
     blockAction->setStatusTip(tr("Explore the BlockChain"));
     blockAction->setToolTip(blockAction->statusTip());
+    blockAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_8));
+    blockAction->setCheckable(true);
     tabGroup->addAction(blockAction);
 
     forumAction = new QAction(QIcon(":/icons/toolbar"), tr("Forums"), this);

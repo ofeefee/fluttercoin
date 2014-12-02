@@ -128,7 +128,10 @@ bool CWallet::Unlock(const SecureString& strWalletPassphrase)
             if (!crypter.Decrypt(pMasterKey.second.vchCryptedKey, vMasterKey))
                 return false;
             if (CCryptoKeyStore::Unlock(vMasterKey))
+            {
+                SecureMsgWalletUnlocked();
                 return true;
+            }
         }
     }
     return false;

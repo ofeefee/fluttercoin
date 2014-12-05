@@ -1459,10 +1459,15 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
                 int64 nValueIn = 0;
                 if (!SelectCoins(nTotalValue, wtxNew.nTime, setCoins, nValueIn, coinControl))
                     return false;
+                CTxDestination outputAddress;
                 BOOST_FOREACH(PAIRTYPE(const CWalletTx*, unsigned int) pcoin, setCoins)
                 {
                     int64 nCredit = pcoin.first->vout[pcoin.second].nValue;
                     dPriority += (double)nCredit * pcoin.first->GetDepthInMainChain();
+                    //Presstab HyperStake
+                    //use this address to send change back
+                    //note that this will use the last address run through the FOREACH, needs better logic added
+                    ExtractDestination(pcoin.first->vout[pcoin.second].scriptPubKey, outputAddress);
                 }
 
                 int64 nChange = nValueIn - nValue - nFeeRet;
@@ -1493,6 +1498,8 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
                     // coin control: send change to custom address
                     if (coinControl && !boost::get<CNoDestination>(&coinControl->destChange))
                         scriptChange.SetDestination(coinControl->destChange);
+                    else if (coinControl && coinControl->fReturnChange == true)
+                        scriptChange.SetDestination(outputAddress);
 
                     // no coin control: send change to newly generated address
                     else

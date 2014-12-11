@@ -87,7 +87,7 @@ public:
     };
 
     // Send coins to a list of recipients
-    SendCoinsReturn sendCoins(const QList<SendCoinsRecipient> &recipients, const CCoinControl *coinControl=NULL);
+    SendCoinsReturn sendCoins(const QList<SendCoinsRecipient> &recipients, int SplitBlock, const CCoinControl *coinControl=NULL);
 
     // Wallet encryption
     bool setWalletEncrypted(bool encrypted, const SecureString &passphrase);
@@ -98,6 +98,9 @@ public:
     bool backupWallet(const QString &filename);
     
     void getStakeWeightFromValue(const qint64& nTime, const qint64& nValue, quint64& nWeight);
+
+    void setSplitBlock(bool fSplitBlock);
+    bool getSplitBlock();
 
     //setAutoSavings Wallet settings
     void setAutoSavings(bool fAutoSavings, int& nAutoSavingsPercent,

@@ -93,6 +93,8 @@ public:
     int64 nAutoSavingsMin;
     int64 nAutoSavingsMax;
     CBitcoinAddress strAutoSavingsAddress;
+    CBitcoinAddress strAutoSavingsChangeAddress;
+    bool fSplitBlock;
 
     std::set<int64> setKeyPool;
     std::map<CKeyID, CKeyMetadata> mapKeyMetadata;
@@ -113,8 +115,10 @@ public:
         fAutoSavings = false;
         nAutoSavingsPercent = 0;
         strAutoSavingsAddress = "";
+        strAutoSavingsChangeAddress = "";
         nAutoSavingsMin = 0;
         nAutoSavingsMax = 0;
+        fSplitBlock = false;
     }
     CWallet(std::string strWalletFileIn)
     {
@@ -128,8 +132,10 @@ public:
         fAutoSavings = false;
         nAutoSavingsPercent = 0;
         strAutoSavingsAddress = "";
+        strAutoSavingsChangeAddress = "";
         nAutoSavingsMin = MIN_TXOUT_AMOUNT;
         nAutoSavingsMax = MAX_MONEY;
+        fSplitBlock = false;
     }
 
     std::map<uint256, CWalletTx> mapWallet;
@@ -203,8 +209,8 @@ public:
     int64 GetStake() const;
     int64 GetNewMint() const;
     bool AutoSavings();
-    bool CreateTransaction(const std::vector<std::pair<CScript, int64> >& vecSend, CWalletTx& wtxNew, CReserveKey& reservekey, int64& nFeeRet, const CCoinControl *coinControl=NULL);
-    bool CreateTransaction(CScript scriptPubKey, int64 nValue, CWalletTx& wtxNew, CReserveKey& reservekey, int64& nFeeRet, const CCoinControl *coinControl=NULL);
+    bool CreateTransaction(const std::vector<std::pair<CScript, int64> >& vecSend, CWalletTx& wtxNew, CReserveKey& reservekey, int64& nFeeRet, int nSplitBlock, bool fAllowAutoSavings=false, const CCoinControl *coinControl=NULL);
+    bool CreateTransaction(CScript scriptPubKey, int64 nValue, CWalletTx& wtxNew, CReserveKey& reservekey, int64& nFeeRet, bool fAllowAutoSavings=false, const CCoinControl *coinControl=NULL);
     bool CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey);
 
     bool GetStakeWeight(const CKeyStore& keystore, uint64& nMinWeight, uint64& nMaxWeight, uint64& nWeight, uint64& nHoursToMaturity);

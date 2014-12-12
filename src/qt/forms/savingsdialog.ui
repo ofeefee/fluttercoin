@@ -182,6 +182,48 @@
     <bool>false</bool>
    </property>
   </widget>
+  <widget class="QLineEdit" name="savingsChangeAddressEdit">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>190</y>
+     <width>481</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Change address must be owned by you</string>
+   </property>
+   <property name="placeholderText">
+    <string>Enter Change Address (optional)</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="changeAddressBookButton">
+   <property name="geometry">
+    <rect>
+     <x>590</x>
+     <y>190</y>
+     <width>28</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Choose an address from the address book</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset resource="../bitcoin.qrc">
+     <normaloff>:/icons/address-book</normaloff>:/icons/address-book</iconset>
+   </property>
+   <property name="shortcut">
+    <string>Alt+A</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+  </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>

@@ -51,7 +51,7 @@ void AutoSavingsDialog::setModel(WalletModel *model)
         if (nMax > 0 && nMax != MAX_MONEY)
             ui->savingsMaxEdit->setText(QString::number(nMax/COIN));
         ui->message->setStyleSheet("QLabel { color: green; }");
-        ui->message->setText(tr("You are now saving to: ") + strAddress.ToString().c_str() + tr("."));
+        ui->message->setText(tr("You are now sending to: ") + strAddress.ToString().c_str() + tr("."));
     }
 }
 
@@ -173,7 +173,7 @@ void AutoSavingsDialog::on_enableButton_clicked()
 
     model->setAutoSavings(true, nSavingsPercent, address, changeAddress, nMinAmount, nMaxAmount);
     ui->message->setStyleSheet("QLabel { color: green; }");
-    ui->message->setText(tr("You are now saving to: ") + QString(address.ToString().c_str()) + tr("."));
+    ui->message->setText(tr("You are now sending to: ") + QString(address.ToString().c_str()) + tr("."));
     return;
 }
 
@@ -191,7 +191,7 @@ void AutoSavingsDialog::on_disableButton_clicked()
     ui->savingsMinEdit->clear();
     ui->savingsPercentEdit->clear();
     ui->message->setStyleSheet("QLabel { color: black; }");
-    ui->message->setText(tr("Auto Savings is now off"));
+    ui->message->setText(tr("FlutterShare is now off"));
     return;
 }
 

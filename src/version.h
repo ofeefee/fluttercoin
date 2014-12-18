@@ -30,10 +30,10 @@ static const int DATABASE_VERSION = 70507;
 // network protocol versioning
 //
 
-static const int PROTOCOL_VERSION = 70011;
+static const int PROTOCOL_VERSION = 70012;
 
 // earlier versions not supported and are disconnected
-static const int MIN_PROTO_VERSION = 70009;
+static const int MIN_PROTO_VERSION = 70010;
 
 // nTime field added to CAddress, starting with this version;
 // if possible, avoid requesting addresses nodes older than this
@@ -52,7 +52,7 @@ static const int MEMPOOL_GD_VERSION = 70000;
 #define DISPLAY_VERSION_MAJOR       0
 #define DISPLAY_VERSION_MINOR       7
 #define DISPLAY_VERSION_REVISION    5
-#define DISPLAY_VERSION_BUILD       14
+#define DISPLAY_VERSION_BUILD       15
 
 static const int DISPLAY_VERSION =
                            1000000 * DISPLAY_VERSION_MAJOR

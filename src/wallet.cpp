@@ -1420,7 +1420,7 @@ bool CWallet::SelectCoinsSimple(int64 nTargetValue, unsigned int nSpendTime, int
     return true;
 }
 
-bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CWalletTx& wtxNew, CReserveKey& reservekey, int64& nFeeRet, bool fAllowAutoSavings, const CCoinControl* coinControl)
+bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CWalletTx& wtxNew, CReserveKey& reservekey, int64& nFeeRet, int nSplitBlock, bool fAllowAutoSavings, const CCoinControl* coinControl)
 {
     int64 nValue = 0;
     BOOST_FOREACH (const PAIRTYPE(CScript, int64)& s, vecSend)
@@ -1448,10 +1448,33 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
 
                 int64 nTotalValue = nValue + nFeeRet;
                 double dPriority = 0;
-                // vouts to the payees
-                BOOST_FOREACH (const PAIRTYPE(CScript, int64)& s, vecSend)
-                    wtxNew.vout.push_back(CTxOut(s.second, s.first));
+                if (nSplitBlock < 1 )
+                    nSplitBlock = 1;
 
+                // vouts to the payees
+                if (!fSplitBlock)
+                {
+                    BOOST_FOREACH (const PAIRTYPE(CScript, int64)& s, vecSend)
+                    wtxNew.vout.push_back(CTxOut(s.second, s.first));
+                }
+                else
+                    BOOST_FOREACH (const PAIRTYPE(CScript, int64)& s, vecSend)
+                {
+                    uint64 nBlockAmount = 0;
+                    uint64 nBlockSum = 0;
+                    uint64 nAvgBlock = nValue / nSplitBlock;
+
+                    for(int nCount = 0; nCount < nSplitBlock; nCount++)
+                    {
+                        if (!(nCount == nSplitBlock - 1))
+                            nBlockAmount =  nAvgBlock - ((nCount + 1) * COIN / 4000);
+                        else
+                            nBlockAmount = nValue - nBlockSum;
+                        nBlockSum += nBlockAmount;
+                        wtxNew.vout.push_back(CTxOut(nBlockAmount, s.first));
+                    }
+                }
+ 
                 // Choose coins to use
                 set<pair<const CWalletTx*,unsigned int> > setCoins;
                 int64 nValueIn = 0;
@@ -1573,7 +1596,7 @@ bool CWallet::CreateTransaction(CScript scriptPubKey, int64 nValue, CWalletTx& w
 {
     vector< pair<CScript, int64> > vecSend;
     vecSend.push_back(make_pair(scriptPubKey, nValue));
-    return CreateTransaction(vecSend, wtxNew, reservekey, nFeeRet, fAllowAutoSavings, coinControl);
+    return CreateTransaction(vecSend, wtxNew, reservekey, nFeeRet, 1, fAllowAutoSavings, coinControl);
 }
 
 void CWallet::GetStakeWeightFromValue(const int64& nTime, const int64& nValue, uint64& nWeight)

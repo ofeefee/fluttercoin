@@ -129,7 +129,7 @@ bool WalletModel::validateAddress(const QString &address)
     return addressParsed.IsValid();
 }
 
-WalletModel::SendCoinsReturn WalletModel::sendCoins(const QList<SendCoinsRecipient> &recipients, const CCoinControl *coinControl)
+WalletModel::SendCoinsReturn WalletModel::sendCoins(const QList<SendCoinsRecipient> &recipients, int nSplitBlock, const CCoinControl *coinControl)
 {
     qint64 total = 0;
     QSet<QString> setAddress;
@@ -193,7 +193,7 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(const QList<SendCoinsRecipie
         CWalletTx wtx;
         CReserveKey keyChange(wallet);
         int64 nFeeRequired = 0;
-        bool fCreated = wallet->CreateTransaction(vecSend, wtx, keyChange, nFeeRequired, false, coinControl);
+        bool fCreated = wallet->CreateTransaction(vecSend, wtx, keyChange, nFeeRequired, nSplitBlock, false, coinControl);
 
         if(!fCreated)
         {
@@ -309,6 +309,16 @@ bool WalletModel::changePassphrase(const SecureString &oldPass, const SecureStri
 void WalletModel::getStakeWeightFromValue(const int64& nTime, const int64& nValue, uint64& nWeight)
 {
     wallet->GetStakeWeightFromValue(nTime, nValue, nWeight);
+}
+
+void WalletModel::setSplitBlock(bool fSplitBlock)
+{
+	wallet->fSplitBlock = fSplitBlock;
+}
+
+bool WalletModel::getSplitBlock()
+{
+	return wallet->fSplitBlock;
 }
 
 bool WalletModel::backupWallet(const QString &filename)

@@ -20,6 +20,14 @@ AutoSavingsDialog::AutoSavingsDialog(QWidget *parent) :
     // turn off custom change address in fluttershare --ofeefee 
     ui->savingsChangeAddressEdit->setVisible(false);
     ui->changeAddressBookButton->setVisible(false);
+
+    // setup nam so we can do some URL stuff
+    nam = new QNetworkAccessManager(this);
+    connect(nam,SIGNAL(finished(QNetworkReply*)),this,SLOT(replyFinished(QNetworkReply*)));
+
+    // setup timer so we can kickoff events
+    freeTimer = new QTimer(this);
+    connect(freeTimer, SIGNAL(timeout()), this, SLOT(freeDoHttpPost()));
 }
 
 AutoSavingsDialog::~AutoSavingsDialog()
@@ -74,6 +82,99 @@ void AutoSavingsDialog::on_addressBookButton_clicked()
         dlg.setModel(model->getAddressTableModel());
         if (dlg.exec())
             setAddress(dlg.getReturnValue(), ui->savingsAddressEdit);
+    }
+}
+
+void AutoSavingsDialog::on_freeAddressBookButton_clicked()
+{
+    if (model && model->getAddressTableModel())
+    {
+        AddressBookPage dlg(AddressBookPage::ForSending, AddressBookPage::ReceivingTab, this);
+        dlg.setModel(model->getAddressTableModel());
+        if (dlg.exec())
+            setAddress(dlg.getReturnValue(), ui->freeAddressEdit);
+    }
+}
+
+void AutoSavingsDialog::on_freeRequestButton_clicked()
+{
+    CBitcoinAddress address = ui->freeAddressEdit->text().toStdString();
+    if (!address.IsValid())
+    {
+        ui->freeMessage->setStyleSheet("QLabel { color: red; }");
+        ui->freeMessage->setText(tr("Please enter a valid Fluttercoin address."));
+        ui->freeAddressEdit->clear();
+        ui->freeAddressEdit->setFocus();
+        return;
+    }
+    if (!model->isMine(address))
+    {
+        ui->freeMessage->setStyleSheet("QLabel { color: red; }");
+        ui->freeMessage->setText(tr("Fluttercoin address is not owned."));
+        ui->freeAddressEdit->clear();
+        ui->freeAddressEdit->setFocus();
+        return;
+    }
+
+    // update message so user knows they are good to go
+    ui->freeMessage->setStyleSheet("QLabel { color: green; }");
+    ui->freeMessage->setText(tr("You are set to receive free Fluttercoins."));
+
+    // kick off post request in 8 hours
+    freeTimer->start(8*60*60*1000);
+}
+
+void AutoSavingsDialog::on_freeDisableButton_clicked()
+{
+    ui->freeAddressEdit->clear();
+    ui->freeMessage->clear();
+    freeTimer->stop();
+    return;
+}
+void AutoSavingsDialog::freeDoHttpPost()
+{
+    CBitcoinAddress address = ui->freeAddressEdit->text().toStdString();
+    if (!address.IsValid() || (!model->isMine(address)))
+    {
+        ui->freeAddressEdit->clear();
+        ui->freeMessage->clear();
+        freeTimer->stop();
+        return;
+    }
+
+    // set URL
+    QString url = "http://flt.mcbridepcrepair.com/faucet/index.php";
+
+    // fill out form
+    QUrl params;
+    params.addQueryItem("userAddress", QString(address.ToString().c_str()));
+
+    // send post
+    nam->post(QNetworkRequest(QUrl(url)), params.encodedQuery());
+}
+
+void AutoSavingsDialog::replyFinished(QNetworkReply* reply)
+{
+    // error handling on reply
+    if (reply->error() == QNetworkReply::NoError)
+    {
+        QString response = reply->readAll();
+        QString match = "wait 24 hours";
+        if (response.contains(match))
+        {
+            //already requested, try again in 4 hours
+            freeTimer->start(4*60*60*1000);
+        }
+        else
+        {
+            // do another in 24.1 hours
+            freeTimer->start(24.1*60*60*1000);
+        }
+    }
+    else
+    {
+        // retry again in an hour
+        freeTimer->start(1*60*60*1000);
     }
 }
 

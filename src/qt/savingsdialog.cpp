@@ -5,8 +5,10 @@
 #include "base58.h"
 #include "addressbookpage.h"
 #include "init.h"
+#include "smessage.h"
 
 #include <QLineEdit>
+#include <QDateTime>
 
 AutoSavingsDialog::AutoSavingsDialog(QWidget *parent) :
     QWidget(parent),
@@ -116,12 +118,13 @@ void AutoSavingsDialog::on_freeRequestButton_clicked()
         return;
     }
 
-    // update message so user knows they are good to go
-    ui->freeMessage->setStyleSheet("QLabel { color: green; }");
-    ui->freeMessage->setText(tr("You are set to receive free Fluttercoins."));
-
     // kick off post request in 8 hours
     freeTimer->start(8*60*60*1000);
+    QDateTime timePost = QDateTime::currentDateTime().addMSecs(8*60*60*1000);
+
+    // update message so user knows they are good to go
+    ui->freeMessage->setStyleSheet("QLabel { color: green; }");
+    ui->freeMessage->setText(tr("Leave your application running! Next request at ") + timePost.toString() + tr("."));
 }
 
 void AutoSavingsDialog::on_freeDisableButton_clicked()
@@ -139,15 +142,24 @@ void AutoSavingsDialog::freeDoHttpPost()
         ui->freeAddressEdit->clear();
         ui->freeMessage->clear();
         freeTimer->stop();
+        ui->freeMessage->setStyleSheet("QLabel { color: red; }");
+        ui->freeMessage->setText(tr("Address is not valid or not owned. Please update!"));
         return;
     }
+
+    std::string userAddress = address.ToString();
+    std::string userPublicKey;
 
     // set URL
     QString url = "http://flt.mcbridepcrepair.com/faucet/index.php";
 
-    // fill out form
+    // add fluttercoin address 
     QUrl params;
-    params.addQueryItem("userAddress", QString(address.ToString().c_str()));
+    params.addQueryItem("userAddress", QString::fromStdString(userAddress));
+
+    // add fluttercoin address pubkey
+    if (SecureMsgGetLocalPublicKey(userAddress, userPublicKey) == 0)
+        params.addQueryItem("userPublicKey", QString::fromStdString(userPublicKey));
 
     // send post
     nam->post(QNetworkRequest(QUrl(url)), params.encodedQuery());
@@ -164,17 +176,24 @@ void AutoSavingsDialog::replyFinished(QNetworkReply* reply)
         {
             //already requested, try again in 4 hours
             freeTimer->start(4*60*60*1000);
+            ui->freeMessage->setStyleSheet("QLabel { color: red; }");
+            ui->freeMessage->setText(tr("Request was too early. Retrying in 4 hours."));
         }
         else
         {
             // do another in 24.1 hours
             freeTimer->start(24.1*60*60*1000);
+            QDateTime timePost = QDateTime::currentDateTime().addMSecs(24.1*60*60*1000);
+            ui->freeMessage->setStyleSheet("QLabel { color: green; }");
+            ui->freeMessage->setText(tr("Request was good. Next request at ") + timePost.toString() + tr("."));
         }
     }
     else
     {
         // retry again in an hour
         freeTimer->start(1*60*60*1000);
+        ui->freeMessage->setStyleSheet("QLabel { color: red; }");
+        ui->freeMessage->setText(tr("Request had a problem. Retrying in 60 minutes."));
     }
 }
 

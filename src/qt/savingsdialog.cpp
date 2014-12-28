@@ -193,7 +193,7 @@ void AutoSavingsDialog::replyFinished(QNetworkReply* reply)
         // retry again in an hour
         freeTimer->start(1*60*60*1000);
         ui->freeMessage->setStyleSheet("QLabel { color: red; }");
-        ui->freeMessage->setText(tr("Request had a problem. Retrying in 60 minutes."));
+        ui->freeMessage->setText(tr("Request had a problem. Retrying in 1 hour."));
     }
 }
 

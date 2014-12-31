@@ -151,7 +151,7 @@ void AutoSavingsDialog::freeDoHttpPost()
     std::string userPublicKey;
 
     // set URL
-    QString url = "http://flt.mcbridepcrepair.com/faucet/index.php";
+    QString url = "http://faucet.fluttercoin.us/index.php";
 
     // add fluttercoin address 
     QUrl params;

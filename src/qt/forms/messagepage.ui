@@ -137,7 +137,11 @@
          </layout>
         </item>
         <item>
-         <widget class="QListView" name="listConversation"/>
+         <widget class="QListView" name="listConversation">
+          <property name="contextMenuPolicy">
+           <enum>Qt::CustomContextMenu</enum>
+          </property>
+         </widget>
         </item>
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_3"/>

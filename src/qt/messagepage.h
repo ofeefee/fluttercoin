@@ -45,6 +45,7 @@ private:
     QMenu *contextMenu;
     QAction *replyAction;
     QAction *deleteAction;
+    QAction *copyAddressAction;
     QString replyFromAddress;
     QString replyToAddress;
     MessageViewDelegate *msgdelegate;
@@ -54,6 +55,7 @@ private slots:
     void on_newButton_clicked();
     void on_deleteButton_clicked();
     void on_backButton_clicked();
+    void copyToClipboard();
     void messageTextChanged();
     void selectionChanged();
     void itemSelectionChanged();

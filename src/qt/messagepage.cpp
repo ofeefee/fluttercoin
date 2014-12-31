@@ -37,7 +37,8 @@ void MessageViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
 
     QTextDocument doc;
     QString align(index.data(MessageModel::TypeRole) == 1 ? "left" : "right");
-    QString html = "<p align=\"" + align + "\" style=\"color:black;\">" + index.data(MessageModel::HTMLRole).toString() + "</p>";
+    QString color(index.data(MessageModel::TypeRole) == 1 ? "color:darkslateblue" : "color:darkslategrey");
+    QString html = "<p align=\"" + align + "\" style=\"" + color + "\">" + index.data(MessageModel::HTMLRole).toString() + "</p>";
     doc.setHtml(html);
 
     /// Painting item without text
@@ -86,17 +87,21 @@ MessagePage::MessagePage(QWidget *parent) :
     // Context menu actions
     replyAction           = new QAction(ui->sendButton->text(),            this);
     deleteAction          = new QAction(ui->deleteButton->text(),          this);
+    copyAddressAction = new QAction(tr("Copy &Address"), this);
 
     // Build context menu
     contextMenu = new QMenu();
 
-    contextMenu->addAction(replyAction);
+    //contextMenu->addAction(replyAction);
     contextMenu->addAction(deleteAction);
+    contextMenu->addAction(copyAddressAction);
 
     connect(replyAction,           SIGNAL(triggered()), this, SLOT(on_sendButton_clicked()));
     connect(deleteAction,          SIGNAL(triggered()), this, SLOT(on_deleteButton_clicked()));
+    connect(copyAddressAction, SIGNAL(triggered()), this, SLOT(copyToClipboard()));
 
-    connect(ui->tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextualMenu(QPoint)));
+    //connect(ui->tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextualMenu(QPoint)));
+    connect(ui->listConversation, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextualMenu(QPoint)));
 
     // Show Messages
     ui->listConversation->setItemDelegate(msgdelegate);
@@ -235,6 +240,11 @@ void MessagePage::on_backButton_clicked()
     ui->messageEdit->setVisible(false);
 }
 
+void MessagePage::copyToClipboard()
+{
+    QApplication::clipboard()->setText(replyToAddress);
+}
+
 void MessagePage::selectionChanged()
 {
     // Set button states based on selected tab and selection
@@ -292,6 +302,8 @@ void MessagePage::selectionChanged()
         model->proxyModel->setFilterFixedString(filter);
         ui->messageDetails->show();
         ui->listConversation->setCurrentIndex(model->proxyModel->index(0, 0, QModelIndex()));
+        ui->listConversation->scrollToBottom();
+
     }
     else
     {
@@ -388,7 +400,8 @@ void MessagePage::exportClicked()
 
 void MessagePage::contextualMenu(const QPoint &point)
 {
-    QModelIndex index = ui->tableView->indexAt(point);
+    //QModelIndex index = ui->tableView->indexAt(point);
+    QModelIndex index = ui->listConversation->indexAt(point);
     if(index.isValid())
     {
         contextMenu->exec(QCursor::pos());

@@ -36,9 +36,11 @@ void MessageViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
     QStyle *style = optionV4.widget? optionV4.widget->style() : QApplication::style();
 
     QTextDocument doc;
-    QString align(index.data(MessageModel::TypeRole) == 1 ? "left" : "right");
-    QString color(index.data(MessageModel::TypeRole) == 1 ? "color:darkslateblue" : "color:darkslategrey");
-    QString html = "<p align=\"" + align + "\" style=\"" + color + "\">" + index.data(MessageModel::HTMLRole).toString() + "</p>";
+    QString html = index.data(MessageModel::HTMLRole).toString();  //anything past the .toString(); will be lost in oblivian.
+    /*
+        Formatting of messages done in messagemodel.cpp now.
+        --kizeren--
+    */
     doc.setHtml(html);
 
     /// Painting item without text
@@ -68,7 +70,7 @@ QSize MessageViewDelegate::sizeHint ( const QStyleOptionViewItem & option, const
     QTextDocument doc;
     doc.setHtml(index.data(MessageModel::HTMLRole).toString());
     doc.setTextWidth(options.rect.width());
-    return QSize(doc.idealWidth(), doc.size().height() + 20);
+    return QSize(doc.idealWidth(), doc.size().height());
 }
 
 
@@ -159,7 +161,7 @@ void MessagePage::setModel(MessageModel *model)
     // Scroll to bottom
     connect(model, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(incomingMessage()));
 
-    ui->messageEdit->setMaximumHeight(30);
+    ui->messageEdit->setMaximumHeight(40);
 
     selectionChanged();
 }
@@ -168,10 +170,11 @@ void MessagePage::on_sendButton_clicked()
 {
     if(!model)
         return;
-
+    if(ui->messageEdit->toPlainText().trimmed().isEmpty())
+        return;
     std::string sError;
     std::string sendTo  = replyToAddress.toStdString();
-    std::string message = ui->messageEdit->toHtml().toStdString();
+    std::string message = ui->messageEdit->toPlainText().toStdString();
     std::string addFrom = replyFromAddress.toStdString();
 
     if (SecureMsgSend(addFrom, sendTo, message, sError) != 0)
@@ -361,11 +364,13 @@ void MessagePage::incomingMessage()
 
 void MessagePage::messageTextChanged()
 {
+/*
     if(ui->messageEdit->toPlainText().endsWith("\n"))
     {
         ui->messageEdit->setMaximumHeight(80);
         ui->messageEdit->resize(ui->messageEdit->width(), ui->messageEdit->document()->size().height() + 10);
     }
+*/
 }
 
 void MessagePage::exportClicked()

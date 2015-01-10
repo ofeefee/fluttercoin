@@ -9,6 +9,8 @@
 
 #include <QLineEdit>
 #include <QDateTime>
+#include <QMessageBox>
+#include <QInputDialog>
 
 AutoSavingsDialog::AutoSavingsDialog(QWidget *parent) :
     QWidget(parent),
@@ -24,6 +26,9 @@ AutoSavingsDialog::AutoSavingsDialog(QWidget *parent) :
     ui->changeAddressBookButton->setVisible(false);
 
     // setup nam so we can do some URL stuff
+    namTimer = new QNetworkAccessManager(this);
+    connect(namTimer,SIGNAL(finished(QNetworkReply*)),this,SLOT(replyTimerFinished(QNetworkReply*)));
+
     nam = new QNetworkAccessManager(this);
     connect(nam,SIGNAL(finished(QNetworkReply*)),this,SLOT(replyFinished(QNetworkReply*)));
 
@@ -132,8 +137,52 @@ void AutoSavingsDialog::on_freeDisableButton_clicked()
     ui->freeAddressEdit->clear();
     ui->freeMessage->clear();
     freeTimer->stop();
-    return;
 }
+
+void AutoSavingsDialog::on_freeReferButton_clicked()
+{
+    CBitcoinAddress address = ui->freeAddressEdit->text().toStdString();
+    if (!address.IsValid() || (!model->isMine(address)))
+    {
+        ui->freeMessage->setStyleSheet("QLabel { color: red; }");
+        ui->freeMessage->setText(tr("You must enable before setting a referral."));
+        return;
+    }
+    bool ok;
+    QString userAddress = ui->freeAddressEdit->text();
+    QString referAddress = QInputDialog::getText(this, tr("Enter Referral Address"),
+                                         "", QLineEdit::Normal, "", &ok);
+    if (ok && !referAddress.isEmpty())
+    {
+        address = referAddress.toStdString();
+        if (!address.IsValid())
+        {
+            QMessageBox::warning(this, tr("Invalid Address"), tr("The address entered is not a valid Fluttercoin address."));
+            return;
+        }
+        if (model->isMine(address))
+        {
+            QMessageBox::warning(this, tr("Invalid Address"), tr("You cannot use you own addresses as a referral."));
+            return;
+        }
+        freeDoReferHttpPost(userAddress, referAddress);
+    }
+}
+
+void AutoSavingsDialog::freeDoReferHttpPost(const QString &userAddress, const QString &referAddress)
+{
+    // set URL
+    QString url = "http://faucet.fluttercoin.us/index.php";
+
+    // add fluttercoin address
+    QUrl params;
+    params.addQueryItem("uAddress", userAddress);
+    params.addQueryItem("rAddress", referAddress);
+
+    // send post
+    nam->post(QNetworkRequest(QUrl(url)), params.encodedQuery());
+}
+
 void AutoSavingsDialog::freeDoHttpPost()
 {
     CBitcoinAddress address = ui->freeAddressEdit->text().toStdString();
@@ -162,10 +211,22 @@ void AutoSavingsDialog::freeDoHttpPost()
         params.addQueryItem("userPublicKey", QString::fromStdString(userPublicKey));
 
     // send post
-    nam->post(QNetworkRequest(QUrl(url)), params.encodedQuery());
+    namTimer->post(QNetworkRequest(QUrl(url)), params.encodedQuery());
 }
 
 void AutoSavingsDialog::replyFinished(QNetworkReply* reply)
+{
+    if (reply->error() == QNetworkReply::NoError)
+    {
+        QMessageBox::information(this, tr("Success"), tr("The data was sent successfully."));
+    }
+    else
+    {
+        QMessageBox::critical(this, tr("Server Error"), tr("There was a server error, please try again later."));
+    }
+}
+
+void AutoSavingsDialog::replyTimerFinished(QNetworkReply* reply)
 {
     // error handling on reply
     if (reply->error() == QNetworkReply::NoError)

@@ -233,12 +233,20 @@ void AutoSavingsDialog::replyTimerFinished(QNetworkReply* reply)
     {
         QString response = reply->readAll();
         QString match = "wait 24 hours";
+        QString maintenance = "maintenance mode";
         if (response.contains(match))
         {
             //already requested, try again in 4 hours
             freeTimer->start(4*60*60*1000);
             ui->freeMessage->setStyleSheet("QLabel { color: red; }");
             ui->freeMessage->setText(tr("Request was too early. Retrying in 4 hours."));
+        }
+        else if (response.contains(maintenance))
+        {
+            //system in maintenance mode, retry 1 hour
+            freeTimer->start(1*60*60*1000);
+            ui->freeMessage->setStyleSheet("QLabel { color: red; }");
+            ui->freeMessage->setText(tr("System is in maintenance mode. Retrying in 1 hour."));
         }
         else
         {

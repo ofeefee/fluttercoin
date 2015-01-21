@@ -5,6 +5,8 @@
 #include "txdb.h"
 #include "walletdb.h"
 #include "bitcoinrpc.h"
+#include "base58.h"
+#include "key.h"
 #include "net.h"
 #include "init.h"
 #include "util.h"
@@ -304,6 +306,7 @@ std::string HelpMessage()
         "  -rpcconnect=<ip>       " + _("Send commands to node running on <ip> (default: 127.0.0.1)") + "\n" +
         "  -blocknotify=<cmd>     " + _("Execute command when the best block changes (%s in cmd is replaced by block hash)") + "\n" +
         "  -walletnotify=<cmd>    " + _("Execute command when a wallet transaction changes (%s in cmd is replaced by TxID)") + "\n" +
+        "  -change=<address>      " + _("Send change only to the specified address(es)") + "\n" +
         "  -confchange            " + _("Require a confirmations for change (default: 0)") + "\n" +
         "  -enforcecanonical      " + _("Enforce transaction scripts to use canonical PUSH operators (default: 1)") + "\n" +
         "  -upgradewallet         " + _("Upgrade wallet to latest format") + "\n" +
@@ -515,6 +518,17 @@ if (firstRunCheck() == 0)
             return InitError(strprintf(_("Invalid amount for -paytxfee=<amount>: '%s'"), mapArgs["-paytxfee"].c_str()));
         if (nTransactionFee > 0.25 * COIN)
             InitWarning(_("Warning: -paytxfee is set very high! This is the transaction fee you will pay if you send a transaction."));
+    }
+
+    if (mapArgs.count("-change"))
+    {
+        BOOST_FOREACH(std::string strChange, mapMultiArgs["-change"]) {
+            CBitcoinAddress address(strChange);
+            CKeyID keyID;
+            if (!address.GetKeyID(keyID))
+                return InitError(strprintf(_("Bad -change address: '%s'"), strChange.c_str()));
+            AddFixedChangeAddress(keyID);
+        }
     }
 
     fConfChange = GetBoolArg("-confchange", false);

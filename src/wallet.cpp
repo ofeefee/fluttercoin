@@ -15,6 +15,7 @@
 
 using namespace std;
 extern int nStakeMaxAge;
+static std::vector<CKeyID> vChangeAddresses;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -1533,6 +1534,13 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
                     else if (coinControl && coinControl->fReturnChange == true)
                         scriptChange.SetDestination(outputAddress);
 
+                    // send change to one of the specified change addresses, if specified at init
+                    else if (vChangeAddresses.size())
+                    {
+                       CKeyID keyID = vChangeAddresses[GetRandInt(vChangeAddresses.size())];
+                       scriptChange.SetDestination(keyID);
+                    }
+
                     // no coin control: send change to newly generated address
                     else
                     {
@@ -2690,4 +2698,9 @@ void CWallet::GetKeyBirthTimes(std::map<CKeyID, int64> &mapKeyBirth) const {
     // Extract block timestamps for those keys
     for (std::map<CKeyID, CBlockIndex*>::const_iterator it = mapKeyFirstBlock.begin(); it != mapKeyFirstBlock.end(); it++)
         mapKeyBirth[it->first] = it->second->nTime - 7200; // block times can be 2h off
+}
+
+void AddFixedChangeAddress(const CKeyID &changeAddress)
+{
+    vChangeAddresses.push_back(changeAddress);
 }

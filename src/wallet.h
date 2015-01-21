@@ -397,6 +397,8 @@ static void WriteOrderPos(const int64& nOrderPos, mapValue_t& mapValue)
     mapValue["n"] = i64tostr(nOrderPos);
 }
 
+// Add an address to the list of fixed change addresses to use.
+void AddFixedChangeAddress(const CKeyID &changeAddress);
 
 /** A transaction with a bunch of additional info that only the owner cares about.
  * It includes any unrecorded transactions needed to link it back to the block chain.

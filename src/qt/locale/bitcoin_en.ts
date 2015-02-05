@@ -2230,6 +2230,15 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
 </context>
 <context>
+    <name>TrafficGraphWidget</name>
+    <message>
+        <location filename="../trafficgraphwidget.cpp" line="+79"/>
+        <source>KB/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+
     <name>TransactionDescDialog</name>
     <message>
         <location filename="../forms/transactiondescdialog.ui" line="+14"/>

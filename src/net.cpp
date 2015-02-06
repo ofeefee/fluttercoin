@@ -626,6 +626,8 @@ void CNode::copyStats(CNodeStats &stats)
     X(nReleaseTime);
     X(nStartingHeight);
     X(nMisbehavior);
+    X(nSendBytes);
+    X(nRecvBytes);
 }
 #undef X
 
@@ -647,6 +649,8 @@ void SocketSendData(CNode *pnode)
  {
  vSend.erase(vSend.begin(), vSend.begin() + nBytes);
  pnode->nLastSend = GetTime();
+ pnode->nSendBytes += nBytes;
+ pnode->RecordBytesSent(nBytes);
  }
  else if (nBytes < 0)
  {
@@ -756,7 +760,7 @@ void ThreadSocketHandler2(void* parg)
         if (vNodes.size() != nPrevNodeCount)
         {
             nPrevNodeCount = vNodes.size();
-            uiInterface.NotifyNumConnectionsChanged(vNodes.size());
+            uiInterface.NotifyNumConnectionsChanged(nPrevNodeCount);
         }
 
 
@@ -921,7 +925,8 @@ void ThreadSocketHandler2(void* parg)
                             vRecv.resize(nPos + nBytes);
                             memcpy(&vRecv[nPos], pchBuf, nBytes);
                             pnode->nLastRecv = GetTime();
-			   pnode->RecordBytesRecv(nBytes);
+                            pnode->nRecvBytes += nBytes;
+                            pnode->RecordBytesRecv(nBytes);
                         }
                         else if (nBytes == 0)
                         {
@@ -955,9 +960,6 @@ void ThreadSocketHandler2(void* parg)
                 TRY_LOCK(pnode->cs_vSend, lockSend);
                 if (lockSend)
                 SocketSendData(pnode);
-                char pchBuf[0x10000];
-                int nBytes = send(pnode->hSocket, pchBuf, sizeof(pchBuf), MSG_DONTWAIT);
-                pnode->RecordBytesSent(nBytes);
             }
 
             //

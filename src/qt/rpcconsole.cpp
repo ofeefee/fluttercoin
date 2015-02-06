@@ -470,7 +470,17 @@ QString RPCConsole::FormatBytes(quint64 bytes)
 void RPCConsole::setTrafficGraphRange(int mins)
 {
     ui->trafficGraph->setGraphRangeMins(mins);
-    ui->lblGraphRange->setText(GUIUtil::formatDurationStr(mins * 60));
+    if(mins < 60) {
+        ui->lblGraphRange->setText(QString(tr("%1 m")).arg(mins));
+    } else {
+        int hours = mins / 60;
+        int minsLeft = mins % 60;
+        if(minsLeft == 0) {
+            ui->lblGraphRange->setText(QString(tr("%1 h")).arg(hours));
+        } else {
+            ui->lblGraphRange->setText(QString(tr("%1 h %2 m")).arg(hours).arg(minsLeft));
+        }
+    }
 }
 
 void RPCConsole::updateTrafficStats(quint64 totalBytesIn, quint64 totalBytesOut)
@@ -479,23 +489,7 @@ void RPCConsole::updateTrafficStats(quint64 totalBytesIn, quint64 totalBytesOut)
     ui->lblBytesOut->setText(FormatBytes(totalBytesOut));
 }
 
-void RPCConsole::resizeEvent(QResizeEvent *event)
+void RPCConsole::on_btnClearTrafficGraph_clicked()
 {
-    QWidget::resizeEvent(event);
-}
-
-void RPCConsole::showEvent(QShowEvent *event)
-{
-    QWidget::showEvent(event);
-
-    if (!clientModel)
-        return;
-}
-
-void RPCConsole::hideEvent(QHideEvent *event)
-{
-    QWidget::hideEvent(event);
-
-    if (!clientModel)
-        return;
+    ui->trafficGraph->clear();
 }

@@ -140,6 +140,8 @@ public:
     int64 nReleaseTime;
     int nStartingHeight;
     int nMisbehavior;
+    uint64 nSendBytes;
+    uint64 nRecvBytes;
 };
 
 class CNetMessage {
@@ -212,6 +214,8 @@ public:
     SOCKET hSocket;
     CDataStream vSend;
     CDataStream vRecv;
+    uint64 nSendBytes;
+    uint64 nRecvBytes;
     CCriticalSection cs_vSend;
     CCriticalSection cs_vRecv;
     int64 nLastSend;
@@ -271,6 +275,8 @@ public:
         hSocket = hSocketIn;
         nLastSend = 0;
         nLastRecv = 0;
+        nSendBytes = 0;
+        nRecvBytes = 0;
         nLastSendEmpty = GetTime();
         nTimeConnected = GetTime();
         nHeaderStart = -1;

@@ -55,6 +55,8 @@ Value getpeerinfo(const Array& params, bool fHelp)
         obj.push_back(Pair("services", strprintf("%08"PRI64x, stats.nServices)));
         obj.push_back(Pair("lastsend", (boost::int64_t)stats.nLastSend));
         obj.push_back(Pair("lastrecv", (boost::int64_t)stats.nLastRecv));
+        obj.push_back(Pair("bytessent", (boost::int64_t)stats.nSendBytes));
+        obj.push_back(Pair("bytesrecv", (boost::int64_t)stats.nRecvBytes));
         obj.push_back(Pair("conntime", (boost::int64_t)stats.nTimeConnected));
         obj.push_back(Pair("version", stats.nVersion));
         obj.push_back(Pair("subver", stats.strSubVer));
@@ -133,4 +135,19 @@ Value sendalert(const Array& params, bool fHelp)
     if (alert.nCancel > 0)
         result.push_back(Pair("nCancel", alert.nCancel));
     return result;
+}
+
+Value getnettotals(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() > 0)
+        throw runtime_error(
+            "getnettotals\n"
+            "Returns information about network traffic, including bytes in, bytes out,\n"
+            "and current time.");
+
+    Object obj;
+    obj.push_back(Pair("totalbytesrecv", CNode::GetTotalBytesRecv()));
+    obj.push_back(Pair("totalbytessent", CNode::GetTotalBytesSent()));
+    obj.push_back(Pair("timemillis", GetTimeMillis()));
+    return obj;
 }

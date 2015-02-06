@@ -115,6 +115,8 @@ namespace GUIUtil
         QString uiOptions;
     };
 
+    /* Convert seconds into a QString with days, hours, mins, secs */
+    QString formatDurationStr(int secs);
 } // namespace GUIUtil
 
 #endif // GUIUTIL_H

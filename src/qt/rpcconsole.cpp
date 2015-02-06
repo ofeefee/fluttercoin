@@ -22,7 +22,7 @@ const int CONSOLE_SCROLLBACK = 50;
 const int CONSOLE_HISTORY = 50;
 
 const QSize ICON_SIZE(24, 24);
-
+const int INITIAL_TRAFFIC_GRAPH_MINS = 30;
 const struct {
     const char *url;
     const char *source;
@@ -202,12 +202,12 @@ RPCConsole::RPCConsole(QWidget *parent) :
     ui->messagesWidget->installEventFilter(this);
 
     connect(ui->clearButton, SIGNAL(clicked()), this, SLOT(clear()));
-
+    connect(ui->btnClearTrafficGraph, SIGNAL(clicked()), ui->trafficGraph, SLOT(clear()));
     // set OpenSSL version label
     ui->openSSLVersion->setText(SSLeay_version(SSLEAY_VERSION));
 
     startExecutor();
-
+  setTrafficGraphRange(INITIAL_TRAFFIC_GRAPH_MINS);
     clear();
 }
 
@@ -256,11 +256,15 @@ bool RPCConsole::eventFilter(QObject* obj, QEvent *event)
 void RPCConsole::setClientModel(ClientModel *model)
 {
     this->clientModel = model;
+    ui->trafficGraph->setClientModel(model);
     if(model)
     {
         // Subscribe to information, replies, messages, errors
         connect(model, SIGNAL(numConnectionsChanged(int)), this, SLOT(setNumConnections(int)));
         connect(model, SIGNAL(numBlocksChanged(int,int)), this, SLOT(setNumBlocks(int,int)));
+
+        updateTrafficStats(model->getTotalBytesRecv(), model->getTotalBytesSent());
+        connect(model, SIGNAL(bytesChanged(quint64,quint64)), this, SLOT(updateTrafficStats(quint64, quint64)));
 
         // Provide initial values
         ui->clientVersion->setText(model->formatFullVersion());
@@ -441,4 +445,57 @@ void RPCConsole::on_showCLOptionsButton_clicked()
 {
     GUIUtil::HelpMessageBox help;
     help.exec();
+}
+
+
+void RPCConsole::on_sldGraphRange_valueChanged(int value)
+{
+    const int multiplier = 5; // each position on the slider represents 5 min
+    int mins = value * multiplier;
+    setTrafficGraphRange(mins);
+}
+
+QString RPCConsole::FormatBytes(quint64 bytes)
+{
+    if(bytes < 1024)
+        return QString(tr("%1 B")).arg(bytes);
+    if(bytes < 1024 * 1024)
+        return QString(tr("%1 KB")).arg(bytes / 1024);
+    if(bytes < 1024 * 1024 * 1024)
+        return QString(tr("%1 MB")).arg(bytes / 1024 / 1024);
+
+    return QString(tr("%1 GB")).arg(bytes / 1024 / 1024 / 1024);
+}
+
+void RPCConsole::setTrafficGraphRange(int mins)
+{
+    ui->trafficGraph->setGraphRangeMins(mins);
+    ui->lblGraphRange->setText(GUIUtil::formatDurationStr(mins * 60));
+}
+
+void RPCConsole::updateTrafficStats(quint64 totalBytesIn, quint64 totalBytesOut)
+{
+    ui->lblBytesIn->setText(FormatBytes(totalBytesIn));
+    ui->lblBytesOut->setText(FormatBytes(totalBytesOut));
+}
+
+void RPCConsole::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+}
+
+void RPCConsole::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+
+    if (!clientModel)
+        return;
+}
+
+void RPCConsole::hideEvent(QHideEvent *event)
+{
+    QWidget::hideEvent(event);
+
+    if (!clientModel)
+        return;
 }

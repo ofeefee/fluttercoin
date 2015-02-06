@@ -107,6 +107,7 @@ private:
     QAction *unlockWalletAction;
     QAction *aboutQtAction;
     QAction *openRPCConsoleAction;
+    QAction *openTrafficAction;
 
     QAction *flutterSpeedAction;
     QAction *savingsAction;

@@ -204,6 +204,7 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     connect(transactionView, SIGNAL(doubleClicked(QModelIndex)), transactionView, SLOT(showDetails()));
 
     rpcConsole = new RPCConsole(this);
+    connect(openTrafficAction, SIGNAL(triggered()), rpcConsole, SLOT(showTab_Traffic()));
     connect(openRPCConsoleAction, SIGNAL(triggered()), rpcConsole, SLOT(show()));
 
     // Clicking on "Verify Message" in the address book sends you to the verify message tab
@@ -351,6 +352,10 @@ void BitcoinGUI::createActions()
     openRPCConsoleAction = new QAction(QIcon(":/icons/debugwindow"), tr("&Debug window"), this);
     openRPCConsoleAction->setToolTip(tr("Open debugging and diagnostic console"));
 
+    openTrafficAction = new QAction(QIcon(":/icons/traffic"), tr("&Traffic Graph"), this);
+    openTrafficAction->setStatusTip(tr("Open Network Traffic Graph"));
+    openTrafficAction->setToolTip(openTrafficAction->statusTip());
+
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aboutClicked()));
     connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
@@ -397,6 +402,7 @@ void BitcoinGUI::createMenuBar()
 
     QMenu *tools = appMenuBar->addMenu(tr("&Tools"));
     tools->addAction(blockAction);
+    tools->addAction(openTrafficAction);
 
     QMenu *help = appMenuBar->addMenu(tr("&Help"));
     help->addAction(openRPCConsoleAction);

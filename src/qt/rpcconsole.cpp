@@ -493,3 +493,9 @@ void RPCConsole::on_btnClearTrafficGraph_clicked()
 {
     ui->trafficGraph->clear();
 }
+
+void RPCConsole::showTab_Traffic()
+{
+    ui->tabWidget->setCurrentIndex(2);
+    this->show();
+}

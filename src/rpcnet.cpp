@@ -148,6 +148,6 @@ Value getnettotals(const Array& params, bool fHelp)
     Object obj;
     obj.push_back(Pair("totalbytesrecv", CNode::GetTotalBytesRecv()));
     obj.push_back(Pair("totalbytessent", CNode::GetTotalBytesSent()));
-    obj.push_back(Pair("timemillis", GetTimeMillis()));
+    obj.push_back(Pair("timemillis", (boost::int64_t)GetTimeMillis()));
     return obj;
 }

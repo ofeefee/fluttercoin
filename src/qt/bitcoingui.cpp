@@ -1119,6 +1119,9 @@ void BitcoinGUI::updateStakingIcon()
     if (pwalletMain)
         pwalletMain->GetStakeWeight(*pwalletMain, nMinWeight, nMaxWeight, nWeight, nHoursToMaturity);
 
+    if (nHoursToMaturity > 720)
+        nHoursToMaturity = 0;
+
     if (nLastCoinStakeSearchInterval && nWeight && !pwalletMain->IsLocked())
     {
         uint64_t nNetworkWeight = GetPoSKernelPS();

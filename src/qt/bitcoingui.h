@@ -106,6 +106,8 @@ private:
     QAction *lockWalletAction;
     QAction *unlockWalletAction;
     QAction *aboutQtAction;
+    QAction *themeDefaultAction;
+    QAction *themeCustomAction;
     QAction *openRPCConsoleAction;
     QAction *openTrafficAction;
 
@@ -122,6 +124,14 @@ private:
 
     QMovie *syncIconMovie;
     QMovie *stakingIconMovie;
+
+    /* Themes support */
+    QString selectedTheme;
+    QStringList themesList;
+    // Path to directory where all themes are (usable for some common images?...)
+    QString themesDir;
+    QAction *customActions[100];
+    /* /Themes support */
 
     /** Create the main UI actions. */
     void createActions();
@@ -222,6 +232,12 @@ private slots:
     void flutterSpeedClicked();
     void websiteClicked();
     void forumClicked();
+
+    /** Load external QSS stylesheet */
+    void changeTheme(QString theme);
+    void loadTheme(QString theme);
+    void listThemes(QStringList& themes);
+    void keyPressEvent(QKeyEvent * e);
 };
 
 #endif

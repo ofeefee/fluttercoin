@@ -4,6 +4,7 @@
 #include "clientmodel.h"
 #include "bitcoinrpc.h"
 #include "guiutil.h"
+#include "debugdialog.h"
 
 #include <QTime>
 #include <QTimer>
@@ -432,7 +433,9 @@ void RPCConsole::on_tabWidget_currentChanged(int index)
 
 void RPCConsole::on_openDebugLogfileButton_clicked()
 {
-    GUIUtil::openDebugLogfile();
+    //GUIUtil::openDebugLogfile();
+    debugDialog debugdialog;
+    debugdialog.exec();
 }
 
 void RPCConsole::scrollToEnd()

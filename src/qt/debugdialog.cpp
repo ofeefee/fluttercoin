@@ -44,5 +44,5 @@ void debugDialog::startTail()
 
 void debugDialog::recieveLine(QString line)
 {
-    ui->textBrowser->append(line);
+    ui->textBrowser->insertPlainText(line);
 }

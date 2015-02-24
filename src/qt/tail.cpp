@@ -57,13 +57,10 @@ Tail::goToPosition ()
 		line = in.readLine();
 		lines.push_back ( in.readLine() );
 
-		if ( lines.count() > 5 )
-		{
-			lines.pop_front();
-		}
+            lines.pop_front();
 	}
 	foreach(line,lines)
-		emit sendLine(line);
+        emit sendLine(line);
 }
 
 void Tail::checkLine()
@@ -82,7 +79,7 @@ Tail::run ()
 	QMutexLocker lock(&mutex);
 	forever 
 	{
-		waiter.wait(&mutex, 1500);
+        waiter.wait(&mutex, 750);
 		if (abort)
 			return;
 		while ( ! in.atEnd() )

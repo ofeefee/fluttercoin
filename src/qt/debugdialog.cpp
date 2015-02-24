@@ -12,6 +12,7 @@
 #include <QTextCursor>
 #include <QMessageBox>
 #include <QTextStream>
+#include <QRegExp>
 
 debugDialog::debugDialog(QWidget *parent) :
     QDialog(parent),
@@ -52,6 +53,7 @@ void debugDialog::startTail()
 void debugDialog::recieveLine(QString line)
 {
     ui->textEdit->insertPlainText(line);
+
     if (ui->Pause->text() == "Pause")
     {
         ui->textEdit->moveCursor(QTextCursor::End);

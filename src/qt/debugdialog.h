@@ -20,7 +20,10 @@ public:
     ~debugDialog();
 
 private slots:
-    void on_buttonBox_clicked();
+
+    void on_Close_clicked();
+
+    void on_Pause_clicked();
 
 private:
     Ui::debugDialog *ui;

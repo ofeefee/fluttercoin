@@ -8,6 +8,10 @@
 
 #include <QFile>
 #include <QString>
+#include <QTextEdit>
+#include <QTextCursor>
+#include <QMessageBox>
+#include <QTextStream>
 
 debugDialog::debugDialog(QWidget *parent) :
     QDialog(parent),
@@ -22,16 +26,19 @@ debugDialog::~debugDialog()
     delete ui;
 }
 
-void debugDialog::on_buttonBox_clicked()
-{
-    worker->stopProcess();
-    close();
-}
-
 void debugDialog::startTail()
 {
     boost::filesystem::path debugFile = GetDataDir() / "debug.log";
     QString filename = QString::fromStdString(debugFile.string());
+    QFile file(filename);
+    if(!file.open(QIODevice::ReadOnly))
+    {
+        QMessageBox::information(0,"info",file.errorString());
+        return;
+    }
+    QTextStream in(&file);
+    ui->textEdit->setText(in.readAll());
+    file.close();
 
     worker = new Tail(filename,this);
     if (worker != NULL)
@@ -44,5 +51,29 @@ void debugDialog::startTail()
 
 void debugDialog::recieveLine(QString line)
 {
-    ui->textBrowser->insertPlainText(line);
+    ui->textEdit->insertPlainText(line);
+    if (ui->Pause->text() == "Pause")
+    {
+        ui->textEdit->moveCursor(QTextCursor::End);
+    }
+}
+
+
+
+void debugDialog::on_Close_clicked()
+{
+    worker->stopProcess();
+    close();
+}
+
+void debugDialog::on_Pause_clicked()
+{
+   if (ui->Pause->text() == "Pause")
+   {
+       ui->Pause->setText("Resume");
+   }
+   else
+   {
+       ui->Pause->setText("Pause");
+   }
 }

@@ -12,7 +12,6 @@
 #include <QTextCursor>
 #include <QMessageBox>
 #include <QTextStream>
-#include <QRegExp>
 
 debugDialog::debugDialog(QWidget *parent) :
     QDialog(parent),

@@ -880,6 +880,8 @@ void StakeMiner(CWallet *pwallet)
     // Each thread has its own counter
     unsigned int nExtraNonce = 0;
 
+    bool fTryToSync = true;
+
     while (true)
     {
         if (fShutdown)
@@ -887,7 +889,7 @@ void StakeMiner(CWallet *pwallet)
 
         while (pwallet->IsLocked())
         {
-            //strMintWarning = strMintMessage;
+            nLastCoinStakeSearchInterval = 0;
             Sleep(1000);
             if (fShutdown)
                 return;
@@ -895,12 +897,22 @@ void StakeMiner(CWallet *pwallet)
 
         while (vNodes.empty() || IsInitialBlockDownload())
         {
+            nLastCoinStakeSearchInterval = 0;
+            fTryToSync = true;
             Sleep(1000);
             if (fShutdown)
                 return;
         }
 
-        //strMintWarning = "";
+        if (fTryToSync)
+        {
+            fTryToSync = false;
+            if (vNodes.size() < 3 || nBestHeight < GetNumBlocksOfPeers())
+            {
+                MilliSleep(60000);
+                continue;
+            }
+        }
 
         //
         // Create new block

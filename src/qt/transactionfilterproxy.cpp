@@ -34,7 +34,7 @@ bool TransactionFilterProxy::filterAcceptsRow(int sourceRow, const QModelIndex &
     qint64 amount = llabs(index.data(TransactionTableModel::AmountRole).toLongLong());
     int status = index.data(TransactionTableModel::StatusRole).toInt();
 
-    if(!showInactive && status == TransactionStatus::Conflicted  || status == TransactionStatus::NotAccepted))
+    if(!showInactive && (status == TransactionStatus::Conflicted || status == TransactionStatus::NotAccepted))
         return false;
     if(!(TYPE(type) & typeFilter))
         return false;

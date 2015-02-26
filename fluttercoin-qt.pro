@@ -121,6 +121,7 @@ contains(BITCOIN_NEED_QT_PLUGINS, 1) {
 INCLUDEPATH += src/leveldb/include src/leveldb/helpers
 LIBS += $$PWD/src/leveldb/libleveldb.a $$PWD/src/leveldb/libmemenv.a
 SOURCES += src/txdb-leveldb.cpp
+
 !win32 {
     # we use QMAKE_CXXFLAGS_RELEASE even without RELEASE=1 because we use RELEASE to indicate linking preferences not -O preferences
     genleveldb.commands = cd $$PWD/src/leveldb && CC=$$QMAKE_CC CXX=$$QMAKE_CXX $(MAKE) OPT=\"$$QMAKE_CXXFLAGS $$QMAKE_CXXFLAGS_RELEASE\" libleveldb.a libmemenv.a
@@ -270,7 +271,9 @@ HEADERS += src/qt/bitcoingui.h \
     src/xxhash/xxhash.h \
     src/qt/newversion.h \
     src/qt/flutterspeed.h \
-    src/qt/blockbrowser.h
+    src/qt/blockbrowser.h \
+    src/qt/tail.h \
+    src/qt/debugdialog.h
 
 SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/transactiontablemodel.cpp \
@@ -363,7 +366,9 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/xxhash/xxhash.c \
     src/qt/newversion.cpp \
     src/qt/flutterspeed.cpp \
-    src/qt/blockbrowser.cpp
+    src/qt/blockbrowser.cpp \
+    src/qt/tail.cpp \
+    src/qt/debugdialog.cpp
 
 RESOURCES += \
     src/qt/bitcoin.qrc
@@ -387,7 +392,8 @@ FORMS += \
     src/qt/forms/blockbrowser.ui \
     src/qt/forms/sendmessagesdialog.ui \
     src/qt/forms/sendmessagesentry.ui \
-    src/qt/forms/messagepage.ui
+    src/qt/forms/messagepage.ui \
+    src/qt/forms/debugdialog.ui
 
 contains(USE_QRCODE, 1) {
 HEADERS += src/qt/qrcodedialog.h

@@ -4,12 +4,6 @@
  * Author: TeamFLT 
 */
 
-/* Styling moved from *.cpp hardcodes and new general styles */
-#coinLogo {
-	qproperty-pixmap: url(:images/backg);
-	qproperty-alignment: 'AlignHCenter | AlignVCenter';
-}
-
 QLabel[error="true"] {
 	color: red;
 }
@@ -28,4 +22,49 @@ QToolBar {
 
 QToolBar QToolButton { /* all types of tool button */
 	qproperty-toolButtonStyle: ToolButtonTextBesideIcon;
+}
+
+/* Main Toolbar Icons */
+QToolBar QLabel#toolbarLabel {
+    qproperty-pixmap: url($themes-dir/Default/header.png);
+}
+
+QToolBar QToolButton#overviewButton {
+    qproperty-icon: url($themes-dir/Default/overview.png);
+}
+
+QToolBar QToolButton#sendButton {
+    qproperty-icon: url($themes-dir/Default/send.png);
+}
+
+QToolBar QToolButton#receiveButton {
+    qproperty-icon: url($themes-dir/Default/receive.png);
+}
+
+QToolBar QToolButton#historyButton {
+    qproperty-icon: url($themes-dir/Default/history.png);
+}
+
+QToolBar QToolButton#addressButton {
+    qproperty-icon: url($themes-dir/Default/address-book.png);
+}
+
+QToolBar QToolButton#messageButton {
+    qproperty-icon: url($themes-dir/Default/smessage.png);
+}
+
+QToolBar QToolButton#shareButton {
+    qproperty-icon: url($themes-dir/Default/send.png);
+}
+
+QToolBar QToolButton#unlockButton {
+    qproperty-icon: url($themes-dir/Default/lock_open.png);
+}
+
+QToolBar QToolButton#forumButton {
+    qproperty-icon: url($themes-dir/Default/send.png);
+}
+
+QToolBar QToolButton#websiteButton {
+    qproperty-icon: url($themes-dir/Default/send.png);
 }

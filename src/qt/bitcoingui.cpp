@@ -45,6 +45,7 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 #include <QToolBar>
+#include <QToolButton>
 #include <QStatusBar>
 #include <QLabel>
 #include <QLineEdit>
@@ -294,12 +295,12 @@ void BitcoinGUI::createActions()
     blockAction->setCheckable(true);
     tabGroup->addAction(blockAction);
 
-    forumAction = new QAction(QIcon(":/icons/toolbar"), tr("Forums"), this);
+    forumAction = new QAction(QIcon(":/icons/send"), tr("Forums"), this);
     forumAction->setStatusTip(tr("Fluttercoin Talk"));
     forumAction->setToolTip(forumAction->statusTip());
     tabGroup->addAction(forumAction);
 
-    websiteAction = new QAction(QIcon(":/icons/toolbar"), tr("Fluttercoin.us"), this);
+    websiteAction = new QAction(QIcon(":/icons/send"), tr("Fluttercoin.us"), this);
     websiteAction->setStatusTip(tr("Visit the Website"));
     websiteAction->setToolTip(websiteAction->statusTip());
     tabGroup->addAction(websiteAction);
@@ -453,40 +454,82 @@ void BitcoinGUI::createMenuBar()
 
 void BitcoinGUI::createToolBars()
 {
-    QLabel *mylabel = new QLabel(this);
-    mylabel->setPixmap(QPixmap(":/images/header"));
-    mylabel->show();
+    QLabel *toolbarLabel = new QLabel(this);
+    toolbarLabel->setObjectName("toolbarLabel");
+    toolbarLabel->setPixmap(QPixmap(":/images/header"));
+
+    QToolButton *overviewButton = new QToolButton(this);
+    overviewButton->setObjectName("overviewButton");
+    overviewButton->setDefaultAction(overviewAction);
+    overviewButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    QToolButton *sendButton = new QToolButton(this);
+    sendButton->setObjectName("sendButton");
+    sendButton->setDefaultAction(sendCoinsAction);
+    sendButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    QToolButton *receiveButton = new QToolButton(this);
+    receiveButton->setObjectName("receiveButton");
+    receiveButton->setDefaultAction(receiveCoinsAction);
+    receiveButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    QToolButton *historyButton = new QToolButton(this);
+    historyButton->setObjectName("historyButton");
+    historyButton->setDefaultAction(historyAction);
+    historyButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    QToolButton *addressButton = new QToolButton(this);
+    addressButton->setObjectName("addressButton");
+    addressButton->setDefaultAction(addressBookAction);
+    addressButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    QToolButton *messageButton = new QToolButton(this);
+    messageButton->setObjectName("messageButton");
+    messageButton->setDefaultAction(messageAction);
+    messageButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    QToolButton *shareButton = new QToolButton(this);
+    shareButton->setObjectName("shareButton");
+    shareButton->setDefaultAction(savingsAction);
+    shareButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    QToolButton *unlockButton = new QToolButton(this);
+    unlockButton->setObjectName("unlockButton");
+    unlockButton->setDefaultAction(unlockWalletAction);
+    unlockButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    QToolButton *forumButton = new QToolButton(this);
+    forumButton->setObjectName("forumButton");
+    forumButton->setDefaultAction(forumAction);
+    forumButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    QToolButton *websiteButton = new QToolButton(this);
+    websiteButton->setObjectName("websiteButton");
+    websiteButton->setDefaultAction(websiteAction);
+    websiteButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
 
     QToolBar *toolbar = addToolBar(tr("Menu"));
     toolbar->setObjectName("toolbar");
     addToolBar(Qt::LeftToolBarArea, toolbar);
-    toolbar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     toolbar->setMovable(false);
     toolbar->setOrientation(Qt::Vertical);
     toolbar->setIconSize(QSize(50, 20));
-    toolbar->addWidget(mylabel);
-    toolbar->addAction(overviewAction);
-    toolbar->addAction(sendCoinsAction);
-    toolbar->addAction(receiveCoinsAction);
-    toolbar->addAction(historyAction);
-    toolbar->addAction(addressBookAction);
-    toolbar->addAction(messageAction);
-    toolbar->addAction(savingsAction);
-//    toolbar->addAction(blockAction);
-    toolbar->addAction(unlockWalletAction);
+    toolbar->addWidget(toolbarLabel);
+    toolbar->addWidget(overviewButton);
+    toolbar->addWidget(sendButton);
+    toolbar->addWidget(receiveButton);
+    toolbar->addWidget(historyButton);
+    toolbar->addWidget(addressButton);
+    toolbar->addWidget(messageButton);
+    toolbar->addWidget(shareButton);
+    toolbar->addWidget(unlockButton);
     QWidget* spacer = new QWidget();
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     toolbar->addWidget(spacer);
     spacer->setObjectName("spacer");
-    toolbar->addAction(forumAction);
-    toolbar->addAction(websiteAction);
-//    toolbar->setStyleSheet("#toolbar { font-weight:600;border:none;height:100%;padding-top:20px; background: rgb(37, 40, 46); text-align: left; color: white;min-width:180px;max-width:180px;} QToolBar QToolButton:hover {background:rgb(28, 29, 33);} QToolBar QToolButton:checked {background:rgba(28, 29, 33, 100);}  QToolBar QToolButton { font-weight:600;font-size:10px;font-family:'Century Gothic';padding-left:20px;padding-right:181px;padding-top:4px;padding-bottom:4px; width:100%; color: white; text-align: left; background:transparent;text-transform:uppercase; }");
-
-//    QToolBar *toolbar2 = addToolBar(tr("Actions toolbar"));
-//    toolbar2->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-//    toolbar2->setOrientation(Qt::Vertical);
-//    toolbar2->addAction(unlockWalletAction);
-//    toolbar2->addAction(exportAction);
+    toolbar->addWidget(forumButton);
+    toolbar->addWidget(websiteButton);
 }
 
 void BitcoinGUI::setClientModel(ClientModel *clientModel)

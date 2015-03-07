@@ -1369,6 +1369,11 @@ void BitcoinGUI::loadTheme(QString theme)
 void BitcoinGUI::listThemes(QStringList& themes)
 {
     QDir currentDir(qApp->applicationDirPath());
+
+    bool fAltDir = false;
+    boost::filesystem::path datadir =  GetDataDir();
+    QDir alternateDir(QString::fromStdString(datadir.string())); //check default user datadir or -datadir
+
     // try app dir
     if (currentDir.cd("themes")) {
     // got it! (win package)
@@ -1376,14 +1381,26 @@ void BitcoinGUI::listThemes(QStringList& themes)
         // got it
     } else if (currentDir.cd("../src/qt/res/themes")) {
         // got it
+    } else if (alternateDir.cd("themes")) {
+        fAltDir = true; //themes in alternate directory
     } else {
         // themes not found, setup existing style
         qApp->setStyleSheet("#toolbar { font-weight:600;border:none;height:100%;padding-top:20px; background: rgb(37, 40, 46); text-align: left; color: white;min-width:180px;max-width:180px;} QToolBar QToolButton:hover {background:rgb(28, 29, 33);} QToolBar QToolButton:checked {background:rgba(28, 29, 33, 100);}  QToolBar QToolButton { font-weight:600;font-size:10px;font-family:'Century Gothic';padding-left:20px;padding-right:181px;padding-top:4px;padding-bottom:4px; width:100%; color: white; text-align: left; background:transparent;text-transform:uppercase; }");
         return;
     }
-    themesDir = currentDir.path();
-    currentDir.setFilter(QDir::Dirs);
-    QStringList entries = currentDir.entryList();
+    QStringList entries;
+    if (fAltDir)
+    {
+        themesDir = alternateDir.path();
+        alternateDir.setFilter(QDir::Dirs);
+        entries = alternateDir.entryList();
+    }
+    else
+    {
+        themesDir = currentDir.path();
+        currentDir.setFilter(QDir::Dirs);
+        entries = currentDir.entryList();
+    }
     for( QStringList::ConstIterator entry=entries.begin(); entry!=entries.end(); ++entry )
     {
         QString themeName=*entry;

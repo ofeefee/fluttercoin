@@ -11,8 +11,12 @@ build=`grep DISPLAY_VERSION_BUILD src/version.h | awk {'print $3'} | head -n1`
 cd ..
 rm gitian/fluttercoin-??-linux*
 rm gitian/inputs/fluttercoin-src.zip
+rm -r gitian/themes
 zip -vr gitian/inputs/fluttercoin-src.zip fluttercoin
 cd gitian
 time sudo bin/gbuild ../fluttercoin/contrib/gitian-descriptors/gitian-linux.yml
 zip -jv fluttercoin-32-linux-v$major.$minor.$revision.$build.zip build/out/bin/32/*
 zip -jv fluttercoin-64-linux-v$major.$minor.$revision.$build.zip build/out/bin/64/*
+cp -r ../fluttercoin/src/qt/res/themes .
+zip -grv fluttercoin-32-linux-v$major.$minor.$revision.$build.zip themes
+zip -grv fluttercoin-64-linux-v$major.$minor.$revision.$build.zip themes

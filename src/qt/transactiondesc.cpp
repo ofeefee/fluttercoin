@@ -134,6 +134,24 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
                 strHTML += "(" + tr("not accepted") + ")";
             strHTML += "<br>";
         }
+        else if (wtx.IsCoinStake() && nCredit == 0) //fix details for PoS blocks --ofeefee
+        {
+            //
+            // Coinstake
+            //
+            int64 nUnmatured = 0;
+            BOOST_FOREACH(const CTxOut& txout, wtx.vout)
+                nUnmatured += wallet->GetCredit(txout);
+            strHTML += "<b>" + tr("Credit") + ":</b> ";
+            if (wtx.IsInMainChain())
+                strHTML += BitcoinUnits::formatWithUnit(BitcoinUnits::BTC, (nUnmatured - nDebit))+ " (" + tr("matures in %n more block(s)", "", wtx.GetBlocksToMaturity()) + ")";
+            else
+                strHTML += "(" + tr("not accepted") + ")";
+            strHTML += "<br>";
+
+            // adjust nNet to not show negative values if not yet mature
+            nNet = nNet > 0 ? nNet : 0;
+        }
         else if (nNet > 0)
         {
             //

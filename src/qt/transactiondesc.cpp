@@ -144,13 +144,16 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
                 nUnmatured += wallet->GetCredit(txout);
             strHTML += "<b>" + tr("Credit") + ":</b> ";
             if (wtx.IsInMainChain())
+            {
                 strHTML += BitcoinUnits::formatWithUnit(BitcoinUnits::BTC, (nUnmatured - nDebit))+ " (" + tr("matures in %n more block(s)", "", wtx.GetBlocksToMaturity()) + ")";
+                nNet = nUnmatured - nDebit;
+            }
             else
+            {
                 strHTML += "(" + tr("not accepted") + ")";
+                nNet = 0;
+            }
             strHTML += "<br>";
-
-            // adjust nNet to not show negative values if not yet mature
-            nNet = nNet > 0 ? nNet : 0;
         }
         else if (nNet > 0)
         {

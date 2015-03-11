@@ -69,7 +69,16 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet *
                         continue; // last coinstake output
 
                     sub.type = TransactionRecord::Generated;
-                    sub.credit = nNet > 0 ? nNet : wtx.GetValueOut() - nDebit;
+//                    sub.credit = nNet > 0 ? nNet : wtx.GetValueOut() - nDebit;
+                    if (nNet > 0)
+                        sub.credit = nNet;
+                    else
+                    {
+                        int64 nUnmatured = 0;
+                        BOOST_FOREACH(const CTxOut& txout, wtx.vout)
+                            nUnmatured += wallet->GetCredit(txout);
+                        sub.credit = nUnmatured - nDebit;
+                    }
                     hashPrev = hash;
                 }
 

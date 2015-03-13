@@ -701,20 +701,20 @@ void CWalletTx::GetAmounts(list<pair<CTxDestination, int64> >& listReceived,
         if (txout.scriptPubKey.empty())
             continue;
 
-		bool fIsMine;
-		// Only need to handle txouts if AT LEAST one of these is true:
-		//   1) they debit from us (sent)
-		//   2) the output is to us (received)
-		if (nDebit > 0)
-		{
-		    // Don't report 'change' txouts
-		    if (pwallet->IsChange(txout))
-		        continue;
-		    fIsMine = pwallet->IsMine(txout);
-		}
-		else if (!(fIsMine = pwallet->IsMine(txout)))
-		    continue;
-
+        bool fIsMine;
+        // Only need to handle txouts if AT LEAST one of these is true:
+        //   1) they debit from us (sent)
+        //   2) the output is to us (received)
+        if (nDebit > 0)
+        {
+            // Don't report 'change' txouts
+            if (pwallet->IsChange(txout))
+                continue;
+            fIsMine = pwallet->IsMine(txout);
+        }
+        else if (!(fIsMine = pwallet->IsMine(txout)))
+            continue;
+            
         // In either case, we need to get the destination address
         CTxDestination address;
         if (!ExtractDestination(txout.scriptPubKey, address))

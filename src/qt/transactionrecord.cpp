@@ -28,7 +28,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet *
     int64 nCredit = wtx.GetCredit(true);
     int64 nDebit = wtx.GetDebit();
     int64 nNet = nCredit - nDebit;
-    uint256 hash = wtx.GetHash(), hashPrev = 0;
+    uint256 hash = wtx.GetHash();
     std::map<std::string, std::string> mapValue = wtx.mapValue;
 
     if (nNet > 0 || wtx.IsCoinBase() || wtx.IsCoinStake())
@@ -64,12 +64,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet *
                 if (wtx.IsCoinStake())
                 {
                     // Generated (proof-of-stake)
-
-                    if (hashPrev == hash)
-                        continue; // last coinstake output
-
                     sub.type = TransactionRecord::Generated;
-//                    sub.credit = nNet > 0 ? nNet : wtx.GetValueOut() - nDebit;
                     if (nNet > 0)
                         sub.credit = nNet;
                     else
@@ -79,9 +74,9 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet *
                             nUnmatured += wallet->GetCredit(txout);
                         sub.credit = nUnmatured - nDebit;
                     }
-                    hashPrev = hash;
+                    parts.append(sub);
+                    return parts; // last coinstake output
                 }
-
                 parts.append(sub);
             }
         }
@@ -158,7 +153,6 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet *
             parts.append(TransactionRecord(hash, nTime, TransactionRecord::Other, "", nNet, 0));
         }
     }
-
     return parts;
 }
 

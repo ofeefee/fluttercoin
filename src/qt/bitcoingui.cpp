@@ -1201,20 +1201,20 @@ void BitcoinGUI::updateWeight()
     if (!pwalletMain)
         return;
 
-        //fix periodical gui lag --Blackcoin a78528
-        TRY_LOCK(cs_main, lockMain);
-        if (!lockMain)
-            return;
-        TRY_LOCK(pwalletMain->cs_wallet, lockWallet);
-        if (!lockWallet)
-            return;
+    //fix periodical gui lag --Blackcoin a78528
+    TRY_LOCK(cs_main, lockMain);
+    if (!lockMain)
+        return;
+    TRY_LOCK(pwalletMain->cs_wallet, lockWallet);
+    if (!lockWallet)
+        return;
 
-        nWeight = 0;
+    nWeight = 0;
+    nHoursToMaturity = 0;
+    uint64 nMinWeight = 0, nMaxWeight = 0;
+    pwalletMain->GetStakeWeight(*pwalletMain, nMinWeight, nMaxWeight, nWeight, nHoursToMaturity);
+    if (nHoursToMaturity > 720)
         nHoursToMaturity = 0;
-        uint64 nMinWeight = 0, nMaxWeight = 0;
-        pwalletMain->GetStakeWeight(*pwalletMain, nMinWeight, nMaxWeight, nWeight, nHoursToMaturity);
-        if (nHoursToMaturity > 720)
-            nHoursToMaturity = 0;
 }
 
 void BitcoinGUI::updateStakingIcon()

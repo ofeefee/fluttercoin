@@ -174,6 +174,10 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     frameBlocksLayout->addWidget(labelBlocksIcon);
     frameBlocksLayout->addStretch();
 
+    // Set initial values for user and network weights
+    nWeight = 0;
+    nHoursToMaturity = 0;
+
     // Progress bar and label for blocks download
     progressBarLabel = new QLabel();
     progressBarLabel->setVisible(false);
@@ -1192,19 +1196,30 @@ void BitcoinGUI::toggleHidden()
     showNormalIfMinimized(true);
 }
 
+void BitcoinGUI::updateWeight()
+{
+    if (!pwalletMain)
+        return;
+
+        //fix periodical gui lag --Blackcoin a78528
+        TRY_LOCK(cs_main, lockMain);
+        if (!lockMain)
+            return;
+        TRY_LOCK(pwalletMain->cs_wallet, lockWallet);
+        if (!lockWallet)
+            return;
+
+        nWeight = 0;
+        nHoursToMaturity = 0;
+        uint64 nMinWeight = 0, nMaxWeight = 0;
+        pwalletMain->GetStakeWeight(*pwalletMain, nMinWeight, nMaxWeight, nWeight, nHoursToMaturity);
+        if (nHoursToMaturity > 720)
+            nHoursToMaturity = 0;
+}
+
 void BitcoinGUI::updateStakingIcon()
 {
-    uint64 nMinWeight = 0;
-    uint64 nMaxWeight = 0;
-    uint64 nWeight = 0;
-    uint64 nHoursToMaturity = 0;
-
-    if (pwalletMain)
-        pwalletMain->GetStakeWeight(*pwalletMain, nMinWeight, nMaxWeight, nWeight, nHoursToMaturity);
-
-    if (nHoursToMaturity > 720)
-        nHoursToMaturity = 0;
-
+    updateWeight();
     if (nLastCoinStakeSearchInterval && nWeight && !pwalletMain->IsLocked())
     {
         uint64_t nNetworkWeight = GetPoSKernelPS();

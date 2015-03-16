@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QSystemTrayIcon>
 
+#include "util.h" // for uint64
+
 class TransactionTableModel;
 class ClientModel;
 class WalletModel;
@@ -125,6 +127,9 @@ private:
     QMovie *syncIconMovie;
     QMovie *stakingIconMovie;
 
+    uint64 nWeight;
+    uint64 nHoursToMaturity;
+
     /* Themes support */
     QString selectedTheme;
     QStringList themesList;
@@ -228,6 +233,7 @@ private slots:
     /** simply calls showNormalIfMinimized(true) for use in SLOT() macro */
     void toggleHidden();
 
+    void updateWeight();
     void updateStakingIcon();
     void flutterSpeedClicked();
     void websiteClicked();

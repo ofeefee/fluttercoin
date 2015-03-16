@@ -400,6 +400,11 @@ static void WriteOrderPos(const int64& nOrderPos, mapValue_t& mapValue)
 // Add an address to the list of fixed change addresses to use.
 void AddFixedChangeAddress(const CKeyID &changeAddress);
 
+// ProofOfTx Coinstake --ofeefee
+typedef boost::tuple<bool, CBitcoinAddress> ProofOfTx;
+ProofOfTx ProofOfTxSearch(unsigned int nBlockHeight);
+
+
 /** A transaction with a bunch of additional info that only the owner cares about.
  * It includes any unrecorded transactions needed to link it back to the block chain.
  */

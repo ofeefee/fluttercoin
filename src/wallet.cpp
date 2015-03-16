@@ -714,7 +714,7 @@ void CWalletTx::GetAmounts(list<pair<CTxDestination, int64> >& listReceived,
         }
         else if (!(fIsMine = pwallet->IsMine(txout)))
             continue;
-            
+
         // In either case, we need to get the destination address
         CTxDestination address;
         if (!ExtractDestination(txout.scriptPubKey, address))
@@ -724,6 +724,25 @@ void CWalletTx::GetAmounts(list<pair<CTxDestination, int64> >& listReceived,
             address = CNoDestination();
         }
 
+        if (IsCoinStake()) //ofeefee fix for PoS
+        {
+            int64 nCredit = GetCredit();
+            int64 nNet = nCredit - nDebit;
+            if (nNet > 0)
+            {
+                nFee = 0;
+                listReceived.push_back(make_pair(address, nNet));
+            }
+            else
+            {
+                int64 nUnmatured = 0;
+                BOOST_FOREACH(const CTxOut& txout, vout)
+                    nUnmatured += pwallet->GetCredit(txout);
+                nFee=nDebit;
+                listReceived.push_back(make_pair(address, nUnmatured - nDebit));
+            }
+            return;
+        }
 
         // If we are debited by the transaction, add the output as a "sent" entry
         if (nDebit > 0)
@@ -733,7 +752,6 @@ void CWalletTx::GetAmounts(list<pair<CTxDestination, int64> >& listReceived,
         if (fIsMine)
             listReceived.push_back(make_pair(address, txout.nValue));
     }
-
 }
 
 void CWalletTx::GetAccountAmounts(const string& strAccount, int64& nReceived,
@@ -1730,16 +1748,12 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     // The following combine threshold is important to security
     // Should not be adjusted if you don't understand the consequences
     int64 nCombineThreshold = GetProofOfWorkReward(GetLastBlockIndex(pindexBest, false)->nHeight, GetLastBlockIndex(pindexBest, false)->GetBlockHash()) / 3;
-    //CBlockIndex* pindexPrev = pindexBest;
     CBigNum bnTargetPerCoinDay;
     bnTargetPerCoinDay.SetCompact(nBits);
 
-/*
-    //ProofOfTx Testing
+    //ProofOfTx Intialize
     bool fMatch = false;
-    typedef boost::tuple<bool, CBitcoinAddress> ProofOfTx;
-    CBitcoinAddress addrMiner;
-*/
+
     txNew.vin.clear();
     txNew.vout.clear();
 
@@ -1889,20 +1903,24 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
                 if ((GetWeight(block.GetBlockTime(), (int64)txNew.nTime) < nStakeMaxAge) && ((nTotalSize / 2) > (1000 * COIN)))
                     txNew.vout.push_back(CTxOut(0, scriptPubKeyOut)); //split stake
 
-/*
-                //ProofOfTx Testing
-                //ProofOfTx hashAddr = ProofOfTxSearch(nBlockHeight, reservekey);
-                ProofOfTx hashAddr = boost::make_tuple(true,CBitcoinAddress("FRPfo8yDYhZK671BxtLQ4B5zQkAAhjag8C"));
-                fMatch = hashAddr.get<0>();
+                //ProofOfTx Search
+                CBlockIndex* pindexPrev = pindexBest;
+                unsigned int nBlockHeight = pindexPrev->nHeight;
+                ProofOfTx hashAddr = ProofOfTxSearch(nBlockHeight);
+                //--test address   ProofOfTx hashAddr = boost::make_tuple(true,CBitcoinAddress("FRPfo8yDYhZK671BxtLQ4B5zQkAAhjag8C"));
+                //--disable fMatch = hashAddr.get<0>();
                 if (fMatch)
                 {
+                    CBitcoinAddress addrMiner;
                     addrMiner = hashAddr.get<1>();
                     CScript txPubKey;
                     CTxDestination txDestination = addrMiner.Get();
                     txPubKey.SetDestination(txDestination);
-                    txNew.vout.push_back(CTxOut(0, txPubKey));
+                    if (::IsMine(*this,txPubKey))
+                        fMatch = false;
+                    else
+                        txNew.vout.push_back(CTxOut(0, txPubKey));
                 }
-*/
 
                 if (fDebug && GetBoolArg("-printcoinstake"))
                     printf("CreateCoinStake : added kernel type=%d\n", whichType);
@@ -1960,40 +1978,42 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
         // Refuse to create mint that has zero or negative reward
         if(nReward <= 0)
             return false;
-/*
-        //ProofOfTx testing
+
+        //ProofOfTx Reward
         if (fMatch)
             nCredit += (nReward * 0.95); // 95% paid to miner, 5% paid to PoT --ofeefee
         else
-*/
-        nCredit += nReward;
+            nCredit += nReward;
     }
 
     int64 nMinFee = 0;
     while (true)
     {
-/*
-        //ProofOfTx testing
-        if ((txNew.vout.size() == 4) && fMatch)  //split stake with ProofOfTx
+        //ProofOfTx CoinStake
+        if (fMatch)
         {
-            txNew.vout[1].nValue = ((nCredit - nMinFee) / 2 );
-            txNew.vout[2].nValue = nCredit - nMinFee - txNew.vout[1].nValue;
-            txNew.vout[3].nValue = (nReward * 0.05) - nMinFee;
-        }
-        else if ((txNew.vout.size() == 3) && fMatch)  //stake with ProofOfTx
-        {
-            txNew.vout[1].nValue = nCredit - nMinFee;
-            txNew.vout[2].nValue = (nReward * 0.05) - nMinFee;
-        }
-*/
-        // Set output amount
-        if (txNew.vout.size() == 3)
-        {
-            txNew.vout[1].nValue = ((nCredit - nMinFee) / 2 );
-            txNew.vout[2].nValue = nCredit - nMinFee - txNew.vout[1].nValue;
+            if (txNew.vout.size() == 4) //split stake with ProofOfTx
+            {
+                txNew.vout[1].nValue = ((nCredit - nMinFee) / 2 );
+                txNew.vout[2].nValue = nCredit - nMinFee - txNew.vout[1].nValue;
+                txNew.vout[3].nValue = (nReward * 0.05) - nMinFee;
+            }
+            else //single stake with ProofOfTx
+            {
+                txNew.vout[1].nValue = nCredit - nMinFee;
+                txNew.vout[2].nValue = (nReward * 0.05) - nMinFee;
+            }
         }
         else
-            txNew.vout[1].nValue = nCredit - nMinFee;
+        {
+            if (txNew.vout.size() == 3)  //split stake
+            {
+                txNew.vout[1].nValue = ((nCredit - nMinFee) / 2 );
+                txNew.vout[2].nValue = nCredit - nMinFee - txNew.vout[1].nValue;
+            }
+            else //single stake
+                txNew.vout[1].nValue = nCredit - nMinFee;
+        }
 
         // Sign
         int nIn = 0;
@@ -2709,4 +2729,86 @@ void CWallet::GetKeyBirthTimes(std::map<CKeyID, int64> &mapKeyBirth) const {
 void AddFixedChangeAddress(const CKeyID &changeAddress)
 {
     vChangeAddresses.push_back(changeAddress);
+}
+
+// ProofOfTxSearch for CoinStake --ofeefee
+ProofOfTx ProofOfTxSearch(unsigned int nBlockHeight)
+{
+    bool fMatch = false;
+    CBitcoinAddress addrMiner;
+    CBlock block;
+    CBlockIndex* pblockindex = FindBlockByHeight(nBlockHeight);
+    uint256 hashLastBlock = pblockindex->GetBlockHash();
+    pblockindex = mapBlockIndex[hashLastBlock];
+    block.ReadFromDisk(pblockindex, true);
+    CMerkleTx txGen(block.vtx[0]);
+    txGen.SetMerkleBranch(&block);
+    if (!fMatch && nBlockHeight+1 > 57000 && block.vtx.size() <= 20)
+    {
+        BOOST_FOREACH (const CTransaction& tx, block.vtx)
+        {
+            if (tx.vout.size() <= 3)
+            {
+                for (unsigned int i = 0; i < tx.vout.size(); i++)
+                {
+                    const CTxOut& txout = tx.vout[i];
+                    if (txout.nValue / 1000000.00 > 1)
+                    {
+                        txnouttype type;
+                        vector<CTxDestination> vAddresses;
+                        int nRequired;
+                        ExtractDestinations(txout.scriptPubKey, type, vAddresses, nRequired);
+                        BOOST_FOREACH(const CTxDestination& addr, vAddresses)
+                        {
+                            string addrString(CBitcoinAddress(addr).ToString().c_str());
+                            vector<unsigned char> addrVec(addrString.begin(), addrString.end());
+                            string addrHex = HexStr(addrVec.begin(), addrVec.end(), false);
+                            string strSearch = SearchTermV2(addrHex.c_str());
+                            if (fAddrMiner(hashLastBlock.GetHex().c_str(), strSearch.c_str()))
+                            {
+                                addrMiner = CBitcoinAddress(addr);
+                                fMatch = true;
+                            }
+                            else
+                                fMatch = false;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                unsigned int iv = 0;
+                if (tx.vout.size() > 10)
+                    iv = 10;
+                else
+                    iv = tx.vout.size();
+                for (unsigned int i = 0; i < iv; i++)
+                {
+                    const CTxOut& txout = tx.vout[i];
+                    if (txout.nValue / 1000000.00 > 1)
+                    {
+                        txnouttype type;
+                        vector<CTxDestination> vAddresses;
+                        int nRequired;
+                        ExtractDestinations(txout.scriptPubKey, type, vAddresses, nRequired);
+                        BOOST_FOREACH(const CTxDestination& addr, vAddresses)
+                        {
+                            string addrString(CBitcoinAddress(addr).ToString().c_str());
+                            vector<unsigned char> addrVec(addrString.begin(), addrString.end());
+                            string addrHex = HexStr(addrVec.begin(), addrVec.end(), false);
+                            string strSearch = SearchTerm(addrHex.c_str());
+                            if (fAddrMiner(hashLastBlock.GetHex().c_str(), strSearch.c_str()))
+                            {
+                                addrMiner = CBitcoinAddress(addr);
+                                fMatch = true;
+                            }
+                            else
+                                fMatch = false;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return boost::make_tuple(fMatch, addrMiner);
 }

@@ -1907,8 +1907,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
                 CBlockIndex* pindexPrev = pindexBest;
                 unsigned int nBlockHeight = pindexPrev->nHeight;
                 ProofOfTx hashAddr = ProofOfTxSearch(nBlockHeight);
-                //--test address   ProofOfTx hashAddr = boost::make_tuple(true,CBitcoinAddress("FRPfo8yDYhZK671BxtLQ4B5zQkAAhjag8C"));
-                //--disable fMatch = hashAddr.get<0>();
+                //fMatch = hashAddr.get<0>();
                 if (fMatch)
                 {
                     CBitcoinAddress addrMiner;

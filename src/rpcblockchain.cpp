@@ -122,6 +122,10 @@ Object blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool fPri
 
     if (!blockindex->IsProofOfStake() && block.vtx[0].vout.size() > 1)
         result.push_back(Pair("extraflags", "proof-of-transaction"));
+    else if (blockindex->IsProofOfStake() && block.vtx[1].vout.size() == 4) //split stake with ProofOfTx
+        result.push_back(Pair("extraflags", "proof-of-transaction"));
+    else if (blockindex->IsProofOfStake() && block.vtx[1].vout.size() == 3 && block.vtx[1].vout[1].nValue / 2 > block.vtx[1].vout[2].nValue) //single stake with ProofOfTx
+        result.push_back(Pair("extraflags", "proof-of-transaction"));
     else
         result.push_back(Pair("extraflags", "none"));
 

@@ -331,10 +331,16 @@ std::string HexStr(const T itbegin, const T itend, bool fSpaces=false)
     return rv;
 }
 
-inline std::string HexStr(const std::vector<unsigned char>& vch, bool fSpaces=false)
+template<typename T>
+inline std::string HexStr(const T& vch, bool fSpaces=false)
 {
     return HexStr(vch.begin(), vch.end(), fSpaces);
 }
+
+/*inline std::string HexStr(const std::vector<unsigned char>& vch, bool fSpaces=false)
+{
+    return HexStr(vch.begin(), vch.end(), fSpaces);
+}*/
 
 template<typename T>
 void PrintHex(const T pbegin, const T pend, const char* pszFormat="%s", bool fSpaces=true)

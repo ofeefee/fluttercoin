@@ -53,7 +53,8 @@ Notes:
 #include "db.h"
 #include "init.h" // pwalletMain
 #include "txdb.h"
-
+#include "sync.h"
+#include "key.h"
 
 #include "lz4/lz4.c"
 
@@ -70,7 +71,6 @@ Notes:
 #define PRI64u  "lu"
 #define PRI64x  "lx"
 #endif // IS_ARCH_64
-
 
 // TODO: For buckets older than current, only need to store no. messages and hash in memory
 
@@ -1941,109 +1941,97 @@ int SecureMsgInsertAddress(CKeyID& hashKey, CPubKey& pubKey)
     return rv;
 };
 
-
 static bool ScanBlock(CBlock& block, CTxDB& txdb, SecMsgDB& addrpkdb,
-    uint32_t& nTransactions, uint32_t& nInputs, uint32_t& nPubkeys, uint32_t& nDuplicates)
+    uint32_t& nTransactions, uint32_t& nElements, uint32_t& nPubkeys, uint32_t& nDuplicates)
 {
-    // -- should have LOCK(cs_smsg) where db is opened
+    AssertLockHeld(cs_smsgDB);
+    
+    valtype vch;
+    opcodetype opcode;
+    
+    // -- only scan inputs of standard txns and coinstakes
+    
     BOOST_FOREACH(CTransaction& tx, block.vtx)
     {
-        if (!tx.IsStandard())
-            continue; // leave out coinbase and others
-        
-        /*
-        Look at the inputs of every tx.
-        If the inputs are standard, get the pubkey from scriptsig and
-        look for the corresponding output (the input(output of other tx) to the input of this tx)
-        get the address from scriptPubKey
-        add to db if address is unique.
-        
-        Would make more sense to do this the other way around, get address first for early out.
-        
-        */
-        
-        for (unsigned int i = 0; i < tx.vin.size(); i++)
+        // - harvest public keys from coinstake txns
+        if (tx.IsCoinStake())
         {
-            CScript *script = &tx.vin[i].scriptSig;
-            
-            opcodetype opcode;
-            valtype vch;
-            CScript::const_iterator pc = script->begin();
-            CScript::const_iterator pend = script->end();
-            
-            uint256 prevoutHash;
-            CKey key;
-            
-            // -- matching address is in scriptPubKey of previous tx output
-            while (pc < pend)
+            const CTxOut& txout = tx.vout[1];
+            CScript::const_iterator pc = txout.scriptPubKey.begin();
+            while (pc < txout.scriptPubKey.end())
             {
-                if (!script->GetOp(pc, opcode, vch))
+                if (!txout.scriptPubKey.GetOp(pc, opcode, vch))
                     break;
-                // -- opcode is the length of the following data, compressed public key is always 33
-                if (opcode == 33)
+                
+                if (vch.size() == 33) // pubkey
                 {
-                    key.SetPubKey(vch);
-                    
-                    key.SetCompressedPubKey(); // ensure key is compressed
-                    CPubKey pubKey = key.GetPubKey();
+                    CPubKey pubKey(vch);
                     
                     if (!pubKey.IsValid()
                         || !pubKey.IsCompressed())
                     {
-                        printf("Public key is invalid %s.\n", ValueString(pubKey.Raw()).c_str());
+                        printf("Public key is invalid %s.\n", HexStr(pubKey).c_str());
                         continue;
                     };
                     
-                    prevoutHash = tx.vin[i].prevout.hash;
-                    CTransaction txOfPrevOutput;
-                    if (!txdb.ReadDiskTx(prevoutHash, txOfPrevOutput))
+                    CKeyID addrKey = pubKey.GetID();
+                    switch (SecureMsgInsertAddress(addrKey, pubKey, addrpkdb))
                     {
-                        printf("Could not get transaction for hash: %s.\n", prevoutHash.ToString().c_str());
-                        continue;
-                    };
-                    
-                    unsigned int nOut = tx.vin[i].prevout.n;
-                    if (nOut >= txOfPrevOutput.vout.size())
-                    {
-                        printf("Output %u, not in transaction: %s.\n", nOut, prevoutHash.ToString().c_str());
-                        continue;
-                    };
-                    
-                    CTxOut *txOut = &txOfPrevOutput.vout[nOut];
-                    
-                    CTxDestination addressRet;
-                    if (!ExtractDestination(txOut->scriptPubKey, addressRet))
-                    {
-                        printf("ExtractDestination failed: %s.\n", prevoutHash.ToString().c_str());
-                        break;
-                    };
-                    
-                    
-                    CBitcoinAddress coinAddress(addressRet);
-                    CKeyID hashKey;
-                    if (!coinAddress.GetKeyID(hashKey))
-                    {
-                        printf("coinAddress.GetKeyID failed: %s.\n", coinAddress.ToString().c_str());
-                        break;
-                    };
-                    
-                    int rv = SecureMsgInsertAddress(hashKey, pubKey, addrpkdb);
-                    if (rv != 0)
-                    {
-                        if (rv == 4)
-                            nDuplicates++;
-                        break;
-                    };
-                    nPubkeys++;
+                        case 0: nPubkeys++; break;      // added key
+                        case 4: nDuplicates++; break;   // duplicate key
+                    }
                     break;
                 };
-                
-                //printf("opcode %d, %s, value %s.\n", opcode, GetOpName(opcode), ValueString(vch).c_str());
             };
-            nInputs++;
+            nElements++;
+        } else
+        if (tx.IsStandard())
+        {
+            for (uint32_t i = 0; i < tx.vin.size(); i++)
+            {
+               /* if (tx.nVersion == ANON_TXN_VERSION
+                    && tx.vin[i].IsAnonInput())
+                    continue; // skip anon inputs */
+
+                CScript *script = &tx.vin[i].scriptSig;
+                CScript::const_iterator pc = script->begin();
+                CScript::const_iterator pend = script->end();
+
+                uint256 prevoutHash;
+                CKey key;
+
+                while (pc < pend)
+                {
+                    if (!script->GetOp(pc, opcode, vch))
+                        break;
+                    // -- opcode is the length of the following data, compressed public key is always 33
+                    if (opcode == 33)
+                    {
+                        CPubKey pubKey(vch);
+                        
+                        if (!pubKey.IsValid()
+                            || !pubKey.IsCompressed())
+                        {
+                            printf("Public key is invalid %s.\n", HexStr(pubKey).c_str());
+                            continue;
+                        };
+                        
+                        CKeyID addrKey = pubKey.GetID();
+                        switch (SecureMsgInsertAddress(addrKey, pubKey, addrpkdb))
+                        {
+                            case 0: nPubkeys++; break;      // added key
+                            case 4: nDuplicates++; break;   // duplicate key
+                        }
+                        break;
+                    };
+
+                    //printf("opcode %d, %s, value %s.\n", opcode, GetOpName(opcode), ValueString(vch).c_str());
+                };
+                nElements++;
+            };
         };
         nTransactions++;
-        
+
         if (nTransactions % 10000 == 0) // for ScanChainForPublicKeys
         {
             printf("Scanning transaction no. %u.\n", nTransactions);
@@ -2051,7 +2039,6 @@ static bool ScanBlock(CBlock& block, CTxDB& txdb, SecMsgDB& addrpkdb,
     };
     return true;
 };
-
 
 bool SecureMsgScanBlock(CBlock& block)
 {
@@ -2064,7 +2051,7 @@ bool SecureMsgScanBlock(CBlock& block)
         printf("SecureMsgScanBlock().\n");
     
     uint32_t nTransactions  = 0;
-    uint32_t nInputs        = 0;
+    uint32_t nElements      = 0;
     uint32_t nPubkeys       = 0;
     uint32_t nDuplicates    = 0;
     
@@ -2078,13 +2065,13 @@ bool SecureMsgScanBlock(CBlock& block)
             return false;
         
         ScanBlock(block, txdb, addrpkdb,
-            nTransactions, nInputs, nPubkeys, nDuplicates);
+            nTransactions, nElements, nPubkeys, nDuplicates);
         
         addrpkdb.TxnCommit();
     }
     
     if (fDebugSmsg)
-        printf("Found %u transactions, %u inputs, %u new public keys, %u duplicates.\n", nTransactions, nInputs, nPubkeys, nDuplicates);
+        printf("Found %u transactions, %u inputs, %u new public keys, %u duplicates.\n", nTransactions, nElements, nPubkeys, nDuplicates);
     
     return true;
 };

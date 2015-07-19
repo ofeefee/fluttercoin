@@ -47,7 +47,7 @@ void OptionsModel::Init()
     bDisplayAddresses = settings.value("bDisplayAddresses", false).toBool();
     fMinimizeToTray = settings.value("fMinimizeToTray", false).toBool();
     fMinimizeOnClose = settings.value("fMinimizeOnClose", false).toBool();
-    fCoinControlFeatures = settings.value("fCoinControlFeatures", false).toBool();
+    fCoinControlFeatures = settings.value("fCoinControlFeatures", true).toBool();
     nTransactionFee = settings.value("nTransactionFee").toLongLong();
     language = settings.value("language", "").toString();
     fCheckOnlineUpdate = settings.value("fCheckOnlineUpdate", true).toBool();

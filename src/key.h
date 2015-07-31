@@ -63,12 +63,56 @@ public:
 /** An encapsulated public key. */
 class CPubKey {
 private:
+    // Just store the serialized data.
+    // Its length can very cheaply be computed from the first byte.
+    unsigned char vch[65];
+
     std::vector<unsigned char> vchPubKey;
     friend class CKey;
 
+    // Compute the length of a pubkey with a given first byte.
+    unsigned int static GetLen(unsigned char chHeader) {
+        if (chHeader == 2 || chHeader == 3)
+            return 33;
+        if (chHeader == 4 || chHeader == 6 || chHeader == 7)
+            return 65;
+        return 0;
+    }
+
+    // Set this key data to be invalid
+    void Invalidate() {
+        vch[0] = 0xFF;
+    }
+
 public:
-    CPubKey() { }
+    CPubKey() {
+        Invalidate();
+    }
+
+    // Initialize a public key using begin/end iterators to byte data.
+    template<typename T>
+    void Set(const T pbegin, const T pend) {
+        int len = pend == pbegin ? 0 : GetLen(pbegin[0]);
+        if (len && len == (pend-pbegin))
+            memcpy(vch, (unsigned char*)&pbegin[0], len);
+        else
+            Invalidate();
+    }
+
+    // Construct a public key using begin/end iterators to byte data.
+    template<typename T>
+    CPubKey(const T pbegin, const T pend) {
+        Set(pbegin, pend);
+    }
+
     CPubKey(const std::vector<unsigned char> &vchPubKeyIn) : vchPubKey(vchPubKeyIn) { }
+
+    // Simple read-only vector-like interface to the pubkey data.
+    unsigned int size() const { return GetLen(vch[0]); }
+    const unsigned char *begin() const { return vch; }
+    const unsigned char *end() const { return vch+size(); }
+    const unsigned char &operator[](unsigned int pos) const { return vch[pos]; }
+
     friend bool operator==(const CPubKey &a, const CPubKey &b) { return a.vchPubKey == b.vchPubKey; }
     friend bool operator!=(const CPubKey &a, const CPubKey &b) { return a.vchPubKey != b.vchPubKey; }
     friend bool operator<(const CPubKey &a, const CPubKey &b) { return a.vchPubKey < b.vchPubKey; }

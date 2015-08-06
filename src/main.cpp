@@ -1075,7 +1075,7 @@ int64 GetProofOfStakeReward(int64 nCoinAge, int64 nCoinValue, unsigned int nBits
     if ((nTime > FORK_FLT1) && (nCoinValue > 10000 * COIN))
     {
         //if (fDebug && GetBoolArg("-printcreation") && nSubsidyLimit < nSubsidy)
-            printf("GetProofOfStakeReward(): %s is greater than 25000FLT, coinstake reward will be truncated\n", FormatMoney(nCoinValue).c_str());
+            printf("GetProofOfStakeReward(): %s is greater than 10000FLT, coinstake reward will be truncated\n", FormatMoney(nCoinValue).c_str());
         //nSubsidy = min(nSubsidy, nSubsidyLimit);
     }
 

@@ -900,15 +900,6 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
     return ret;
 }
 
-int CWallet::ScanForWalletTransaction(const uint256& hashTx)
-{
-    CTransaction tx;
-    tx.ReadFromDisk(COutPoint(hashTx, 0));
-    if (AddToWalletIfInvolvingMe(tx, NULL, true, true))
-        return 1;
-    return 0;
-}
-
 void CWallet::ReacceptWalletTransactions()
 {
     CTxDB txdb("r");
@@ -1461,6 +1452,10 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
         CTxDB txdb("r");
         {
             nFeeRet = nTransactionFee;
+
+            if(fSplitBlock)
+                nFeeRet = COIN / 1000;
+
             while (true)
             {
                 wtxNew.vin.clear();
@@ -1747,7 +1742,9 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
 {
     // The following combine threshold is important to security
     // Should not be adjusted if you don't understand the consequences
-    int64 nCombineThreshold = GetProofOfWorkReward(GetLastBlockIndex(pindexBest, false)->nHeight, GetLastBlockIndex(pindexBest, false)->GetBlockHash()) / 3;
+    int64 nCombineThreshold = 100 * COIN;
+    int64 nSplitThreshold = 1000 * COIN;
+
     CBigNum bnTargetPerCoinDay;
     bnTargetPerCoinDay.SetCompact(nBits);
 
@@ -1900,7 +1897,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
                 // --ofeefee Fluttercoin MAX_MINT_PROOF_OF_STAKE is 100%
                 uint64 nTotalSize = pcoin.first->vout[pcoin.second].nValue * (1+((txNew.nTime - block.GetBlockTime()) / (60*60*24)) * (1/365));
 
-                if ((GetWeight(block.GetBlockTime(), (int64)txNew.nTime) < nStakeMaxAge) && ((nTotalSize / 2) > (1000 * COIN)))
+                if (nTotalSize / 2 > nSplitThreshold)
                     txNew.vout.push_back(CTxOut(0, scriptPubKeyOut)); //split stake
 
                 //ProofOfTx Search
@@ -1947,9 +1944,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
             // Stop adding more inputs if already too many inputs
             if (txNew.vin.size() >= 100)
                 break;
-            // Stop adding more inputs if value is already pretty significant
-            if (nCredit > nCombineThreshold)
-                break;
+
             // Stop adding inputs if reached reserve limit
             if (nCredit + pcoin.first->vout[pcoin.second].nValue > nBalance - nReserveBalance)
                 break;
@@ -1969,11 +1964,12 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     // Calculate coin age reward
     {
         uint64 nCoinAge;
+        int64 nCoinValue;
         CTxDB txdb("r");
-        if (!txNew.GetCoinAge(txdb, nCoinAge))
+        if (!txNew.GetCoinAge(txdb, nCoinAge, nCoinValue))
             return error("CreateCoinStake : failed to calculate coin age");
 
-        nReward = GetProofOfStakeReward(nCoinAge, nBits, txNew.nTime);
+        nReward = GetProofOfStakeReward(nCoinAge, nCoinValue, nBits, txNew.nTime);
         // Refuse to create mint that has zero or negative reward
         if(nReward <= 0)
             return false;

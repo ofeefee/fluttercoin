@@ -40,6 +40,7 @@ static const int64 MAX_MINT_PROOF_OF_STAKE = 1 * COIN;
 static const int64 MIN_TXOUT_AMOUNT = MIN_TX_FEE;
 static const unsigned int ENTROPY_SWITCH_TIME = 1420070399; // Dec 31 2014, 23:59:59 PM GMT
 static const unsigned int FORK_FINAL = 1397936903;
+static const unsigned int FORK_FLT1 = 1436702400; // July 12 2015, 12:00:00 GMT 
 
 string SearchTerm(const char *chAddress);
 string SearchTermV2(const char *chAddress);
@@ -119,7 +120,7 @@ bool LoadExternalBlockFile(FILE* fileIn);
 bool CheckProofOfWork(uint256 hash, unsigned int nBits);
 unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake);
 int64 GetProofOfWorkReward(unsigned int nHeight, uint256 hashSeed);
-int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTime, bool bCoinYearOnly=false);
+int64 GetProofOfStakeReward(int64 nCoinAge, int64 nCoinValue, unsigned int nBits, unsigned int nTime, bool bCoinYearOnly=false);
 unsigned int ComputeMinWork(unsigned int nBase, int64 nTime);
 unsigned int ComputeMinStake(unsigned int nBase, int64 nTime, unsigned int nBlockTime);
 int GetNumBlocksOfPeers();
@@ -703,7 +704,7 @@ public:
     bool ClientConnectInputs();
     bool CheckTransaction() const;
     bool AcceptToMemoryPool(CTxDB& txdb, bool fCheckInputs=true, bool* pfMissingInputs=NULL);
-    bool GetCoinAge(CTxDB& txdb, uint64& nCoinAge) const;  // fluttercoin: get transaction coin age
+    bool GetCoinAge(CTxDB& txdb, uint64& nCoinAge, int64& nCoinValue) const;  // fluttercoin: get transaction coin age
 
 protected:
     const CTxOut& GetOutputFor(const CTxIn& input, const MapPrevTx& inputs) const;

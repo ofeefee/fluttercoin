@@ -1021,7 +1021,7 @@ int64 GetProofOfWorkReward(unsigned int nHeight, uint256 hashSeed)
 
 
 // miner's coin stake reward based on nBits and coin age spent (coin-days)
-int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTime, bool bCoinYearOnly)
+int64 GetProofOfStakeReward(int64 nCoinAge, int64 nCoinValue, unsigned int nBits, unsigned int nTime, bool bCoinYearOnly)
 {
     int64 nRewardCoinYear, nSubsidy, nSubsidyLimit = 10 * COIN;
     CBigNum bnRewardCoinYearLimit = MAX_MINT_PROOF_OF_STAKE; // Base stake mint rate, 100% year interest
@@ -1069,6 +1069,14 @@ int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTi
             printf("GetProofOfStakeReward(): %s is greater than %s, coinstake reward will be truncated\n", FormatMoney(nSubsidy).c_str(), FormatMoney(nSubsidyLimit).c_str());
 
         nSubsidy = min(nSubsidy, nSubsidyLimit);
+    }
+
+    // This will stimulate large holders to use smaller inputs, that's good for the network protection
+    if ((nTime > FORK_FLT1) && (nCoinValue > 10000 * COIN))
+    {
+        //if (fDebug && GetBoolArg("-printcreation") && nSubsidyLimit < nSubsidy)
+            printf("GetProofOfStakeReward(): %s is greater than 25000FLT, coinstake reward will be truncated\n", FormatMoney(nCoinValue).c_str());
+        //nSubsidy = min(nSubsidy, nSubsidyLimit);
     }
 
     if (fDebug && GetBoolArg("-printcreation"))
@@ -1476,11 +1484,13 @@ bool CTransaction::ConnectInputs(CTxDB& txdb, MapPrevTx inputs, map<uint256, CTx
         {
             // fluttercoin: coin stake tx earns reward instead of paying fee
             uint64 nCoinAge;
-            if (!GetCoinAge(txdb, nCoinAge))
+            int64 nCoinValue;
+
+            if (!GetCoinAge(txdb, nCoinAge, nCoinValue))
                 return error("ConnectInputs() : %s unable to get coin age for coinstake", GetHash().ToString().substr(0,10).c_str());
 
             int64 nStakeReward = GetValueOut() - nValueIn;
-            int64 nCalculatedStakeReward = GetProofOfStakeReward(nCoinAge, pindexBlock->nBits, nTime) - GetMinFee() + MIN_TX_FEE;
+            int64 nCalculatedStakeReward = GetProofOfStakeReward(nCoinAge, nCoinValue, pindexBlock->nBits, nTime) - GetMinFee() + MIN_TX_FEE;
 
             if (nStakeReward > nCalculatedStakeReward)
                 return DoS(100, error("ConnectInputs() : coinstake pays too much(actual=%"PRI64d" vs calculated=%"PRI64d")", nStakeReward, nCalculatedStakeReward));
@@ -2398,10 +2408,11 @@ bool CBlock::SetBestChain(CTxDB& txdb, CBlockIndex* pindexNew)
 // guaranteed to be in main chain by sync-checkpoint. This rule is
 // introduced to help nodes establish a consistent view of the coin
 // age (trust score) of competing branches.
-bool CTransaction::GetCoinAge(CTxDB& txdb, uint64& nCoinAge) const
+bool CTransaction::GetCoinAge(CTxDB& txdb, uint64& nCoinAge, int64& nCoinValue) const
 {
     CBigNum bnCentSecond = 0;  // coin age in the unit of cent-seconds
     nCoinAge = 0;
+    nCoinValue = 0;
 
     if (IsCoinBase())
         return true;
@@ -2424,6 +2435,8 @@ bool CTransaction::GetCoinAge(CTxDB& txdb, uint64& nCoinAge) const
             continue; // only count coins meeting min age requirement
 
         int64 nValueIn = txPrev.vout[txin.prevout.n].nValue;
+        nCoinValue += nValueIn;
+
         bnCentSecond += CBigNum(nValueIn) * (nTime-txPrev.nTime) / CENT;
 
         if (fDebug && GetBoolArg("-printcoinage"))
@@ -2446,7 +2459,8 @@ bool CBlock::GetCoinAge(uint64& nCoinAge) const
     BOOST_FOREACH(const CTransaction& tx, vtx)
     {
         uint64 nTxCoinAge;
-        if (tx.GetCoinAge(txdb, nTxCoinAge))
+        int64 nCoinValue;
+        if (tx.GetCoinAge(txdb, nTxCoinAge, nCoinValue))
             nCoinAge += nTxCoinAge;
         else
             return false;

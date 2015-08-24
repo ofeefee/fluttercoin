@@ -1481,18 +1481,15 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
                 else
                     BOOST_FOREACH (const PAIRTYPE(CScript, int64)& s, vecSend)
                 {
-                    uint64 nBlockAmount = 0;
-                    uint64 nBlockSum = 0;
-                    uint64 nAvgBlock = nValue / nSplitBlock;
-
                     for(int nCount = 0; nCount < nSplitBlock; nCount++)
                     {
-                        if (!(nCount == nSplitBlock - 1))
-                            nBlockAmount =  nAvgBlock - ((nCount + 1) * COIN / 4000);
+                        if(nCount == nSplitBlock -1)
+                        {
+                            uint64 nRemainder = s.second % nSplitBlock;
+                            wtxNew.vout.push_back(CTxOut((s.second / nSplitBlock) + nRemainder, s.first));
+                        }
                         else
-                            nBlockAmount = nValue - nBlockSum;
-                        nBlockSum += nBlockAmount;
-                        wtxNew.vout.push_back(CTxOut(nBlockAmount, s.first));
+                            wtxNew.vout.push_back(CTxOut(s.second / nSplitBlock, s.first));
                     }
                 }
  

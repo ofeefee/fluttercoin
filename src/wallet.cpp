@@ -1887,9 +1887,9 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
 
                 // add stake split limit threshold --presstab HyperStake
                 // --ofeefee Fluttercoin MAX_MINT_PROOF_OF_STAKE is 100%
-                uint64 nTotalSize = pcoin.first->vout[pcoin.second].nValue * (1+((txNew.nTime - block.GetBlockTime()) / (60*60*24)) * (1/365));
+                //uint64 nTotalSize = pcoin.first->vout[pcoin.second].nValue * (1+((txNew.nTime - block.GetBlockTime()) / (60*60*24)) * (1/365));
 
-                if (nTotalSize / 2 > nSplitThreshold)
+                if (nCredit / 2 > nSplitThreshold)
                     txNew.vout.push_back(CTxOut(0, scriptPubKeyOut)); //split stake
 
                 //ProofOfTx Search

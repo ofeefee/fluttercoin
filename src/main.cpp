@@ -142,6 +142,9 @@ void SyncWithWallets(const CTransaction& tx, const CBlock* pblock, bool fUpdate,
 
     BOOST_FOREACH(CWallet* pwallet, setpwalletRegistered)
             pwallet->AddToWalletIfInvolvingMe(tx, pblock, fUpdate);
+
+    // Preloaded coins cache invalidation
+    fCoinsDataActual = false;
 }
 
 // notify wallets about a new best chain

@@ -549,9 +549,6 @@ void SendCoinsDialog::coinControlSplitBlockChecked(int state)
                     ui->splitBlockLineEdit->setVisible(true);
                     ui->labelBlockSizeText->setVisible(true);
                     ui->labelBlockSize->setVisible(true);
-                    //ui->splitBlockLineEdit->setEnabled(true);
-                    //ui->labelBlockSizeText->setEnabled(true);
-                    //ui->labelBlockSize->setEnabled(true);
                 }
 		else
                 {
@@ -561,10 +558,8 @@ void SendCoinsDialog::coinControlSplitBlockChecked(int state)
                     ui->labelBlockSizeText->setVisible(false);
                     ui->labelBlockSize->clear();
                     ui->labelBlockSize->setVisible(false);
-                    //ui->splitBlockLineEdit->setEnabled(false);
-                    //ui->labelBlockSizeText->setEnabled(false);
-                    //ui->labelBlockSize->setEnabled(false);
                 }
+                coinControlUpdateLabels();
 	}
 }
 

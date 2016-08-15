@@ -95,6 +95,7 @@ public:
     CBitcoinAddress strAutoSavingsAddress;
     CBitcoinAddress strAutoSavingsChangeAddress;
     bool fSplitBlock;
+    uint64 nStakeSplitThreshold;
 
     std::set<int64> setKeyPool;
     std::map<CKeyID, CKeyMetadata> mapKeyMetadata;
@@ -119,6 +120,7 @@ public:
         nAutoSavingsMin = 0;
         nAutoSavingsMax = 0;
         fSplitBlock = false;
+        nStakeSplitThreshold = 1000;
     }
     CWallet(std::string strWalletFileIn)
     {
@@ -136,6 +138,7 @@ public:
         nAutoSavingsMin = MIN_TXOUT_AMOUNT;
         nAutoSavingsMax = MAX_MONEY;
         fSplitBlock = false;
+        nStakeSplitThreshold = 1000;
     }
 
     std::map<uint256, CWalletTx> mapWallet;

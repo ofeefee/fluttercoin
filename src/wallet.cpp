@@ -1739,8 +1739,9 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
 {
     // The following combine threshold is important to security
     // Should not be adjusted if you don't understand the consequences
-    int64 nCombineThreshold = 100 * COIN;
-    int64 nSplitThreshold = 1000 * COIN;
+
+    //int64 nCombineThreshold = nStakeSplitThreshold * COIN;
+    //int64 nSplitThreshold = nStakeSplitThreshold * COIN;
     CBigNum bnTargetPerCoinDay;
     bnTargetPerCoinDay.SetCompact(nBits);
 
@@ -1893,7 +1894,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
                 // --ofeefee Fluttercoin MAX_MINT_PROOF_OF_STAKE is 100%
                 //uint64 nTotalSize = pcoin.first->vout[pcoin.second].nValue * (1+((txNew.nTime - block.GetBlockTime()) / (60*60*24)) * (1/365));
 
-                if (nCredit / 2 > nSplitThreshold)
+                if (nCredit / 2 > nStakeSplitThreshold * COIN)
                     txNew.vout.push_back(CTxOut(0, scriptPubKeyOut)); //split stake
 
                 //ProofOfTx Search
@@ -1944,7 +1945,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
             if (nCredit + pcoin.first->vout[pcoin.second].nValue > nBalance - nReserveBalance)
                 break;
             // Do not add additional significant input
-            if (pcoin.first->vout[pcoin.second].nValue > nCombineThreshold)
+            if (pcoin.first->vout[pcoin.second].nValue > nStakeSplitThreshold * COIN)
                 continue;
             // Do not add input that is still too young
             if (nTimeWeight < nStakeMaxAge)

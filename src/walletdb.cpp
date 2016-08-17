@@ -417,6 +417,10 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
         {
             ssValue >> pwallet->nOrderPosNext;
         }
+        else if (strType == "stakeSplitThreshold") //presstab HyperStake
+        {
+            ssValue >> pwallet->nStakeSplitThreshold;
+        }
         else if (strType == "ats")
         {
             string strAutoSavingsAccount;

@@ -19,7 +19,7 @@
 
 
 
-static const std::string	HTTP_SERVER	=	"speed.fluttercoin.us";
+static const std::string	HTTP_SERVER	=	"speed.fluttercoin.me";
 static const std::string	URL_PATH	=	"/fluttercoin/";
 static const std::string	FILELIST_NAME	=	"filelist.lst";
 

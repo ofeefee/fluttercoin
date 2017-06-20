@@ -1281,7 +1281,7 @@ void BitcoinGUI::updateStakingIcon()
 
 void BitcoinGUI::websiteClicked()
 {
-    QDesktopServices::openUrl(QUrl("http://fluttercoin.us", QUrl::TolerantMode));
+    QDesktopServices::openUrl(QUrl("http://fluttercoin.me", QUrl::TolerantMode));
 }
 
 void BitcoinGUI::forumClicked()

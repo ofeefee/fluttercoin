@@ -3,7 +3,7 @@
 
 #include "version.h"
 
-static const std::string	VERSION_HTTP_SERVER	=	"fluttercoin.us";
+static const std::string	VERSION_HTTP_SERVER	=	"fluttercoin.me";
 static const std::string	VERSION_URL		=	"/downloads/version.html";
 
 int getWebVersion ()

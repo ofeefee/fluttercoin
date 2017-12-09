@@ -45,8 +45,8 @@ CBigNum bnProofOfWorkLimitTestNet(~uint256(0) >> 16);
 
 unsigned int nStakeMinAge = 60 * 60 * 24 * 30; // 30 days as zero time weight
 unsigned int nStakeMaxAge = 60 * 60 * 24 * 90; // 90 days as full weight
-unsigned int nStakeTargetSpacing = 2 * 60; // 2-minute stakes spacing
-unsigned int nModifierInterval = 4 * 60 * 60; // time to elapse before new modifier is computed
+unsigned int nStakeTargetSpacing = 2 * 60; // 2 minute stakes spacing
+unsigned int nModifierInterval = 4 * 60 * 60; // 4 hour before new modifier is computed
 
 int nCoinbaseMaturity = 12;
 CBlockIndex* pindexGenesisBlock = NULL;
@@ -1023,57 +1023,67 @@ int64 GetProofOfWorkReward(unsigned int nHeight, uint256 hashSeed)
 // miner's coin stake reward based on nBits and coin age spent (coin-days)
 int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTime, bool bCoinYearOnly)
 {
-    int64 nRewardCoinYear, nSubsidy, nSubsidyLimit = 10 * COIN;
-    CBigNum bnRewardCoinYearLimit = MAX_MINT_PROOF_OF_STAKE; // Base stake mint rate, 100% year interest
-    CBigNum bnTarget;
-    bnTarget.SetCompact(nBits);
-    CBigNum bnTargetLimit = GetProofOfStakeLimit(0, nTime);
-    bnTargetLimit.SetCompact(bnTargetLimit.GetCompact());
-
-    // FlutterCoin: A reasonably continuous curve is used to avoid shock to market
-
-    CBigNum bnLowerBound = 5 * CENT, // Lower interest bound is 5% per year
-            bnUpperBound = bnRewardCoinYearLimit, // Upper interest bound is 100% per year
-            bnMidPart, bnRewardPart;
-
-    while (bnLowerBound + CENT <= bnUpperBound)
+    if (nTime < FORK_ADJUST_HARD)
     {
-        CBigNum bnMidValue = (bnLowerBound + bnUpperBound) / 2;
+        int64 nRewardCoinYear, nSubsidy, nSubsidyLimit = 10 * COIN;
+        CBigNum bnRewardCoinYearLimit = MAX_MINT_PROOF_OF_STAKE; // Base stake mint rate, 100% year interest
+        CBigNum bnTarget;
+        bnTarget.SetCompact(nBits);
+        CBigNum bnTargetLimit = GetProofOfStakeLimit(0, nTime);
+        bnTargetLimit.SetCompact(bnTargetLimit.GetCompact());
+
+        // FlutterCoin: A reasonably continuous curve is used to avoid shock to market
+
+        CBigNum bnLowerBound = 5 * CENT, // Lower interest bound is 5% per year
+                bnUpperBound = bnRewardCoinYearLimit, // Upper interest bound is 100% per year
+                bnMidPart, bnRewardPart;
+
+        while (bnLowerBound + CENT <= bnUpperBound)
+        {
+            CBigNum bnMidValue = (bnLowerBound + bnUpperBound) / 2;
+            if (fDebug && GetBoolArg("-printcreation"))
+                printf("GetProofOfStakeReward() : lower=%"PRI64d" upper=%"PRI64d" mid=%"PRI64d"\n", bnLowerBound.getuint64(), bnUpperBound.getuint64(), bnMidValue.getuint64());
+
+            bnMidPart = bnMidValue * bnMidValue * bnMidValue;
+            bnRewardPart = bnRewardCoinYearLimit * bnRewardCoinYearLimit * bnRewardCoinYearLimit;
+
+            if (bnMidPart * bnTargetLimit > bnRewardPart * bnTarget)
+                bnUpperBound = bnMidValue;
+            else
+                bnLowerBound = bnMidValue;
+        }
+
+        nRewardCoinYear = bnUpperBound.getuint64();
+        nRewardCoinYear = min((nRewardCoinYear / CENT) * CENT, MAX_MINT_PROOF_OF_STAKE);
+
+        if(bCoinYearOnly)
+            return nRewardCoinYear;
+
+        nSubsidy = (nCoinAge * nRewardCoinYear * 33) / (365 * 33 + 8);
+
+        // Set reasonable reward limit for large inputs
+        // This will stimulate large holders to use smaller inputs, that's good for the network protection
+
+        if(nTime < FORK_FINAL)
+        {
+            if (fDebug && GetBoolArg("-printcreation") && nSubsidyLimit < nSubsidy)
+                printf("GetProofOfStakeReward(): %s is greater than %s, coinstake reward will be truncated\n", FormatMoney(nSubsidy).c_str(), FormatMoney(nSubsidyLimit).c_str());
+
+            nSubsidy = min(nSubsidy, nSubsidyLimit);
+        }
+
         if (fDebug && GetBoolArg("-printcreation"))
-            printf("GetProofOfStakeReward() : lower=%"PRI64d" upper=%"PRI64d" mid=%"PRI64d"\n", bnLowerBound.getuint64(), bnUpperBound.getuint64(), bnMidValue.getuint64());
+            printf("GetProofOfStakeReward(): create=%s nCoinAge=%"PRI64d" nBits=%d\n", FormatMoney(nSubsidy).c_str(), nCoinAge, nBits);
 
-        bnMidPart = bnMidValue * bnMidValue * bnMidValue;
-        bnRewardPart = bnRewardCoinYearLimit * bnRewardCoinYearLimit * bnRewardCoinYearLimit;
-
-        if (bnMidPart * bnTargetLimit > bnRewardPart * bnTarget)
-            bnUpperBound = bnMidValue;
-        else
-            bnLowerBound = bnMidValue;
+        return nSubsidy;
     }
 
-    nRewardCoinYear = bnUpperBound.getuint64();
-    nRewardCoinYear = min((nRewardCoinYear / CENT) * CENT, MAX_MINT_PROOF_OF_STAKE);
-
-
+    static int64 nRewardCoinYear = 5 * CENT;  // interest bound is 5% per year
     if(bCoinYearOnly)
         return nRewardCoinYear;
-
-    nSubsidy = (nCoinAge * nRewardCoinYear * 33) / (365 * 33 + 8);
-
-    // Set reasonable reward limit for large inputs
-    // This will stimulate large holders to use smaller inputs, that's good for the network protection
-
-    if(nTime < FORK_FINAL)
-    {
-        if (fDebug && GetBoolArg("-printcreation") && nSubsidyLimit < nSubsidy)
-            printf("GetProofOfStakeReward(): %s is greater than %s, coinstake reward will be truncated\n", FormatMoney(nSubsidy).c_str(), FormatMoney(nSubsidyLimit).c_str());
-
-        nSubsidy = min(nSubsidy, nSubsidyLimit);
-    }
-
+    int64 nSubsidy = nCoinAge * 33 / (365 * 33 + 8) * nRewardCoinYear;
     if (fDebug && GetBoolArg("-printcreation"))
-        printf("GetProofOfStakeReward(): create=%s nCoinAge=%"PRI64d" nBits=%d\n", FormatMoney(nSubsidy).c_str(), nCoinAge, nBits);
-
+        printf("GetProofOfStakeReward(): create=%s nCoinAge=%" PRI64d"\n", FormatMoney(nSubsidy).c_str(), nCoinAge);
     return nSubsidy;
 }
 
@@ -3142,10 +3152,11 @@ bool LoadBlockIndex(bool fAllowNew)
         pchMessageStart[3] = 0xef;
         bnTrustedModulus.SetHex("b64b2ad9835da7afca61e781990f33024800e9f08cdcf2fe43a2c18e2bd5cc9fd7685826b41c1ee5e027160b6391312078be3e839ddf14f02340b97070117c3c8092da4086341d243778923cd285dbf5644a80dffdc430b36ae67368a9cd8751a5ae06f8a57c651bc3cc55caebd807dc6d0edb84c42e928c6e8f58a77b94b4989af32ea8425488c4deac50674f8a03d7c3e20c17f3972695022d1133b974fd0ea577833b0c5b9cf999b1d444d11d775a4ab8432e88361acb588475bd6bbcb496adf3f84c72bf70052b9665f264c7778c8f093c5e35a09ded8b476d7a257858a67e0b364c119f662e3ce3571ca0abe8b11c67cb8981882734098452ebb08092549");
         bnProofOfWorkLimit = bnProofOfWorkLimitTestNet; // 16 bits PoW target limit for testnet
-        nStakeMinAge = 1 * 60 * 60; // test net min age is 2 hours
+
+        nStakeMinAge = 1 * 60 * 60; // test net min age is 1 hours
         nModifierInterval = 20 * 60; // test modifier interval is 20 minutes
         nCoinbaseMaturity = 10; // test maturity is 10 blocks
-        nStakeTargetSpacing = 1 * 30; // test block spacing is 1 minutes
+        nStakeTargetSpacing = 1 * 30; // test block spacing is 30 seconds 
     }
     else
     {
@@ -3538,14 +3549,9 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
             return false;
         }
 
-        if(nTime > 1400198400) // Fri, 16 May 2014 00:00:00 GMT
+        if (nTime > FORK_ADJUST_SOFT)
         {
-            if(pfrom->nVersion < 70009)
-                badVersion = true;
-        }
-        else
-        {
-            if(pfrom->nVersion < 70007)
+            if(pfrom->nVersion < 70014)
                 badVersion = true;
         }
 

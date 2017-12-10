@@ -45,8 +45,8 @@ CBigNum bnProofOfWorkLimitTestNet(~uint256(0) >> 16);
 
 unsigned int nStakeMinAge = 60 * 60 * 24 * 30; // 30 days as zero time weight
 unsigned int nStakeMaxAge = 60 * 60 * 24 * 90; // 90 days as full weight
-unsigned int nStakeTargetSpacing = 2 * 60; // 2 minute stakes spacing
-unsigned int nModifierInterval = 4 * 60 * 60; // 4 hour before new modifier is computed
+unsigned int nStakeTargetSpacing = 2 * 60; // 2 minute stake spacing
+unsigned int nModifierInterval = 4 * 60 * 60; // 4 hours before new modifier is computed
 
 int nCoinbaseMaturity = 12;
 CBlockIndex* pindexGenesisBlock = NULL;
@@ -3145,7 +3145,6 @@ bool LoadBlockIndex(bool fAllowNew)
         pchMessageStart[3] = 0xef;
         bnTrustedModulus.SetHex("b64b2ad9835da7afca61e781990f33024800e9f08cdcf2fe43a2c18e2bd5cc9fd7685826b41c1ee5e027160b6391312078be3e839ddf14f02340b97070117c3c8092da4086341d243778923cd285dbf5644a80dffdc430b36ae67368a9cd8751a5ae06f8a57c651bc3cc55caebd807dc6d0edb84c42e928c6e8f58a77b94b4989af32ea8425488c4deac50674f8a03d7c3e20c17f3972695022d1133b974fd0ea577833b0c5b9cf999b1d444d11d775a4ab8432e88361acb588475bd6bbcb496adf3f84c72bf70052b9665f264c7778c8f093c5e35a09ded8b476d7a257858a67e0b364c119f662e3ce3571ca0abe8b11c67cb8981882734098452ebb08092549");
         bnProofOfWorkLimit = bnProofOfWorkLimitTestNet; // 16 bits PoW target limit for testnet
-
         nStakeMinAge = 1 * 60 * 60; // test net min age is 1 hours
         nModifierInterval = 20 * 60; // test modifier interval is 20 minutes
         nCoinbaseMaturity = 10; // test maturity is 10 blocks

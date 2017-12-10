@@ -1023,67 +1023,60 @@ int64 GetProofOfWorkReward(unsigned int nHeight, uint256 hashSeed)
 // miner's coin stake reward based on nBits and coin age spent (coin-days)
 int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTime, bool bCoinYearOnly)
 {
-    if (nTime < FORK_ADJUST_HARD)
+    int64 nRewardCoinYear, nSubsidy, nSubsidyLimit = 10 * COIN;
+    CBigNum bnRewardCoinYearLimit = MAX_MINT_PROOF_OF_STAKE; // Base stake mint rate, 100% year interest
+    CBigNum bnTarget;
+    bnTarget.SetCompact(nBits);
+    CBigNum bnTargetLimit = GetProofOfStakeLimit(0, nTime);
+    bnTargetLimit.SetCompact(bnTargetLimit.GetCompact());
+
+    // FlutterCoin: A reasonably continuous curve is used to avoid shock to market
+
+    CBigNum bnLowerBound = 5 * CENT, // Lower interest bound is 5% per year
+            bnUpperBound = bnRewardCoinYearLimit, // Upper interest bound is 100% per year
+            bnMidPart, bnRewardPart;
+
+    while (bnLowerBound + CENT <= bnUpperBound)
     {
-        int64 nRewardCoinYear, nSubsidy, nSubsidyLimit = 10 * COIN;
-        CBigNum bnRewardCoinYearLimit = MAX_MINT_PROOF_OF_STAKE; // Base stake mint rate, 100% year interest
-        CBigNum bnTarget;
-        bnTarget.SetCompact(nBits);
-        CBigNum bnTargetLimit = GetProofOfStakeLimit(0, nTime);
-        bnTargetLimit.SetCompact(bnTargetLimit.GetCompact());
-
-        // FlutterCoin: A reasonably continuous curve is used to avoid shock to market
-
-        CBigNum bnLowerBound = 5 * CENT, // Lower interest bound is 5% per year
-                bnUpperBound = bnRewardCoinYearLimit, // Upper interest bound is 100% per year
-                bnMidPart, bnRewardPart;
-
-        while (bnLowerBound + CENT <= bnUpperBound)
-        {
-            CBigNum bnMidValue = (bnLowerBound + bnUpperBound) / 2;
-            if (fDebug && GetBoolArg("-printcreation"))
-                printf("GetProofOfStakeReward() : lower=%"PRI64d" upper=%"PRI64d" mid=%"PRI64d"\n", bnLowerBound.getuint64(), bnUpperBound.getuint64(), bnMidValue.getuint64());
-
-            bnMidPart = bnMidValue * bnMidValue * bnMidValue;
-            bnRewardPart = bnRewardCoinYearLimit * bnRewardCoinYearLimit * bnRewardCoinYearLimit;
-
-            if (bnMidPart * bnTargetLimit > bnRewardPart * bnTarget)
-                bnUpperBound = bnMidValue;
-            else
-                bnLowerBound = bnMidValue;
-        }
-
-        nRewardCoinYear = bnUpperBound.getuint64();
-        nRewardCoinYear = min((nRewardCoinYear / CENT) * CENT, MAX_MINT_PROOF_OF_STAKE);
-
-        if(bCoinYearOnly)
-            return nRewardCoinYear;
-
-        nSubsidy = (nCoinAge * nRewardCoinYear * 33) / (365 * 33 + 8);
-
-        // Set reasonable reward limit for large inputs
-        // This will stimulate large holders to use smaller inputs, that's good for the network protection
-
-        if(nTime < FORK_FINAL)
-        {
-            if (fDebug && GetBoolArg("-printcreation") && nSubsidyLimit < nSubsidy)
-                printf("GetProofOfStakeReward(): %s is greater than %s, coinstake reward will be truncated\n", FormatMoney(nSubsidy).c_str(), FormatMoney(nSubsidyLimit).c_str());
-
-            nSubsidy = min(nSubsidy, nSubsidyLimit);
-        }
-
+        CBigNum bnMidValue = (bnLowerBound + bnUpperBound) / 2;
         if (fDebug && GetBoolArg("-printcreation"))
-            printf("GetProofOfStakeReward(): create=%s nCoinAge=%"PRI64d" nBits=%d\n", FormatMoney(nSubsidy).c_str(), nCoinAge, nBits);
+            printf("GetProofOfStakeReward() : lower=%"PRI64d" upper=%"PRI64d" mid=%"PRI64d"\n", bnLowerBound.getuint64(), bnUpperBound.getuint64(), bnMidValue.getuint64());
 
-        return nSubsidy;
+        bnMidPart = bnMidValue * bnMidValue * bnMidValue;
+        bnRewardPart = bnRewardCoinYearLimit * bnRewardCoinYearLimit * bnRewardCoinYearLimit;
+
+        if (bnMidPart * bnTargetLimit > bnRewardPart * bnTarget)
+            bnUpperBound = bnMidValue;
+        else
+            bnLowerBound = bnMidValue;
     }
 
-    static int64 nRewardCoinYear = 5 * CENT;  // interest bound is 5% per year
+    if (nTime > FORK_ADJUST_HARD)
+        nRewardCoinYear = 5 * CENT; //interest bound to 5% per year 
+    else
+        nRewardCoinYear = bnUpperBound.getuint64();
+
+    nRewardCoinYear = min((nRewardCoinYear / CENT) * CENT, MAX_MINT_PROOF_OF_STAKE);
+
     if(bCoinYearOnly)
         return nRewardCoinYear;
-    int64 nSubsidy = nCoinAge * 33 / (365 * 33 + 8) * nRewardCoinYear;
+
+    nSubsidy = (nCoinAge * nRewardCoinYear * 33) / (365 * 33 + 8);
+
+    // Set reasonable reward limit for large inputs
+    // This will stimulate large holders to use smaller inputs, that's good for the network protection
+
+    if(nTime < FORK_FINAL)
+    {
+        if (fDebug && GetBoolArg("-printcreation") && nSubsidyLimit < nSubsidy)
+            printf("GetProofOfStakeReward(): %s is greater than %s, coinstake reward will be truncated\n", FormatMoney(nSubsidy).c_str(), FormatMoney(nSubsidyLimit).c_str());
+
+        nSubsidy = min(nSubsidy, nSubsidyLimit);
+    }
+
     if (fDebug && GetBoolArg("-printcreation"))
-        printf("GetProofOfStakeReward(): create=%s nCoinAge=%" PRI64d"\n", FormatMoney(nSubsidy).c_str(), nCoinAge);
+        printf("GetProofOfStakeReward(): create=%s nCoinAge=%"PRI64d" nBits=%d\n", FormatMoney(nSubsidy).c_str(), nCoinAge, nBits);
+
     return nSubsidy;
 }
 

@@ -3541,7 +3541,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
             return false;
         }
 
-        if(nTime > FORK_ADJUST_SOFT) // Fri, 16 May 2014 00:00:00 GMT
+        if(nTime > FORK_ADJUST_SOFT) // reward adjustment --ofeefee 
         {
             if(pfrom->nVersion < 70014)
                 badVersion = true;

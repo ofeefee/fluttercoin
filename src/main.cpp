@@ -3541,15 +3541,14 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
             return false;
         }
 
-        if(nTime > 1400198400) // Fri, 16 May 2014 00:00:00 GMT
-        {
-            if(pfrom->nVersion < 70009)
-                badVersion = true;
-        }
-
-        if (nTime > FORK_ADJUST_SOFT)
+        if(nTime > FORK_DJUST_SOFT) // Fri, 16 May 2014 00:00:00 GMT
         {
             if(pfrom->nVersion < 70014)
+                badVersion = true;
+        }
+        else
+        {
+            if(pfrom->nVersion < 70007)
                 badVersion = true;
         }
 

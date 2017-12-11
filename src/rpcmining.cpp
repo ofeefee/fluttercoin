@@ -97,6 +97,7 @@ Value getstakinginfo(const Array& params, bool fHelp)
     obj.push_back(Pair("weight", (uint64_t)nWeight));
     obj.push_back(Pair("netstakeweight", (uint64_t)nNetworkWeight));
     obj.push_back(Pair("expectedtime", nExpectedTime));
+    obj.push_back(Pair("stakeinterest",    (uint64_t)GetProofOfStakeReward(0, GetLastBlockIndex(pindexBest, true)->nBits, GetLastBlockIndex(pindexBest, true)->nTime, true)));
     obj.push_back(Pair("hourstomaturity", (uint64_t)nHoursToMaturity));
 
     return obj;

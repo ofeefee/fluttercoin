@@ -1028,7 +1028,7 @@ int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTi
     if (nTime > FORK_ADJUST_HARD) // interest reduction fork
     {
         nRewardCoinYear = 5 * CENT;  // interest bound is 5% per year
-        nSubsidy = nCoinAge * 33 / (365 * 33 + 8) * nRewardCoinYear;
+        nSubsidy = (nCoinAge * nRewardCoinYear * 33) / (365 * 33 + 8);
         if (fDebug && GetBoolArg("-printcreation"))
             printf("GetProofOfStakeReward(): create=%s nCoinAge=%" PRI64d"\n", FormatMoney(nSubsidy).c_str(), nCoinAge);
         return nSubsidy;

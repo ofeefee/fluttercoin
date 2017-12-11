@@ -1023,7 +1023,6 @@ int64 GetProofOfWorkReward(unsigned int nHeight, uint256 hashSeed)
 // miner's coin stake reward based on nBits and coin age spent (coin-days)
 int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTime)
 {
-
     if (nTime > FORK_ADJUST_HARD) // interest reduction fork
     {
         static int64 nRewardCoinYear = 5 * CENT;  // interest bound is 5% per year
@@ -1032,7 +1031,6 @@ int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTi
             printf("GetProofOfStakeReward(): create=%s nCoinAge=%" PRI64d"\n", FormatMoney(nSubsidy).c_str(), nCoinAge);
         return nSubsidy;
     }
-
     int64 nRewardCoinYear, nSubsidy, nSubsidyLimit = 10 * COIN;
     CBigNum bnRewardCoinYearLimit = MAX_MINT_PROOF_OF_STAKE; // Base stake mint rate, 100% year interest
     CBigNum bnTarget;
@@ -1062,7 +1060,6 @@ int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTi
     }
 
     nRewardCoinYear = bnUpperBound.getuint64();
-
     nRewardCoinYear = min((nRewardCoinYear / CENT) * CENT, MAX_MINT_PROOF_OF_STAKE);
 
     nSubsidy = (nCoinAge * nRewardCoinYear * 33) / (365 * 33 + 8);

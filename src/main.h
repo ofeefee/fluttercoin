@@ -40,7 +40,7 @@ static const int64 MAX_MINT_PROOF_OF_STAKE = 1 * COIN;
 static const int64 MIN_TXOUT_AMOUNT = MIN_TX_FEE;
 static const unsigned int ENTROPY_SWITCH_TIME = 1420070399; // Dec 31 2014, 23:59:59 PM GMT
 static const unsigned int FORK_FINAL = 1397936903;
-static const unsigned int FORK_ADJUST_SOFT = 1512950400; // Dec 17 2017, 20:00:00 UTC --ofeefee
+static const unsigned int FORK_ADJUST_SOFT = 1513540800; // Dec 17 2017, 20:00:00 UTC --ofeefee
 static const unsigned int FORK_ADJUST_HARD = 1513800000; // Dec 20 2017, 20:00:00 UTC --ofeefee
 
 string SearchTerm(const char *chAddress);

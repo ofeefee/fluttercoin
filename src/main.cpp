@@ -1023,15 +1023,17 @@ int64 GetProofOfWorkReward(unsigned int nHeight, uint256 hashSeed)
 // miner's coin stake reward based on nBits and coin age spent (coin-days)
 int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTime)
 {
+    int64 nRewardCoinYear, nSubsidy, nSubsidyLimit = 10 * COIN;
+
     if (nTime > FORK_ADJUST_HARD) // interest reduction fork
     {
-        static int64 nRewardCoinYear = 5 * CENT;  // interest bound is 5% per year
-        int64 nSubsidy = nCoinAge * 33 / (365 * 33 + 8) * nRewardCoinYear;
+        nRewardCoinYear = 5 * CENT;  // interest bound is 5% per year
+        nSubsidy = nCoinAge * 33 / (365 * 33 + 8) * nRewardCoinYear;
         if (fDebug && GetBoolArg("-printcreation"))
             printf("GetProofOfStakeReward(): create=%s nCoinAge=%" PRI64d"\n", FormatMoney(nSubsidy).c_str(), nCoinAge);
         return nSubsidy;
     }
-    int64 nRewardCoinYear, nSubsidy, nSubsidyLimit = 10 * COIN;
+
     CBigNum bnRewardCoinYearLimit = MAX_MINT_PROOF_OF_STAKE; // Base stake mint rate, 100% year interest
     CBigNum bnTarget;
     bnTarget.SetCompact(nBits);

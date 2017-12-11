@@ -121,7 +121,7 @@ bool LoadExternalBlockFile(FILE* fileIn);
 bool CheckProofOfWork(uint256 hash, unsigned int nBits);
 unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake);
 int64 GetProofOfWorkReward(unsigned int nHeight, uint256 hashSeed);
-int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTime, bool bCoinYearOnly=false);
+int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTime);
 unsigned int ComputeMinWork(unsigned int nBase, int64 nTime);
 unsigned int ComputeMinStake(unsigned int nBase, int64 nTime, unsigned int nBlockTime);
 int GetNumBlocksOfPeers();

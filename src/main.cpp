@@ -1005,12 +1005,18 @@ int64 GetProofOfWorkReward(unsigned int nHeight, uint256 hashSeed)
         return nSubsidy * COIN;
     }
 
-    if (nHeight > 70037)
+    if (nHeight > 70037 && nHeight <= 1410000)
     {
         nSubsidy = 20;
 
         unsigned int nHeightTemp = nHeight - 70037;
         nSubsidy >>= (nHeightTemp / 262800);
+        return nSubsidy * COIN;
+    }
+
+    if (nHeight > 1410000) //new reward set --ofeefee
+    {
+        nSubsidy = 20;
         return nSubsidy * COIN;
     }
 

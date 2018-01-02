@@ -1005,12 +1005,18 @@ int64 GetProofOfWorkReward(unsigned int nHeight, uint256 hashSeed)
         return nSubsidy * COIN;
     }
 
-    if (nHeight > 70037)
+    if (nHeight > 70037 && nHeight <= 1410000)
     {
         nSubsidy = 20;
 
         unsigned int nHeightTemp = nHeight - 70037;
         nSubsidy >>= (nHeightTemp / 262800);
+        return nSubsidy * COIN;
+    }
+
+    if (nHeight > 1410000) //new reward set --ofeefee
+    {
+        nSubsidy = 20;
         return nSubsidy * COIN;
     }
 
@@ -1024,6 +1030,21 @@ int64 GetProofOfWorkReward(unsigned int nHeight, uint256 hashSeed)
 int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTime, bool bCoinYearOnly)
 {
     int64 nRewardCoinYear, nSubsidy, nSubsidyLimit = 10 * COIN;
+
+    if (nTime > FORK_ADJUST_HARD) // interest reduction fork
+    {
+        nRewardCoinYear = 5 * CENT;  // interest bound is 5% per year
+
+        if(bCoinYearOnly)
+            return nRewardCoinYear;
+
+        nSubsidy = (nCoinAge * nRewardCoinYear * 33) / (365 * 33 + 8);
+        if (fDebug && GetBoolArg("-printcreation"))
+            printf("GetProofOfStakeReward(): create=%s nCoinAge=%" PRI64d"\n", FormatMoney(nSubsidy).c_str(), nCoinAge);
+
+        return nSubsidy;
+    }
+
     CBigNum bnRewardCoinYearLimit = MAX_MINT_PROOF_OF_STAKE; // Base stake mint rate, 100% year interest
     CBigNum bnTarget;
     bnTarget.SetCompact(nBits);
@@ -3538,9 +3559,9 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
             return false;
         }
 
-        if(nTime > 1400198400) // Fri, 16 May 2014 00:00:00 GMT
+        if(nTime > FORK_ADJUST_SOFT) // reward adjustment --ofeefee
         {
-            if(pfrom->nVersion < 70009)
+            if(pfrom->nVersion < 70014)
                 badVersion = true;
         }
         else

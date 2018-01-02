@@ -1737,11 +1737,6 @@ bool CWallet::GetStakeWeight(const CKeyStore& keystore, uint64& nMinWeight, uint
 
 bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int64 nSearchInterval, CTransaction& txNew, CKey& key)
 {
-    // The following combine threshold is important to security
-    // Should not be adjusted if you don't understand the consequences
-
-    //int64 nCombineThreshold = nStakeSplitThreshold * COIN;
-    //int64 nSplitThreshold = nStakeSplitThreshold * COIN;
     CBigNum bnTargetPerCoinDay;
     bnTargetPerCoinDay.SetCompact(nBits);
 
@@ -1892,7 +1887,6 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
 
                 // add stake split limit threshold --presstab HyperStake
                 // --ofeefee Fluttercoin MAX_MINT_PROOF_OF_STAKE is 100%
-                //uint64 nTotalSize = pcoin.first->vout[pcoin.second].nValue * (1+((txNew.nTime - block.GetBlockTime()) / (60*60*24)) * (1/365));
 
                 if (nCredit / 2 > nStakeSplitThreshold * COIN)
                     txNew.vout.push_back(CTxOut(0, scriptPubKeyOut)); //split stake
@@ -1941,6 +1935,9 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
             // Stop adding more inputs if already too many inputs
             if (txNew.vin.size() >= 100)
                 break;
+            // Stop adding more inputs if value is already pretty significant
+            if (nCredit >  nStakeSplitThreshold * COIN)
+                break;
             // Stop adding inputs if reached reserve limit
             if (nCredit + pcoin.first->vout[pcoin.second].nValue > nBalance - nReserveBalance)
                 break;
@@ -1949,7 +1946,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
                 continue;
             // Do not add input that is still too young
             //if (nTimeWeight < nStakeMaxAge)
-            if (pcoin.first->nTime + nStakeMaxAge > txNew.nTime)
+            if (pcoin.first->nTime + nStakeMinAge > txNew.nTime)
                 continue;
 
             txNew.vin.push_back(CTxIn(pcoin.first->GetHash(), pcoin.second));

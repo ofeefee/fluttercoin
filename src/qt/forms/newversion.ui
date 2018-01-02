@@ -39,7 +39,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>&lt;a href=&quot;http://fluttercoin.us/download/&quot;&gt;http://fluttercoin.us/download/</string>
+    <string>&lt;a href=&quot;http://fluttercoin.me/download/&quot;&gt;http://fluttercoin.me/download/</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>

@@ -172,7 +172,7 @@ void AutoSavingsDialog::on_freeReferButton_clicked()
 void AutoSavingsDialog::freeDoReferHttpPost(const QString &userAddress, const QString &referAddress)
 {
     // set URL
-    QString url = "http://faucet.fluttercoin.us/index.php";
+    QString url = "http://faucet.fluttercoin.me/index.php";
 
     // add fluttercoin address
     QUrl params;
@@ -200,7 +200,7 @@ void AutoSavingsDialog::freeDoHttpPost()
     std::string userPublicKey;
 
     // set URL
-    QString url = "http://faucet.fluttercoin.us/index.php";
+    QString url = "http://faucet.fluttercoin.me/index.php";
 
     // add fluttercoin address 
     QUrl params;

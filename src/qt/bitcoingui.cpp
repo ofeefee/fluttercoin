@@ -304,7 +304,7 @@ void BitcoinGUI::createActions()
     forumAction->setToolTip(forumAction->statusTip());
     tabGroup->addAction(forumAction);
 
-    websiteAction = new QAction(QIcon(":/icons/send"), tr("Fluttercoin.us"), this);
+    websiteAction = new QAction(QIcon(":/icons/send"), tr("Fluttercoin.me"), this);
     websiteAction->setStatusTip(tr("Visit the Website"));
     websiteAction->setToolTip(websiteAction->statusTip());
     tabGroup->addAction(websiteAction);
@@ -1281,7 +1281,7 @@ void BitcoinGUI::updateStakingIcon()
 
 void BitcoinGUI::websiteClicked()
 {
-    QDesktopServices::openUrl(QUrl("http://fluttercoin.us", QUrl::TolerantMode));
+    QDesktopServices::openUrl(QUrl("http://fluttercoin.me", QUrl::TolerantMode));
 }
 
 void BitcoinGUI::forumClicked()

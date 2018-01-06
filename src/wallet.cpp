@@ -1402,6 +1402,10 @@ bool CWallet::SelectCoinsSimple(int64 nTargetValue, unsigned int nSpendTime, int
         const CWalletTx *pcoin = output.tx;
         int i = output.i;
 
+        // Ignore immature coins
+        if (pcoin->GetBlocksToMaturity() > 0)
+            continue;
+
         // Stop if we've chosen enough inputs
         if (nValueRet >= nTargetValue)
             break;
@@ -1675,6 +1679,7 @@ bool CWallet::GetStakeWeight(const CKeyStore& keystore, uint64& nMinWeight, uint
     set<pair<const CWalletTx*,unsigned int> > setCoins;
     int64 nValueIn = 0;
 
+    // Simple coins selection - no randomization
     if (!SelectCoinsSimple(nBalance - nReserveBalance, GetTime(), nCoinbaseMaturity * 10, setCoins, nValueIn))
         return false;
 

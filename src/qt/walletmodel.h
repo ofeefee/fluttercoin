@@ -142,6 +142,7 @@ public:
     void lockCoin(COutPoint& output);
     void unlockCoin(COutPoint& output);
     void listLockedCoins(std::vector<COutPoint>& vOutpts);
+    void clearOrphans();
     bool isMine(const CBitcoinAddress &address);
 
 private:

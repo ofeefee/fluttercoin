@@ -536,3 +536,8 @@ bool WalletModel::isMine(const CBitcoinAddress &address)
 {
     return IsMine(*wallet, address.Get());
 }
+
+void WalletModel::clearOrphans()
+{
+    wallet->ClearOrphans();
+}

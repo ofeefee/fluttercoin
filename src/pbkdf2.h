@@ -1,3 +1,4 @@
+// Copyright (c) 2014-2018 Fluttercoin Developers
 // Copyright (c) 2013 FlutterCoin Developers
 
 #ifndef PBKDF2_H

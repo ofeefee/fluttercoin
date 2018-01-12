@@ -1,3 +1,5 @@
+// Copyright (c) 2014-2018 Fluttercoin Developers
+// Copyright (c) 2014-2018 Fluttercoin Developers
 // Copyright (c) 2012 The Bitcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -6,7 +8,7 @@
 #include "version.h"
 
 // Name of client reported in the 'version' message. Report the same name
-// for both bitcoind and bitcoin-qt, to make it harder for attackers to
+// for both fluttercoind and fluttercoin-qt, to make it harder for attackers to
 // target servers or GUI users specifically.
 const std::string CLIENT_NAME("Fluttercoin");
 

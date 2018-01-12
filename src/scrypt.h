@@ -1,3 +1,4 @@
+// Copyright (c) 2014-2018 Fluttercoin Developers
 #ifndef SCRYPT_MINE_H
 #define SCRYPT_MINE_H
 

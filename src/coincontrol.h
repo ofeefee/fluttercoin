@@ -1,3 +1,4 @@
+// Copyright (c) 2014-2018 Fluttercoin Developers
 #ifndef COINCONTROL_H
 #define COINCONTROL_H
 

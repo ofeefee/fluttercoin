@@ -1,3 +1,4 @@
+// Copyright (c) 2014-2018 Fluttercoin Developers
 /*
  * Copyright 2012 pooler@litecoinpool.org
  *

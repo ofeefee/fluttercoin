@@ -1,3 +1,4 @@
+// Copyright (c) 2014-2018 Fluttercoin Developers
 #include <iostream>
 #include <boost/asio/ip/tcp.hpp>
 

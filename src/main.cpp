@@ -14,7 +14,6 @@
 #include "ui_interface.h"
 #include "kernel.h"
 #include "smessage.h"
-#include "zerocoin/Zerocoin.h"
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -37,7 +36,6 @@ unsigned int nTransactionsUpdated = 0;
 
 map<uint256, CBlockIndex*> mapBlockIndex;
 set<pair<COutPoint, unsigned int> > setStakeSeen;
-libzerocoin::Params* ZCParams;
 
 CBigNum bnProofOfWorkLimit(~uint256(0) >> 20); // "standard" scrypt target limit for proof of work, results with 0,000244140625 proof-of-work difficulty
 CBigNum bnProofOfStakeLimit(~uint256(0) >> 27);
@@ -3173,9 +3171,6 @@ bool LoadBlockIndex(bool fAllowNew)
     {
         bnTrustedModulus.SetHex("9ff28c9cb5039df509a37260e10ae66ef880a538824de54e78051eed6a95ceb0509dd160eb77ec47279453c3b2e58f1ac25a607277d403e05a8ae5e8e4c8365fa3eec911f9a1e0a4ad58bc4c5a3531c5632e13a94526851c618f59715842c56b31af96b973a7c0bae154cddd8f67985783f299616d588f7fe1942d3f2a766711b8690cc3a225d52d93130594e130a17e51602eda21a03dc955075b6fa20f3d4e25a91d32b0aef75d8ca05802fa159f94b9b0f2e385744bc6105b744727ea063b59e8cf838fcf5dcd31d399919db49cd1c73ea9bff02be4e92c3766b65219ae79ee2bb61441d4362c8251d2f2d97314c7e56a40e21b13fa5016e16482065bd797960a04069b97b23bcbe699e78e87fec1d8ea1f035e0ac643bb5a873ed0a2282ccfa31b5fd464264a793025e8357841596e4d995d95092980b73616345d37acb9284344cf862dc5c5729f32abc46e96603e1d3ff5263fc7d02b2eb62d35dc4b3b958d5b3e4bbd3884a5a112903552354a400db24fc60e2a4fb35eb151f8b57cd8dde7b68c1bfe2755f05c4af071c1f15d58b59d56761a72b03277e03d75156733b19bcdf2b62cd58e56e7f774c22856f8ece7c6e49445e481f29b265390e785e7857046d45a671b9a435642cfa445c47d8e8e2212fe3073bd86577e0083be490db1cf4a14095dc958eab7b4ca3c45c900bb68c9928d41859a70ad602fcc7c4309");
     }
-
-    // Set up the Zerocoin Params object
-    ZCParams = new libzerocoin::Params(bnTrustedModulus);
 
     //
     // Load block index

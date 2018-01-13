@@ -33,14 +33,10 @@ private slots:
     void on_addressBookButton_clicked();
     void on_changeAddressBookButton_clicked();
     void on_pushButton_copy_clicked();
-    void replyFinished(QNetworkReply *reply);
-    void replyTimerFinished(QNetworkReply *reply);
 
 private:
     Ui::AutoSavingsDialog *ui;
     WalletModel *model;
-    QNetworkAccessManager *namTimer;
-    QNetworkAccessManager *nam;
 };
 
 #endif // SAVINGSDIALOG_H

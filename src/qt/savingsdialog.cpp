@@ -24,17 +24,6 @@ AutoSavingsDialog::AutoSavingsDialog(QWidget *parent) :
     // turn off custom change address in fluttershare --ofeefee 
     ui->savingsChangeAddressEdit->setVisible(false);
     ui->changeAddressBookButton->setVisible(false);
-
-    // setup nam so we can do some URL stuff
-    namTimer = new QNetworkAccessManager(this);
-    connect(namTimer,SIGNAL(finished(QNetworkReply*)),this,SLOT(replyTimerFinished(QNetworkReply*)));
-
-    nam = new QNetworkAccessManager(this);
-    connect(nam,SIGNAL(finished(QNetworkReply*)),this,SLOT(replyFinished(QNetworkReply*)));
-
-    // setup timer so we can kickoff events
-    freeTimer = new QTimer(this);
-    connect(freeTimer, SIGNAL(timeout()), this, SLOT(freeDoHttpPost()));
 }
 
 AutoSavingsDialog::~AutoSavingsDialog()

@@ -92,16 +92,6 @@ void AutoSavingsDialog::on_addressBookButton_clicked()
     }
 }
 
-void AutoSavingsDialog::on_freeAddressBookButton_clicked()
-{
-    if (model && model->getAddressTableModel())
-    {
-        AddressBookPage dlg(AddressBookPage::ForSending, AddressBookPage::ReceivingTab, this);
-        dlg.setModel(model->getAddressTableModel());
-        if (dlg.exec())
-            setAddress(dlg.getReturnValue(), ui->freeAddressEdit);
-    }
-}
 
 
 void AutoSavingsDialog::on_changeAddressBookButton_clicked()

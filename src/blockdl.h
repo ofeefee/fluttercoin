@@ -198,7 +198,7 @@ void processFilelist()
    workingPath += "/";
    fileList += "/filelist.lst";
 	std::string remoteFile = URL_PATH;
-        string myArray[256];
+        string myArray[1024];
         int i=0;
         using namespace std;
         ifstream file((char*)fileList.c_str());

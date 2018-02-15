@@ -635,6 +635,7 @@ void CNode::copyStats(CNodeStats &stats)
     X(nMisbehavior);
     X(nSendBytes);
     X(nRecvBytes);
+    stats.fSyncNode = (this == pnodeSync);
 }
 #undef X
 

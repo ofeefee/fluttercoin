@@ -146,6 +146,7 @@ public:
     int nMisbehavior;
     uint64 nSendBytes;
     uint64 nRecvBytes;
+    bool fSyncNode;
 };
 
 class CNetMessage {

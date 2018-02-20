@@ -265,7 +265,7 @@ void downloadAndReplaceBlockchain()
                 processFilelist();      //reads the filelist and downloads all files in the list
                 //        SoftSetBoolArg("-checkblocks", 0);// Once were done check entire chain
                 SoftSetBoolArg("-rescan", true);// Once were done rescan entire chain for tx
-                printf("Download      %15"PRI64d"ms\n", GetTimeMillis() - sDownload);
+                printf("Download      %15" PRI64d"ms\n", GetTimeMillis() - sDownload);
         }
         else if(fileStatus == 404)
         {

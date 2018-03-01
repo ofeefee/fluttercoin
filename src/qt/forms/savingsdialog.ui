@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>850</width>
-    <height>400</height>
+    <width>652</width>
+    <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,7 +22,7 @@
      <x>20</x>
      <y>130</y>
      <width>131</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="toolTip">
@@ -57,10 +57,10 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>30</x>
      <y>20</y>
-     <width>611</width>
-     <height>41</height>
+     <width>591</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="lineWidth">
@@ -79,10 +79,10 @@
   <widget class="QLineEdit" name="savingsMinEdit">
    <property name="geometry">
     <rect>
-     <x>160</x>
+     <x>500</x>
      <y>130</y>
      <width>131</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="toolTip">
@@ -95,10 +95,10 @@
   <widget class="QLineEdit" name="savingsMaxEdit">
    <property name="geometry">
     <rect>
-     <x>300</x>
-     <y>130</y>
+     <x>500</x>
+     <y>160</y>
      <width>131</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="toolTip">
@@ -115,7 +115,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>210</y>
+     <y>250</y>
      <width>611</width>
      <height>21</height>
     </rect>
@@ -127,10 +127,10 @@
   <widget class="QPushButton" name="enableButton">
    <property name="geometry">
     <rect>
-     <x>350</x>
-     <y>180</y>
+     <x>80</x>
+     <y>210</y>
      <width>75</width>
-     <height>21</height>
+     <height>23</height>
     </rect>
    </property>
    <property name="statusTip">
@@ -143,10 +143,10 @@
   <widget class="QPushButton" name="disableButton">
    <property name="geometry">
     <rect>
-     <x>430</x>
-     <y>180</y>
+     <x>160</x>
+     <y>210</y>
      <width>75</width>
-     <height>21</height>
+     <height>23</height>
     </rect>
    </property>
    <property name="statusTip">
@@ -185,9 +185,9 @@
   <widget class="QLineEdit" name="savingsChangeAddressEdit">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>260</y>
-     <width>301</width>
+     <x>110</x>
+     <y>190</y>
+     <width>481</width>
      <height>21</height>
     </rect>
    </property>
@@ -201,8 +201,8 @@
   <widget class="QPushButton" name="changeAddressBookButton">
    <property name="geometry">
     <rect>
-     <x>320</x>
-     <y>260</y>
+     <x>590</x>
+     <y>190</y>
      <width>28</width>
      <height>21</height>
     </rect>
@@ -240,27 +240,40 @@
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>180</x>
-     <y>110</y>
-     <width>101</width>
+     <x>430</x>
+     <y>130</y>
+     <width>71</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>Min(optional)</string>
+    <string>Minimum</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>320</x>
-     <y>110</y>
-     <width>101</width>
+     <x>430</x>
+     <y>160</y>
+     <width>71</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>Max(optional)</string>
+    <string>Maximum</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>106</y>
+     <width>141</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Advanced Settings</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_6">
@@ -276,164 +289,59 @@
     <string>Donation Address</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="freeAddressEdit">
+  <widget class="QWidget" name="horizontalLayoutWidget">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>330</y>
-     <width>301</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="toolTip">
-    <string>Enter Fluttercoin address</string>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="placeholderText">
-    <string>FShqpDupfZKaw6zkDyqYhZop3P86NRZiet</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="freeAddressBookButton">
-   <property name="geometry">
-    <rect>
-     <x>320</x>
-     <y>330</y>
-     <width>28</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="toolTip">
-    <string>Choose an address from the address book</string>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="icon">
-    <iconset resource="../bitcoin.qrc">
-     <normaloff>:/icons/address-book</normaloff>:/icons/address-book</iconset>
-   </property>
-   <property name="shortcut">
-    <string>Alt+A</string>
-   </property>
-   <property name="autoDefault">
-    <bool>false</bool>
-   </property>
-  </widget>
-  <widget class="QLabel" name="freelabel">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>310</y>
-     <width>331</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Free Fluttercoins for running the app each day!</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="freeRequestButton">
-   <property name="geometry">
-    <rect>
-     <x>350</x>
-     <y>330</y>
-     <width>75</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="statusTip">
-    <string>Get Free Fluttercoins</string>
-   </property>
-   <property name="text">
-    <string>Enable</string>
-   </property>
-  </widget>
-  <widget class="Line" name="line">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>290</y>
-     <width>611</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-  </widget>
-  <widget class="QLabel" name="freeMessage">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>360</y>
+     <y>60</y>
      <width>611</width>
      <height>21</height>
     </rect>
    </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_7">
-   <property name="geometry">
-    <rect>
-     <x>110</x>
-     <y>70</y>
-     <width>481</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>FShqpDupfZKaw6zkDyqYhZop3P86NRZiet - Fluttercoin Bounty Fund</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pushButton_copy">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>70</y>
-     <width>85</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Copy</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="freeDisableButton">
-   <property name="geometry">
-    <rect>
-     <x>430</x>
-     <y>330</y>
-     <width>75</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="statusTip">
-    <string>Get Free Fluttercoins</string>
-   </property>
-   <property name="text">
-    <string>Disable</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="freeReferButton">
-   <property name="geometry">
-    <rect>
-     <x>510</x>
-     <y>330</y>
-     <width>75</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Friend</string>
-   </property>
-   <property name="icon">
-    <iconset resource="../bitcoin.qrc">
-     <normaloff>:/icons/add</normaloff>:/icons/add</iconset>
-   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QLabel" name="label_7">
+      <property name="text">
+       <string>Fluttercoin Bounty Fund - FShqpDupfZKaw6zkDyqYhZop3P86NRZiet</string>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <widget class="QPushButton" name="pushButton_copy">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="baseSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>Copy</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources>

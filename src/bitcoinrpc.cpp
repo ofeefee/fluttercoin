@@ -1,3 +1,4 @@
+// Copyright (c) 2014-2018 Fluttercoin Developers
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin, Novacoin, and FlutterCoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
@@ -415,7 +416,7 @@ static string HTTPReply(int nStatus, const string& strMsg, bool keepalive)
             "HTTP/1.1 %d %s\r\n"
             "Date: %s\r\n"
             "Connection: %s\r\n"
-            "Content-Length: %"PRIszu"\r\n"
+            "Content-Length: %" PRIszu"\r\n"
             "Content-Type: application/json\r\n"
             "Server: fluttercoin-json-rpc/%s\r\n"
             "\r\n"

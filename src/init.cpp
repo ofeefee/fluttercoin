@@ -1,3 +1,4 @@
+// Copyright (c) 2014-2018 Fluttercoin Developers
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin, Novacoin, and FlutterCoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
@@ -108,7 +109,7 @@ void Shutdown(void* parg)
         printf("FlutterCoin exited\n\n");
         fExit = true;
 #ifndef QT_GUI
-        // ensure non-UI client gets exited here, but let Bitcoin-Qt reach 'return 0;' in bitcoin.cpp
+        // ensure non-UI client gets exited here, but let fluttercoin-Qt reach 'return 0;' in bitcoin.cpp
         exit(0);
 #endif
     }
@@ -778,14 +779,14 @@ if (firstRunCheck() == 0)
 
 
     // as LoadBlockIndex can take several minutes, it's possible the user
-    // requested to kill bitcoin-qt during the last operation. If so, exit.
+    // requested to kill fluttercoin-qt during the last operation. If so, exit.
     // As the program has not fully started yet, Shutdown() is possibly overkill.
     if (fRequestShutdown)
     {
         printf("Shutdown requested. Exiting.\n");
         return false;
     }
-    printf(" block index %15"PRI64d"ms\n", GetTimeMillis() - nStart);
+    printf(" block index %15" PRI64d"ms\n", GetTimeMillis() - nStart);
 
     if (GetBoolArg("-printblockindex") || GetBoolArg("-printblocktree"))
     {
@@ -886,7 +887,7 @@ if (firstRunCheck() == 0)
     }
 
     printf("%s", strErrors.str().c_str());
-    printf(" wallet      %15"PRI64d"ms\n", GetTimeMillis() - nStart);
+    printf(" wallet      %15" PRI64d"ms\n", GetTimeMillis() - nStart);
 
     RegisterWallet(pwalletMain);
 
@@ -906,7 +907,7 @@ if (firstRunCheck() == 0)
         printf("Rescanning last %i blocks (from block %i)...\n", pindexBest->nHeight - pindexRescan->nHeight, pindexRescan->nHeight);
         nStart = GetTimeMillis();
         pwalletMain->ScanForWalletTransactions(pindexRescan, true);
-        printf(" rescan      %15"PRI64d"ms\n", GetTimeMillis() - nStart);
+        printf(" rescan      %15" PRI64d"ms\n", GetTimeMillis() - nStart);
     }
 
     // ********************************************************* Step 9: import blocks
@@ -948,7 +949,7 @@ if (firstRunCheck() == 0)
             printf("Invalid or missing peers.dat; recreating\n");
     }
 
-    printf("Loaded %i addresses from peers.dat  %"PRI64d"ms\n",
+    printf("Loaded %i addresses from peers.dat  %" PRI64d"ms\n",
            addrman.size(), GetTimeMillis() - nStart);
 
     // ********************************************************* Step 10.1: startup secure messaging
@@ -963,11 +964,11 @@ if (firstRunCheck() == 0)
     RandAddSeedPerfmon();
 
     //// debug print
-    printf("mapBlockIndex.size() = %"PRIszu"\n",   mapBlockIndex.size());
+    printf("mapBlockIndex.size() = %" PRIszu"\n",   mapBlockIndex.size());
     printf("nBestHeight = %d\n",            nBestHeight);
-    printf("setKeyPool.size() = %"PRIszu"\n",      pwalletMain->setKeyPool.size());
-    printf("mapWallet.size() = %"PRIszu"\n",       pwalletMain->mapWallet.size());
-    printf("mapAddressBook.size() = %"PRIszu"\n",  pwalletMain->mapAddressBook.size());
+    printf("setKeyPool.size() = %" PRIszu"\n",      pwalletMain->setKeyPool.size());
+    printf("mapWallet.size() = %" PRIszu"\n",       pwalletMain->mapWallet.size());
+    printf("mapAddressBook.size() = %" PRIszu"\n",  pwalletMain->mapAddressBook.size());
 
     if (!NewThread(StartNode, NULL))
         InitError(_("Error: could not start node"));

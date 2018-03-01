@@ -1,3 +1,4 @@
+// Copyright (c) 2014-2018 Fluttercoin Developers
 //
 // Alert system
 //
@@ -55,8 +56,8 @@ std::string CUnsignedAlert::ToString() const
     return strprintf(
         "CAlert(\n"
         "    nVersion     = %d\n"
-        "    nRelayUntil  = %"PRI64d"\n"
-        "    nExpiration  = %"PRI64d"\n"
+        "    nRelayUntil  = %" PRI64d"\n"
+        "    nExpiration  = %" PRI64d"\n"
         "    nID          = %d\n"
         "    nCancel      = %d\n"
         "    setCancel    = %s\n"

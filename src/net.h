@@ -1,3 +1,4 @@
+// Copyright (c) 2014-2018 Fluttercoin Developers
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin, Novacoin, and FlutterCoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
@@ -18,6 +19,7 @@
 #include "netbase.h"
 #include "protocol.h"
 #include "addrman.h"
+#include "hash.h"
 
 class CRequestTracker;
 class CNode;
@@ -144,6 +146,7 @@ public:
     int nMisbehavior;
     uint64 nSendBytes;
     uint64 nRecvBytes;
+    bool fSyncNode;
 };
 
 class CNetMessage {
@@ -254,6 +257,7 @@ public:
     CBlockIndex* pindexLastGetBlocksBegin;
     uint256 hashLastGetBlocksEnd;
     int nStartingHeight;
+    bool fStartSync;
 
     // flood relay
     std::vector<CAddress> vAddrToSend;
@@ -297,6 +301,7 @@ public:
         pindexLastGetBlocksBegin = 0;
         hashLastGetBlocksEnd = 0;
         nStartingHeight = -1;
+        fStartSync = false;
         fGetAddr = false;
         nMisbehavior = 0;
         hashCheckpointKnown = 0;
@@ -384,7 +389,7 @@ public:
         // the key is the earliest time the request can be sent
         int64& nRequestTime = mapAlreadyAskedFor[inv];
         if (fDebugNet)
-            printf("askfor %s   %"PRI64d" (%s)\n", inv.ToString().c_str(), nRequestTime, DateTimeStrFormat("%H:%M:%S", nRequestTime/1000000).c_str());
+            printf("askfor %s   %" PRI64d" (%s)\n", inv.ToString().c_str(), nRequestTime, DateTimeStrFormat("%H:%M:%S", nRequestTime/1000000).c_str());
 
         // Make sure not to reuse time indexes to keep things in the same order
         int64 nNow = (GetTime() - 1) * 1000000;

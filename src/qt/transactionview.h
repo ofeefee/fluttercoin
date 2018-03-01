@@ -67,6 +67,7 @@ private slots:
     void copyAmount();
     void copyTxID();
     void showBrowser();
+    void clearOrphans();
 
 signals:
     void doubleClicked(const QModelIndex&);

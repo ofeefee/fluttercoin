@@ -1,3 +1,4 @@
+// Copyright (c) 2014-2018 Fluttercoin Developers
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin, Novacoin, and FlutterCoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
@@ -11,7 +12,7 @@
 #include "allocators.h"
 #include "serialize.h"
 #include "uint256.h"
-#include "util.h"
+#include "hash.h"
 
 #include <openssl/ec.h> // for EC_KEY definition
 

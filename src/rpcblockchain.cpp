@@ -1,3 +1,4 @@
+// Copyright (c) 2014-2018 Fluttercoin Developers
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin, Novacoin, and FlutterCoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
@@ -92,6 +93,9 @@ double GetPoSKernelPS(const CBlockIndex* blockindex)
         pindex = pindex->pprev;
     }
 
+    if (!nStakesHandled)
+        return 0;
+
     return dStakeKernelsTriedAvg / nStakesTime;
 }
 
@@ -131,7 +135,7 @@ Object blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool fPri
 
     result.push_back(Pair("proofhash", blockindex->IsProofOfStake()? blockindex->hashProofOfStake.GetHex() : blockindex->GetBlockHash().GetHex()));
     result.push_back(Pair("entropybit", (int)blockindex->GetStakeEntropyBit()));
-    result.push_back(Pair("modifier", strprintf("%016"PRI64x, blockindex->nStakeModifier)));
+    result.push_back(Pair("modifier", strprintf("%016" PRI64x, blockindex->nStakeModifier)));
     result.push_back(Pair("modifierchecksum", strprintf("%08x", blockindex->nStakeModifierChecksum)));
     Array txinfo;
     BOOST_FOREACH (const CTransaction& tx, block.vtx)

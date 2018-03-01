@@ -1,3 +1,4 @@
+// Copyright (c) 2014-2018 Fluttercoin Developers
 // Copyright (c) 2012 The Bitcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -52,7 +53,7 @@ static const int MEMPOOL_GD_VERSION = 70000;
 #define DISPLAY_VERSION_MAJOR       0
 #define DISPLAY_VERSION_MINOR       7
 #define DISPLAY_VERSION_REVISION    5
-#define DISPLAY_VERSION_BUILD       21 
+#define DISPLAY_VERSION_BUILD       22
 
 static const int DISPLAY_VERSION =
                            1000000 * DISPLAY_VERSION_MAJOR

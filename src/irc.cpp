@@ -1,3 +1,4 @@
+// Copyright (c) 2014-2018 Fluttercoin Developers
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin, Novacoin, and FlutterCoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
@@ -260,7 +261,7 @@ void ThreadIRCSeed2(void* parg)
         if (!fNoListen && GetLocal(addrLocal, &addrIPv4) && nNameRetry<3)
             strMyName = EncodeAddress(GetLocalAddress(&addrConnect));
         if (strMyName == "")
-            strMyName = strprintf("x%"PRI64u"", GetRand(1000000000));
+            strMyName = strprintf("x%" PRI64u"", GetRand(1000000000));
 
         Send(hSocket, strprintf("NICK %s\r", strMyName.c_str()).c_str());
         Send(hSocket, strprintf("USER %s 8 * : %s\r", strMyName.c_str(), strMyName.c_str()).c_str());

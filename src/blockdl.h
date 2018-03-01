@@ -1,3 +1,4 @@
+// Copyright (c) 2014-2018 Fluttercoin Developers
 #ifndef BLOCKDL_H
 #define BLOCKDL_H
 
@@ -197,7 +198,7 @@ void processFilelist()
    workingPath += "/";
    fileList += "/filelist.lst";
 	std::string remoteFile = URL_PATH;
-        string myArray[256];
+        string myArray[1024];
         int i=0;
         using namespace std;
         ifstream file((char*)fileList.c_str());
@@ -264,7 +265,7 @@ void downloadAndReplaceBlockchain()
                 processFilelist();      //reads the filelist and downloads all files in the list
                 //        SoftSetBoolArg("-checkblocks", 0);// Once were done check entire chain
                 SoftSetBoolArg("-rescan", true);// Once were done rescan entire chain for tx
-                printf("Download      %15"PRI64d"ms\n", GetTimeMillis() - sDownload);
+                printf("Download      %15" PRI64d"ms\n", GetTimeMillis() - sDownload);
         }
         else if(fileStatus == 404)
         {

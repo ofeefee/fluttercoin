@@ -1,3 +1,4 @@
+// Copyright (c) 2014-2018 Fluttercoin Developers
 // Copyright (c) 2009-2012 Bitcoin Developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -52,7 +53,7 @@ Value getpeerinfo(const Array& params, bool fHelp)
         Object obj;
 
         obj.push_back(Pair("addr", stats.addrName));
-        obj.push_back(Pair("services", strprintf("%08"PRI64x, stats.nServices)));
+        obj.push_back(Pair("services", strprintf("%08" PRI64x, stats.nServices)));
         obj.push_back(Pair("lastsend", (boost::int64_t)stats.nLastSend));
         obj.push_back(Pair("lastrecv", (boost::int64_t)stats.nLastRecv));
         obj.push_back(Pair("bytessent", (boost::int64_t)stats.nSendBytes));
@@ -63,6 +64,9 @@ Value getpeerinfo(const Array& params, bool fHelp)
         obj.push_back(Pair("inbound", stats.fInbound));
         obj.push_back(Pair("startingheight", stats.nStartingHeight));
         obj.push_back(Pair("banscore", stats.nMisbehavior));
+
+        if (stats.fSyncNode)
+            obj.push_back(Pair("syncnode", true));
 
         ret.push_back(obj);
     }

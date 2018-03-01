@@ -1,3 +1,4 @@
+// Copyright (c) 2014-2018 Fluttercoin Developers
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin, Novacoin, and FlutterCoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
@@ -922,7 +923,7 @@ void CWallet::ReacceptWalletTransactions()
                 // Update fSpent if a tx got spent somewhere else by a copy of wallet.dat
                 if (txindex.vSpent.size() != wtx.vout.size())
                 {
-                    printf("ERROR: ReacceptWalletTransactions() : txindex.vSpent.size() %"PRIszu" != wtx.vout.size() %"PRIszu"\n", txindex.vSpent.size(), wtx.vout.size());
+                    printf("ERROR: ReacceptWalletTransactions() : txindex.vSpent.size() %" PRIszu" != wtx.vout.size() %" PRIszu"\n", txindex.vSpent.size(), wtx.vout.size());
                     continue;
                 }
                 for (unsigned int i = 0; i < txindex.vSpent.size(); i++)
@@ -1402,6 +1403,10 @@ bool CWallet::SelectCoinsSimple(int64 nTargetValue, unsigned int nSpendTime, int
         const CWalletTx *pcoin = output.tx;
         int i = output.i;
 
+        // Ignore immature coins
+        if (pcoin->GetBlocksToMaturity() > 0)
+            continue;
+
         // Stop if we've chosen enough inputs
         if (nValueRet >= nTargetValue)
             break;
@@ -1675,6 +1680,7 @@ bool CWallet::GetStakeWeight(const CKeyStore& keystore, uint64& nMinWeight, uint
     set<pair<const CWalletTx*,unsigned int> > setCoins;
     int64 nValueIn = 0;
 
+    // Simple coins selection - no randomization
     if (!SelectCoinsSimple(nBalance - nReserveBalance, GetTime(), nCoinbaseMaturity * 10, setCoins, nValueIn))
         return false;
 
@@ -2198,12 +2204,12 @@ void CWallet::PrintWallet(const CBlock& block)
         if (block.IsProofOfWork() && mapWallet.count(block.vtx[0].GetHash()))
         {
             CWalletTx& wtx = mapWallet[block.vtx[0].GetHash()];
-            printf("    mine:  %d  %d  %"PRI64d"", wtx.GetDepthInMainChain(), wtx.GetBlocksToMaturity(), wtx.GetCredit());
+            printf("    mine:  %d  %d  %" PRI64d"", wtx.GetDepthInMainChain(), wtx.GetBlocksToMaturity(), wtx.GetCredit());
         }
         if (block.IsProofOfStake() && mapWallet.count(block.vtx[1].GetHash()))
         {
             CWalletTx& wtx = mapWallet[block.vtx[1].GetHash()];
-            printf("    stake: %d  %d  %"PRI64d"", wtx.GetDepthInMainChain(), wtx.GetBlocksToMaturity(), wtx.GetCredit());
+            printf("    stake: %d  %d  %" PRI64d"", wtx.GetDepthInMainChain(), wtx.GetBlocksToMaturity(), wtx.GetCredit());
          }
 
     }
@@ -2266,7 +2272,7 @@ bool CWallet::NewKeyPool()
             walletdb.WritePool(nIndex, CKeyPool(GenerateNewKey()));
             setKeyPool.insert(nIndex);
         }
-        printf("CWallet::NewKeyPool wrote %"PRI64d" new keys\n", nKeys);
+        printf("CWallet::NewKeyPool wrote %" PRI64d" new keys\n", nKeys);
     }
     return true;
 }
@@ -2296,7 +2302,7 @@ bool CWallet::TopUpKeyPool(unsigned int nSize)
             if (!walletdb.WritePool(nEnd, CKeyPool(GenerateNewKey())))
                 throw runtime_error("TopUpKeyPool() : writing generated key failed");
             setKeyPool.insert(nEnd);
-            printf("keypool added key %"PRI64d", size=%"PRIszu"\n", nEnd, setKeyPool.size());
+            printf("keypool added key %" PRI64d", size=%" PRIszu"\n", nEnd, setKeyPool.size());
         }
     }
     return true;
@@ -2326,7 +2332,7 @@ void CWallet::ReserveKeyFromKeyPool(int64& nIndex, CKeyPool& keypool)
             throw runtime_error("ReserveKeyFromKeyPool() : unknown key in key pool");
         assert(keypool.vchPubKey.IsValid());
         if (fDebug && GetBoolArg("-printkeypool"))
-            printf("keypool reserve %"PRI64d"\n", nIndex);
+            printf("keypool reserve %" PRI64d"\n", nIndex);
     }
 }
 
@@ -2354,7 +2360,7 @@ void CWallet::KeepKey(int64 nIndex)
         walletdb.ErasePool(nIndex);
     }
     if(fDebug)
-        printf("keypool keep %"PRI64d"\n", nIndex);
+        printf("keypool keep %" PRI64d"\n", nIndex);
 }
 
 void CWallet::ReturnKey(int64 nIndex)
@@ -2365,7 +2371,7 @@ void CWallet::ReturnKey(int64 nIndex)
         setKeyPool.insert(nIndex);
     }
     if(fDebug)
-        printf("keypool return %"PRI64d"\n", nIndex);
+        printf("keypool return %" PRI64d"\n", nIndex);
 }
 
 bool CWallet::GetKeyFromPool(CPubKey& result, bool fAllowReuse)
@@ -2800,3 +2806,25 @@ ProofOfTx ProofOfTxSearch(unsigned int nBlockHeight)
     }
     return boost::make_tuple(fMatch, addrMiner);
 }
+
+
+void CWallet::ClearOrphans()
+ {
+     list<uint256> orphans;
+ 
+     LOCK(cs_wallet);
+     for(map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it)
+     {
+         const CWalletTx *wtx = &(*it).second;
+         if((wtx->IsCoinBase() || wtx->IsCoinStake()) && !wtx->IsInMainChain())
+         {
+           orphans.push_back(wtx->GetHash());
+         }
+     }
+ 
+     for(list<uint256>::const_iterator it = orphans.begin(); it != orphans.end(); ++it)
+     {
+         EraseFromWallet(*it);
+         UpdatedTransaction(*it);
+     }
+ }

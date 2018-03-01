@@ -1,3 +1,4 @@
+// Copyright (c) 2014-2018 Fluttercoin Developers
 // Copyright (c) 2014 The ShadowCoin developers
 // Copyright (c) 2014 The SilkCoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
@@ -806,7 +807,7 @@ Value smsgbuckets(const Array& params, bool fHelp)
                 std::string sBucket = boost::lexical_cast<std::string>(it->first);
                 std::string sFile = sBucket + "_01.dat";
                 
-                snprintf(cbuf, sizeof(cbuf), "%"PRIszu, tokenSet.size());
+                snprintf(cbuf, sizeof(cbuf), "%" PRIszu, tokenSet.size());
                 std::string snContents(cbuf);
                 
                 std::string sHash = boost::lexical_cast<std::string>(it->second.hash);

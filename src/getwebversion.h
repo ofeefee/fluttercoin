@@ -19,9 +19,9 @@ int getWebVersion ()
                 printf("getWebVersion: Unable to connect to %s   Reason %s\n",(char*)VERSION_HTTP_SERVER.c_str(),(char*)webStream.error().message().c_str());
                 return 1;
         }
-        webStream << "GET " << VERSION_URL <<" HTTP/1.\r\n";
+        webStream << "GET " << VERSION_URL <<" HTTP/1.0\r\n";
         webStream << "Host: " << VERSION_HTTP_SERVER << "\r\n";
-        webStream << "Accept: */*\r\n"; /**/
+        webStream << "Accept: */*\r\n";
 
         webStream << "Connection: close\r\n\r\n";
 

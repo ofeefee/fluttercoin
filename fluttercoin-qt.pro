@@ -27,16 +27,16 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 # Slax0r - Added for Max OS X Mavericks/Homebrew build
 macx: {
 BDB_LIB_SUFFIX = -5.3
-BOOST_INCLUDE_PATH=/usr/local/include
-BOOST_LIB_PATH=/usr/local/lib
-BDB_INCLUDE_PATH=/usr/local/include
-BDB_LIB_PATH=/usr/local/lib
+BOOST_INCLUDE_PATH=/usr/local/opt/boost@1.55/include
+BOOST_LIB_PATH=/usr/local/opt/boost@1.55/lib
+BDB_INCLUDE_PATH=/usr/local/opt/berkeley-db53/include
+BDB_LIB_PATH=/usr/local/opt/berkeley-db53/lib
 OPENSSL_INCLUDE_PATH=/usr/local/opt/openssl/include
 OPENSSL_LIB_PATH=/usr/local/opt/openssl/lib
-MINIUPNPC_INCLUDE_PATH=/usr/local/include
-MINIUPNPC_LIB_PATH=/usr/local/lib
-QRENCODE_INCLUDE_PATH=/usr/local/include
-QRENCODE_LIB_PATH=/usr/local/lib
+MINIUPNPC_INCLUDE_PATH=/usr/local/opt/miniupnpc/include
+MINIUPNPC_LIB_PATH=/usr/local/opt/miniupnpc/lib
+QRENCODE_INCLUDE_PATH=/usr/local/opt/libqrencode/include
+QRENCODE_LIB_PATH=/usr/local/opt/libqrencode/lib
 }
 
 OBJECTS_DIR = build
@@ -46,7 +46,7 @@ UI_DIR = build
 # use: qmake "RELEASE=1"
 contains(RELEASE, 1) {
     # Mac: compile for maximum compatibility (10.5, 32-bit)
-    #macx:QMAKE_CXXFLAGS += -mmacosx-version-min=10.5 -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk
+    macx:QMAKE_CXXFLAGS += -mmacosx-version-min=10.10 -arch x86_64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
 
 # Slaxor - Replaced the line above because version-min is 10.7 as this version of the SDK isnt even available anymore
 # and the removed arguments arent needed in modern build environments (ie the last 3 years)

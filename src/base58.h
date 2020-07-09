@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018 Fluttercoin Developers
+// Copyright (c) 2014-2020 Fluttercoin Developers
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin Developers
 // Distributed under the MIT/X11 software license, see the accompanying
